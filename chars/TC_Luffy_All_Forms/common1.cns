@@ -8,45 +8,6 @@ type = S
 physics = S
 sprpriority = 0
 
-[State 200, End]
-type = ChangeState
-trigger1 = time >=0
-trigger1 = var(51) = 6
-triggerall = AILevel
-triggerall=p2bodydist x<=60
-triggerall = RoundState = 2
-value = 70200
-ctrl = 1
-
-[State -3, Turn SS1]
-type = ChangeAnim
-trigger1 = var(51) = 3
-trigger1 = anim = 0
-value = 6000
-
-[State -3, Turn SS1]
-type = ChangeAnim
-trigger1 = var(51) = 4
-trigger1 = anim = 0
-value = 2000
-
-[State -3, Turn SS1]
-type = ChangeAnim
-trigger1 = var(51) = 5
-trigger1 = anim = 0
-value = 4000
-
-[State -3, Turn SS1]
-type = ChangeAnim
-trigger1 = var(51) = 6
-trigger1 = anim = 0
-value = 70000
-[State 0, RemoveExplod]
-type = RemoveExplod
-trigger1 = time = 0
-id = 1630
-ignorehitpause = 1
-;persistent =
 [State 0, RemoveExplod]
 type = RemoveExplod
 trigger1 = time = 0
@@ -154,11 +115,6 @@ value = 5050
 type    = C
 physics = C
 anim = 10+var(11)
-[State 0, ChangeState]
-type = ChangeState
-triggerall = var(51) = [0,2]
-trigger1 = Ctrl && AILevel && !AnimTime && Enemy,Life > 0
-Value = Cond(Pos y >= 0,2060,2060)
 
 [State 0, RemoveExplod]
 type = RemoveExplod
@@ -217,14 +173,6 @@ physics = C
 anim = 11+var(11)
 sprpriority = 0
 
-
-[State 0, ChangeState]
-type = ChangeState
-triggerall = var(51) = [0,2]
-trigger1 = Ctrl && AILevel && !AnimTime && Enemy,Life > 0
-Value = Cond(Pos y >= 0,2060,2060)
-
-
 [State 0, RemoveExplod]
 type = RemoveExplod
 triggerall = var(13) > 0
@@ -281,11 +229,6 @@ value = 11+var(11)
 type    = S
 physics = S
 anim = 12+var(11)
-[State 0, ChangeState]
-type = ChangeState
-triggerall = var(51) = [0,2]
-trigger1 = Ctrl && AILevel && !AnimTime && Enemy,Life > 0
-Value = Cond(Pos y >= 0,2060,2060)
 
 [State 0, RemoveExplod]
 type = RemoveExplod
@@ -1322,21 +1265,21 @@ volume = 50
 type = VelSet
 triggerall = var(2) = 0
 trigger1 = animelem = 2
-x = 60
+x = 30
 
 [State 0, VelSet]
 type = VelSet
 triggerall = pos y = 0
 triggerall = var(2) > 0
 trigger1 = animelem = 1
-x = 90
+x = 60
 
 [State 0, VelSet]
 type = VelSet
 triggerall = pos y < 0
 triggerall = var(2) > 0
 trigger1 = animelem = 1
-x = 90
+x = 30
 
 [State 0, Explosion]
 type = Explod
@@ -1366,13 +1309,13 @@ y = -2
 type = VelSet
 triggerall = var(2) > 0
 trigger1 = time = 13
-x = 9
+x = 2
 
 [State 0, VelSet]
 type = VelSet
 triggerall = var(2) = 0
 trigger1 = animelem = 4
-x = 9
+x = 2
 
 
 [State 0, Soru]
@@ -1420,38 +1363,36 @@ statetype = A
 movetype = I
 physics = A
 
-[State 200, End]
+; A
+[State -1, A]
 type = ChangeState
-trigger1 = time >=0
-triggerall = var(51) = [6,7]
-triggerall=p2bodydist x<=70
-value = 70200
-ctrl = 1
+triggerall = var(2) > 0
+value = ifelse(pos y >= 0,2200,2600)
+triggerall = time > 3
+trigger1 = command = "a"
+trigger2 = roundstate = 2 && ailevel > 0 && p2bodydist x < 30 && random < (ailevel * 100)
 
-
-[State 200,A Combo]
+; B
+[State -1, B]
 type = ChangeState
-triggerall = var(51) != [6,7]
-TriggerALL = Time >= 5
-Trigger1 = AiLevel = 0 && Command = "a"
-trigger2 = RoundState = 2 && AiLevel > 0 && Random<(ailevel * 100)/2
-Trigger2 = P2BodyDist x = [-30,50]
-Trigger2 = P2BodyDist y = [-30,30]
-value = cond(pos y>=0,200,600)
+triggerall = var(2) > 0
+value = ifelse(pos y >= 0,2300,2610)
+triggerall = time > 3
+trigger1 = command = "b"
+trigger2 = roundstate = 2 && ailevel > 0 && p2bodydist x < 30 && random < (ailevel * 100)/4
 
-[State 200,B Combo]
+; C
+[State -1, C]
 type = ChangeState
-triggerall = var(51) != [6,7]
-TriggerALL = Time >= 5
-Trigger1 = AiLevel = 0 && Command = "b"
-trigger2 = RoundState = 2 && AiLevel > 0 && Random<(ailevel * 100)/2
-Trigger2 = P2BodyDist x = [-30,50]
-Trigger2 = P2BodyDist y = [-30,30]
-value = cond(pos y>=0,300,610)
+value = 2620
+triggerall = var(2) > 0
+triggerall = time > 3
+trigger1 = command = "c"
+trigger2 = roundstate = 2 && ailevel > 0 && p2bodydist x < 30 && random < (ailevel * 100)/6
 
 [State 200, End]
 type = ChangeState
-trigger1 = animtime = 0
+trigger1 = ifelse(statetype = A,time = 13,animtime = 0)
 value = ifelse(statetype = A,50,0)
 ctrl = 1
 ;===============================================================================
@@ -1662,38 +1603,38 @@ type = VelSet
 triggerall = pos y = 0
 triggerall = var(2) > 0
 trigger1 = animelem = 1
-x = -90
+x = -60
 
 [State 0, VelSet]
 type = VelSet
 triggerall = pos y < 0
 triggerall = var(2) > 0
 trigger1 = animelem = 1
-x = -60
+x = -30
 
 [State 0, VelSet]
 type = VelSet
 triggerall = var(2) = 0
 trigger1 = animelem = 3
-x = -60
+x = -30
 
 [State 0, VelSet]
 type = VelSet
 triggerall = prevstateno = 50||prevstateno = 80
 trigger1 = animelem = 3
-y = -9
+y = -2
 
 [State 0, VelSet]
 type = VelSet
 triggerall = var(2) > 0
 trigger1 = time = 13
-x = -9
+x = -2
 
 [State 0, VelSet]
 type = VelSet
 triggerall = var(2) = 0
 trigger1 = animelem = 4
-x = -9
+x = -2
 
 [State 0, Soru]
 type = Explod
@@ -1751,7 +1692,7 @@ trigger2 = roundstate = 2 && ailevel > 0 && p2bodydist x < 40 && random < (ailev
 
 [State 200, End]
 type = ChangeState
-trigger1 = animtime = 0
+trigger1 = ifelse(statetype = A,time = 13,animtime = 0)
 value = ifelse(statetype = A,50,0)
 ctrl = 1
 ;===============================================================================
@@ -2023,45 +1964,32 @@ triggerall = time > 2
 trigger1 = pos y > 0
 value = 12
 
-[State 200,A Combo]
+; A
+[State -1, A]
 type = ChangeState
-triggerall = var(51) = 4
-TriggerALL = Time >= 5
-Trigger1 = AiLevel = 0 && Command = "a"
-trigger2 = RoundState = 2 && AiLevel > 0 && Random<(ailevel * 100)/2
-Trigger2 = P2BodyDist x = [-30,50]
-Trigger2 = P2BodyDist y = [-30,30]
-value = cond(pos y>=0,2200,2600)
+value = ifelse(pos y < 0,4515,4510)
+triggerall = time > 3
+trigger1 = command = "a"
+trigger2 = p2bodydist x = [30,230]
+trigger2 = p2bodydist y = [0,-15]
 
-[State 200,B Combo]
+; b
+[State -1, A]
 type = ChangeState
-triggerall = var(51) = 4
-TriggerALL = Time >= 5
-Trigger1 = AiLevel = 0 && Command = "b"
-trigger2 = RoundState = 2 && AiLevel > 0 && Random<(ailevel * 100)/2
-Trigger2 = P2BodyDist x = [-30,50]
-Trigger2 = P2BodyDist y = [-30,30]
-value = cond(pos y>=0,2300,2610)
+value = ifelse(pos y < 0,4521,4520)
+triggerall = time > 3
+trigger1 = command = "b"
+trigger2 = p2bodydist x = [30,230]
+trigger2 = p2bodydist y = [0,-15]
 
-[State 200,A Combo]
+; C
+[State -1, C]
 type = ChangeState
-triggerall = var(51) = 5
-TriggerALL = Time >= 5
-Trigger1 = AiLevel = 0 && Command = "a"
-trigger2 = RoundState = 2 && AiLevel > 0 && Random<(ailevel * 100)/2
-Trigger2 = P2BodyDist x = [-30,50]
-Trigger2 = P2BodyDist y = [-30,30]
-value = cond(pos y>=0,4200,4600)
-
-[State 200,B Combo]
-type = ChangeState
-triggerall = var(51) = 5
-TriggerALL = Time >= 5
-Trigger1 = AiLevel = 0 && Command = "b"
-trigger2 = RoundState = 2 && AiLevel > 0 && Random<(ailevel * 100)/2
-Trigger2 = P2BodyDist x = [-30,50]
-Trigger2 = P2BodyDist y = [-30,30]
-value = cond(pos y>=0,4300,4610)
+value = ifelse(pos y < 0,4415,4412)
+triggerall = time > 3
+trigger1 = command = "c"
+trigger2 = p2bodydist x = [15,189]
+trigger2 = p2bodydist y = [0,-15]
 
 [State 200, End]
 type = ChangeState
@@ -2746,14 +2674,6 @@ ctrl = 0
 anim = 100+var(11)
 sprpriority = -1
 
-[State 0, PosSet]
-type = PosSet
-trigger1 = 1
-y = 0
-;ignorehitpause = 
-;persistent = 
-
-
 ;=============================
 ; Super Armor
 [State 0, Super Armor]
@@ -2917,23 +2837,54 @@ triggerall = time > 2
 trigger1 = pos y > 0
 value = 12
 
-[State 200,A Combo]
+; A
+[State -1, A]
 type = ChangeState
-TriggerALL = Time >= 5
-Trigger1 = AiLevel = 0 && Command = "a"
-trigger2 = RoundState = 2 && AiLevel > 0 && Random<(ailevel * 100)/2
-Trigger2 = P2BodyDist x = [-30,50]
-Trigger2 = P2BodyDist y = [-30,30]
-value = cond(pos y>=0,6200,6600)
+triggerall = var(4)= 0
+value = 6250
+triggerall = time > 2
+trigger1 = command = "a"
+trigger2 = roundstate = 2 && ailevel > 0 && p2bodydist x < 70 && random < (ailevel * 100)
 
-[State 200,B Combo]
+; B
+[State -1, B]
 type = ChangeState
-TriggerALL = Time >= 5
-Trigger1 = AiLevel = 0 && Command = "b"
-trigger2 = RoundState = 2 && AiLevel > 0 && Random<(ailevel * 100)/2
-Trigger2 = P2BodyDist x = [-30,50]
-Trigger2 = P2BodyDist y = [-30,30]
-value = cond(pos y>=0,6444,6610)
+value = 6321
+triggerall = var(4)= 0
+triggerall = pos y = 0
+triggerall = time > 2
+trigger1 = command = "b"
+trigger2 = roundstate = 2 && ailevel > 0 && p2bodydist x < 55 && random < (ailevel * 100)
+
+; C
+[State -1, C]
+type = ChangeState
+value = 6420
+triggerall = var(4)= 0
+triggerall = pos y = 0
+triggerall = time > 2
+trigger1 = command = "c"
+trigger2 = roundstate = 2 && ailevel > 0 && p2bodydist x < 70 && random < (ailevel * 100)
+
+; Y
+[State -1, Y]
+type = ChangeState
+value = 6413
+triggerall = var(4)= 0
+triggerall = pos y = 0
+triggerall = time > 2
+trigger1 = command = "y"
+trigger2 = roundstate = 2 && ailevel > 0 && p2bodydist x < 155 && random < (ailevel * 100)
+
+; Z
+[State -1, Z]
+type = ChangeState
+value = 6414
+triggerall = var(4)= 0
+triggerall = pos y = 0
+triggerall = time > 2
+trigger1 = command = "z"
+trigger2 = roundstate = 2 && ailevel > 0 && p2bodydist x < 50 && random < (ailevel * 100)
 
 [State 200, End]
 type = ChangeState
@@ -4229,6 +4180,16 @@ value = 52
 type = U    ;Leave state type unchanged
 physics = U ;Leave physics unchanged
 
+;------------------------------------------
+;Red Guard
+[State 0, Guard]
+Type = NotHitBy
+triggerall = var(16) > 0
+Trigger1 = 1
+value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT,AA,AP,AT
+Time = 10
+IgnoreHitPause = 1
+;----------------------------------------------
 
 [State 0, NotHitBy]
 Type = NotHitBy
@@ -4305,8 +4266,17 @@ value = 140
 type    = S
 physics = S
 
+;------------------------------------------
+;Red Guard
+[State 0, Guard]
+Type = NotHitBy
+triggerall = var(16) > 0
+Trigger1 = 1
+value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT,AA,AP,AT
+Time = 10
+IgnoreHitPause = 1
 [State Guard]
-type = null
+type = ReversalDef
 triggerall = var(16) > 0
 trigger1 = 1
 reversal.attr =  SCA,NA,NP,NT,SA,HA,SP,HP,ST,HT,AA,AP,AT
@@ -4365,8 +4335,16 @@ type    = C
 physics = C
 
 ;------------------------------------------
+;Red Guard
+[State 0, Guard]
+Type = NotHitBy
+triggerall = var(16) > 0
+Trigger1 = 1
+value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT,AA,AP,AT
+Time = 10
+IgnoreHitPause = 1
 [State Guard]
-type = null
+type = ReversalDef
 triggerall = var(16) > 0
 trigger1 = 1
 reversal.attr =  SCA,NA,NP,NT,SA,HA,SP,HP,ST,HT,AA,AP,AT
@@ -4424,8 +4402,17 @@ value = 140
 type    = A
 physics = N
 
+;------------------------------------------
+;Red Guard
+[State 0, Guard]
+Type = NotHitBy
+triggerall = var(16) > 0
+Trigger1 = 1
+value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT,AA,AP,AT
+Time = 10
+IgnoreHitPause = 1
 [State Guard]
-type = null
+type = ReversalDef
 triggerall = var(16) > 0
 trigger1 = 1
 reversal.attr =  SCA,NA,NP,NT,SA,HA,SP,HP,ST,HT,AA,AP,AT
@@ -4511,6 +4498,15 @@ type = U    ;Leave state type unchanged
 physics = U ;Leave physics unchanged
 ctrl = 1
 
+;------------------------------------------
+;Red Guard
+[State 0, Guard]
+Type = NotHitBy
+triggerall = var(16) > 0
+Trigger1 = 1
+value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT,AA,AP,AT
+Time = 10
+IgnoreHitPause = 1
 ;----------------------------------------------
 
 [State 0, NotHitBy]
@@ -4591,7 +4587,7 @@ value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT,AA,AP,AT
 Time = 10
 IgnoreHitPause = 1
 [State Guard]
-type = null
+type = ReversalDef
 triggerall = var(16) > 0
 trigger1 = 1
 reversal.attr =  SCA,NA,NP,NT,SA,HA,SP,HP,ST,HT,AA,AP,AT
@@ -4672,7 +4668,7 @@ value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT,AA,AP,AT
 Time = 10
 IgnoreHitPause = 1
 [State Guard]
-type = null
+type = ReversalDef
 triggerall = var(16) > 0
 trigger1 = 1
 reversal.attr =  SCA,NA,NP,NT,SA,HA,SP,HP,ST,HT,AA,AP,AT
@@ -4765,7 +4761,7 @@ value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT,AA,AP,AT
 Time = 10
 IgnoreHitPause = 1
 [State Guard]
-type = null
+type = ReversalDef
 triggerall = var(16) > 0
 trigger1 = 1
 reversal.attr =  SCA,NA,NP,NT,SA,HA,SP,HP,ST,HT,AA,AP,AT
@@ -4846,7 +4842,7 @@ value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT,AA,AP,AT
 Time = 10
 IgnoreHitPause = 1
 [State Guard]
-type = null
+type = ReversalDef
 triggerall = var(16) > 0
 trigger1 = 1
 reversal.attr =  SCA,NA,NP,NT,SA,HA,SP,HP,ST,HT,AA,AP,AT
@@ -4939,7 +4935,7 @@ value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT,AA,AP,AT
 Time = 10
 IgnoreHitPause = 1
 [State Guard]
-type = null
+type = ReversalDef
 triggerall = var(16) > 0
 trigger1 = 1
 reversal.attr =  SCA,NA,NP,NT,SA,HA,SP,HP,ST,HT,AA,AP,AT
@@ -5008,7 +5004,7 @@ value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT,AA,AP,AT
 Time = 10
 IgnoreHitPause = 1
 [State Guard]
-type = null
+type = ReversalDef
 triggerall = var(16) > 0
 trigger1 = 1
 reversal.attr =  SCA,NA,NP,NT,SA,HA,SP,HP,ST,HT,AA,AP,AT

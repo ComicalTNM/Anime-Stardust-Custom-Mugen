@@ -578,6 +578,36 @@ trigger1 = ctrl
 ;--------------------------------Ataques Supers-----------------------------
 ;===========================================================================
 ;---------------------------------------------------------------------------
+; Gear4
+[State -1, Gear4]
+type = ChangeState
+triggerall = life > 300
+triggerall = power >= 3000
+Triggerall = var(16) = 0
+Triggerall = var(2) = 0
+Triggerall = var(6) = 0
+Triggerall = var(13) = 0
+triggerall = var(14) = 0
+value = 900
+triggerall = command = "BoundMan"
+Triggerall = statetype != A
+trigger1 = ctrl
+;---------------------------------------------------------------------------
+; Gear4 - SnakeMan
+[State -1, Gear4 - SnakeMan]
+type = ChangeState
+triggerall = life > 300
+triggerall = power >= 3000
+Triggerall = var(16) = 0
+Triggerall = var(13) = 0
+Triggerall = var(2) = 0
+Triggerall = var(6) = 0
+triggerall = var(14) = 0
+value = 901
+triggerall = command = "SnakeMan"
+Triggerall = statetype != A
+trigger1 = ctrl
+;---------------------------------------------------------------------------
 ; Gear 4 - TankMan
 [State -1, Gear 5]
 type = ChangeState
@@ -593,13 +623,41 @@ triggerall = command = "x"
 Triggerall = statetype != A
 trigger1 = ctrl
 ;---------------------------------------------------------------------------
+; Nightmare
+[State -1, Nightmare]
+type = ChangeState
+triggerall = power >= 3000
+Triggerall = var(16) = 0
+Triggerall = var(14) = 0
+Triggerall = var(13) = 0
+Triggerall = var(2) = 0
+value = 5999
+triggerall = command != "holddown"
+triggerall = command = "Nightmare"
+Triggerall = statetype != A
+trigger1 = ctrl
+;---------------------------------------------------------------------------
+; Gear 5
+[State -1, Gear 5]
+type = ChangeState
+value = 69999
+triggerall = power >= 3000
+Triggerall = var(16) = 0
+Triggerall = var(14) = 0
+Triggerall = var(13) = 0
+Triggerall = var(2) = 0
+triggerall = command = "holddown"
+triggerall = command = "s"
+Triggerall = statetype != A
+trigger1 = ctrl
+;---------------------------------------------------------------------------
 ; King Kong Gun
 [State -1, King Kong Gun]
 type = ChangeState
 triggerall = var(6) = 0
 triggerall = life > 200
 triggerall = power >= 3000
-triggerall = var(51) = 4
+Triggerall = var(2) > 0
 value = 3300
 triggerall = command = "x"
 Triggerall = statetype != A
@@ -610,7 +668,7 @@ trigger1 = ctrl
 type = ChangeState
 triggerall = var(2) = 0
 triggerall = var(6) = 0
-triggerall = var(51) = 5
+triggerall = var(13) > 0
 triggerall = var(14) = 0
 triggerall = power >= 3000
 value = 43005
@@ -676,7 +734,10 @@ trigger1 = ctrl
 ; Red Hawk
 [State -1, Red Hawk]
 type = ChangeState
-triggerall = var(51) = [0,2]
+triggerall = var(2) = 0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 Triggerall = power >= 1000
 value = 1000
 triggerall = command = "Red Hawk"
@@ -687,7 +748,8 @@ trigger2 = numhelper(700) > 0
 ; Kong Gun
 [State -1, Kong Gun]
 type = ChangeState
-triggerall = var(51) = 4
+triggerall = var(6) = 0
+triggerall = var(2) > 0
 Triggerall = power >= 1000
 value = 41000
 triggerall = command = "Red Hawk"
@@ -697,7 +759,11 @@ trigger2 = numhelper(700) > 0
 ; Jet Culverin Short Distance
 [State -1, Jet Culverin Short Distance]
 type = ChangeState
-triggerall = var(51) = 5
+triggerall = var(2) = 0
+triggerall = var(6) = 0
+triggerall = var(13) > 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 Triggerall = power >= 1000
 value = 41101
 triggerall = command = "Red Hawk"
@@ -709,7 +775,11 @@ trigger2 = numhelper(700) > 0
 ; Jet Culverin
 [State -1, Jet Culverin]
 type = ChangeState
-triggerall = var(51) = 5
+triggerall = var(2) = 0
+triggerall = var(6) = 0
+triggerall = var(13) > 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 Triggerall = power >= 1000
 value = 4999
 triggerall = command = "Red Hawk"
@@ -721,7 +791,11 @@ trigger2 = numhelper(700) > 0
 ; Jet Culverin Air
 [State -1, Jet Culverin Air]
 type = ChangeState
-triggerall = var(51) = 5
+triggerall = var(2) = 0
+triggerall = var(6) = 0
+triggerall = var(13) > 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 Triggerall = power >= 1000
 value = 41101
 triggerall = command = "Red Hawk"
@@ -731,7 +805,10 @@ trigger2 = numhelper(700) > 0
 ; Gear Thrid Smash
 [State -1, Gear Thrid Smash]
 type = ChangeState
-triggerall = var(51) = [0,2]
+triggerall = var(2) = 0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 Triggerall = power >= 1000
 value = 1800
 triggerall = command = "Red Hawk"
@@ -741,7 +818,10 @@ trigger1 = ctrl
 ; Jet Riffle
 [State -1, Jet Riffle]
 type = ChangeState
-triggerall = var(51) = [0,2]
+triggerall = var(2) = 0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 Triggerall = power >= 1000
 value = 1100
 triggerall = command = "Jet Pistol"
@@ -752,7 +832,8 @@ trigger2 = numhelper(700) > 0
 ; Rino Schneide
 [State -1, Rino Schneide]
 type = ChangeState
-triggerall = var(51) = 4
+triggerall = var(6) = 0
+triggerall = var(2) > 0
 Triggerall = power >= 1000
 value = 42000
 triggerall = command = "Jet Pistol"
@@ -762,7 +843,11 @@ trigger2 = numhelper(700) > 0
 ; Leg Culverin
 [State -1, Leg Culverin]
 type = ChangeState
-triggerall = var(51) = 5
+triggerall = var(2) = 0
+triggerall = var(6) = 0
+triggerall = var(13) > 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 Triggerall = power >= 1000
 value = 41499
 triggerall = command = "Jet Pistol"
@@ -774,7 +859,11 @@ trigger2 = numhelper(700) > 0
 ; Leg Culverin Short Distance
 [State -1, Leg Culverin Short Distance]
 type = ChangeState
-triggerall = var(51) = 5
+triggerall = var(2) = 0
+triggerall = var(6) = 0
+triggerall = var(13) > 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 Triggerall = power >= 1000
 value = 41501
 triggerall = command = "Jet Pistol"
@@ -786,7 +875,11 @@ trigger2 = numhelper(700) > 0
 ; Leg Culverin Air
 [State -1, Leg Culverin Air]
 type = ChangeState
-triggerall = var(51) = 5
+triggerall = var(2) = 0
+triggerall = var(6) = 0
+triggerall = var(13) > 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 Triggerall = power >= 1000
 value = 41502
 triggerall = command = "Jet Pistol"
@@ -797,7 +890,10 @@ trigger2 = numhelper(700) > 0
 [State -1, Haoshoku Haki]
 type = ChangeState
 triggerall = var(6) = 0
-triggerall = var(51) = [0,2]
+triggerall = var(2) = 0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 triggerall = numhelper(1260) = 0
 Triggerall = power >= 1000
 value = 1200
@@ -809,7 +905,8 @@ trigger2 = numhelper(700) > 0
 ; Calverin
 [State -1, Culverin]
 type = ChangeState
-triggerall = var(51) = 4
+triggerall = var(6) = 0
+triggerall = var(2) > 0
 Triggerall = power >= 1000
 value = 44000
 triggerall = command = "Haoshoku Haki"
@@ -819,7 +916,11 @@ trigger2 = numhelper(700) > 0
 ; Double Culverins
 [State -1, Double Culverins]
 type = ChangeState
-triggerall = var(51) = 5
+triggerall = var(2) = 0
+triggerall = var(6) = 0
+triggerall = var(13) > 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 Triggerall = power >= 1500
 value = 41649
 triggerall = command = "Haoshoku Haki"
@@ -831,7 +932,11 @@ trigger2 = numhelper(700) > 0
 ; Double Culverins Short Distance
 [State -1, Double Culverins Short Distance]
 type = ChangeState
-triggerall = var(51) = 5
+triggerall = var(2) = 0
+triggerall = var(6) = 0
+triggerall = var(13) > 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 Triggerall = power >= 1500
 value = 41651
 triggerall = command = "Haoshoku Haki"
@@ -843,7 +948,11 @@ trigger2 = numhelper(700) > 0
 ; Double Culverins Air
 [State -1, Double Culverins Air]
 type = ChangeState
-triggerall = var(51) = 5
+triggerall = var(2) = 0
+triggerall = var(6) = 0
+triggerall = var(13) > 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 Triggerall = power >= 1500
 value = 41651
 triggerall = command = "Haoshoku Haki"
@@ -854,7 +963,10 @@ trigger2 = numhelper(700) > 0
 [State -1, Kenbunshoku Haki]
 type = ChangeState
 triggerall = var(6) = 0
-triggerall = var(51) = [0,2]
+triggerall = var(2) = 0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 triggerall = numhelper(1360) = 0
 triggerall = numhelper(1350) = 0
 Triggerall = power >= 1000
@@ -866,7 +978,7 @@ trigger1 = ctrl
 ; Taunt
 [State -1, Taunt]
 type = ChangeState
-triggerall = var(51) = 4
+triggerall = var(2) > 0
 Triggerall = power >= 1000
 value = 45000
 triggerall = command = "Kenbunshoku Haki"
@@ -875,7 +987,11 @@ trigger1 = ctrl
 ; Jet Python Short Distance
 [State -1, Jet Python Short Distance]
 type = ChangeState
-triggerall = var(51) = 5
+triggerall = var(2) = 0
+triggerall = var(6) = 0
+triggerall = var(13) > 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 Triggerall = power >= 1000
 value = 41851
 triggerall = command = "Kenbunshoku Haki"
@@ -887,7 +1003,11 @@ trigger2 = numhelper(700) > 0
 ; Jet Python
 [State -1, Jet Python]
 type = ChangeState
-triggerall = var(51) = 5
+triggerall = var(2) = 0
+triggerall = var(6) = 0
+triggerall = var(13) > 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 Triggerall = power >= 1000
 value = 41849
 triggerall = command = "Kenbunshoku Haki"
@@ -899,7 +1019,11 @@ trigger2 = numhelper(700) > 0
 ; Jet Python Air
 [State -1, Jet Python Air]
 type = ChangeState
-triggerall = var(51) = 5
+triggerall = var(2) = 0
+triggerall = var(6) = 0
+triggerall = var(13) > 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 Triggerall = power >= 1500
 value = 41851
 triggerall = command = "Kenbunshoku Haki"
@@ -909,7 +1033,10 @@ trigger2 = numhelper(700) > 0
 ; Jet Hammer
 [State -1, Jet Hammer]
 type = ChangeState
-triggerall = var(51) = [0,2]
+triggerall = var(2) = 0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 Triggerall = power >= 1000
 value = 1900
 triggerall = command = "Kenbunshoku Haki"
@@ -919,7 +1046,10 @@ trigger1 = ctrl
 ; Jet Gatoringu
 [State -1, Jet Gatoringu]
 type = ChangeState
-triggerall = var(51) = [0,2]
+triggerall = var(2) = 0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 Triggerall = power >= 1000
 value = 1600
 triggerall = command = "Hawk Gatling"
@@ -930,7 +1060,7 @@ trigger2 = numhelper(700) > 0
 ; Kong Organ
 [State -1, Kong Organ]
 type = ChangeState
-triggerall = var(51) = 4
+triggerall = var(2) > 0
 Triggerall = power >= 1500
 value = 46000
 triggerall = command = "Hawk Gatling"
@@ -942,7 +1072,7 @@ trigger2 = numhelper(700) > 0
 type = ChangeState
 triggerall = var(2) = 0
 triggerall = var(6) = 0
-triggerall = var(51) = 5
+triggerall = var(13) > 0
 Triggerall = power >= 2000
 value = 42950
 triggerall = command = "Hawk Gatling"
@@ -952,7 +1082,10 @@ trigger2 = numhelper(700) > 0
 ; Eagle Bazooka
 [State -1, Eagle Bazooka]
 type = ChangeState
-triggerall = var(51) = [0,2]
+triggerall = var(2) = 0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 Triggerall = power >= 1500
 value = 1400
 triggerall = command = "Eagle Bazooka"
@@ -963,7 +1096,8 @@ trigger2 = numhelper(700) > 0
 ; Leo Bazooka
 [State -1, Leo Bazooka]
 type = ChangeState
-triggerall = var(51) = 4
+triggerall = var(6) = 0
+triggerall = var(2) > 0
 Triggerall = power >= 2000
 value = 43000
 triggerall = command = "Eagle Bazooka"
@@ -975,7 +1109,7 @@ trigger2 = numhelper(700) > 0
 type = ChangeState
 triggerall = var(2) = 0
 triggerall = var(6) = 0
-triggerall = var(51) = 5
+triggerall = var(13) > 0
 Triggerall = power >= 2500
 value = 42500
 triggerall = command = "Eagle Bazooka"
@@ -986,7 +1120,10 @@ trigger2 = numhelper(700) > 0
 ; Jet Bazooka
 [State -1, Jet Bazooka]
 type = ChangeState
-triggerall = var(51) = [0,2]
+triggerall = var(2) = 0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 Triggerall = power >= 1000
 value = 1700
 triggerall = command = "Eagle Bazooka"
@@ -997,7 +1134,10 @@ trigger2 = numhelper(700) > 0
 ; Hawk Gatling
 [State -1, Hawk Gatling]
 type = ChangeState
-triggerall = var(51) = [0,2]
+triggerall = var(2) = 0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 Triggerall = power >= 1500
 value = 1500
 triggerall = command = "Hawk Gatling"
@@ -1008,7 +1148,11 @@ trigger2 = numhelper(700) > 0
 ; Jet Culverin Gattling
 [State -1, Jet Culverin Gattling]
 type = ChangeState
-triggerall = var(51) = 5
+triggerall = var(2) = 0
+triggerall = var(6) = 0
+triggerall = var(13) > 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 Triggerall = power >= 1500
 value = 43550
 triggerall = command = "Jet Culverin Gatling"
@@ -1020,7 +1164,7 @@ trigger2 = numhelper(700) > 0
 type = ChangeState
 triggerall = var(2) = 0
 triggerall = var(6) = 0
-triggerall = var(51) = 5
+triggerall = var(13) > 0
 triggerall = var(14) = 0
 Triggerall = power >= 2000
 value = 41950
@@ -1031,7 +1175,11 @@ trigger2 = numhelper(700) > 0
 ; Python Deformed
 [State -1, Python Deformed]
 type = ChangeState
-triggerall = var(51) = 5
+triggerall = var(2) = 0
+triggerall = var(6) = 0
+triggerall = var(13) > 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 Triggerall = power >= 2500
 value = 43500
 triggerall = command = "Python Deformed"
@@ -1041,7 +1189,10 @@ trigger2 = numhelper(700) > 0
 ; Nightmare Arrow
 [State -1, Nightmare Arrow]
 type = ChangeState
-triggerall = var(51) = 3
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) > 0
+triggerall = var(16) = 0
 Triggerall = power >= 1000
 value = 641000
 triggerall = command = "Red Hawk"
@@ -1052,7 +1203,10 @@ trigger2 = numhelper(700) > 0
 ; Nightmare FireBall
 [State -1, Nightmare FireBall]
 type = ChangeState
-triggerall = var(51) = 3
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) > 0
+triggerall = var(16) = 0
 Triggerall = power >= 1000
 value = 644000
 triggerall = command = "Jet Pistol"
@@ -1063,7 +1217,10 @@ trigger2 = numhelper(700) > 0
 ; Nightmare Dash Cut
 [State -1, Nightmare Dash Cut]
 type = ChangeState
-triggerall = var(51) = 3
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) > 0
+triggerall = var(16) = 0
 Triggerall = power >= 1000
 value = 61204
 triggerall = command = "Haoshoku Haki"
@@ -1074,7 +1231,10 @@ trigger2 = numhelper(700) > 0
 ; Nightmare Gattling Gun
 [State -1, Nightmare Gattling Gun]
 type = ChangeState
-triggerall = var(51) = 3
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) > 0
+triggerall = var(16) = 0
 Triggerall = power >= 1850
 value = 64998
 triggerall = command = "Kenbunshoku Haki"
@@ -1087,7 +1247,10 @@ trigger2 = numhelper(700) > 0
 type = ChangeState
 value = 64300
 Triggerall = power >= 2000
-triggerall = var(51) = 3
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) > 0
+triggerall = var(16) = 0
 triggerall = command = "Eagle Bazooka"
 Triggerall = statetype != A
 trigger1 = ctrl
@@ -1097,7 +1260,10 @@ trigger1 = ctrl
 type = ChangeState
 value = 640000
 Triggerall = power >= 2000
-triggerall = var(51) = 3
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) > 0
+triggerall = var(16) = 0
 triggerall = command = "Hawk Gatling"
 Triggerall = statetype != A
 trigger1 = ctrl
@@ -1107,7 +1273,10 @@ trigger1 = ctrl
 type = ChangeState
 value = 6866
 Triggerall = power >= 500
-triggerall = var(51) = 3
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) > 0
+triggerall = var(16) = 0
 triggerall = command = "Jet Python Left Arm"
 Triggerall = statetype != A
 trigger1 = ctrl
@@ -1117,7 +1286,10 @@ trigger1 = ctrl
 type = ChangeState
 value = 6920
 Triggerall = power >= 2300
-triggerall = var(51) = 3
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) > 0
+triggerall = var(16) = 0
 triggerall = command = "Sword MAX"
 Triggerall = statetype != A
 trigger1 = ctrl
@@ -1127,7 +1299,10 @@ trigger1 = ctrl
 type = ChangeState
 value = 6925
 Triggerall = power >= 2000
-triggerall = var(51) = 3
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) > 0
+triggerall = var(16) = 0
 triggerall = command = "Jet Culverin Gatling"
 Triggerall = statetype != A
 trigger1 = ctrl
@@ -1137,7 +1312,10 @@ trigger1 = ctrl
 type = ChangeState
 value = 6930
 Triggerall = power >= 2000
-triggerall = var(51) = 3
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) > 0
+triggerall = var(16) = 0
 triggerall = command = "Python Deformed"
 Triggerall = statetype != A
 trigger1 = ctrl
@@ -1145,7 +1323,10 @@ trigger1 = ctrl
 ; Nightmare Arrow Air
 [State -1, Nightmare Arrow Air]
 type = ChangeState
-triggerall = var(51) = 3
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) > 0
+triggerall = var(16) = 0
 Triggerall = power >= 1000
 value = 6945
 triggerall = command = "Red Hawk"
@@ -1155,7 +1336,10 @@ trigger1 = ctrl
 ; Nightmare Gattling Gun Air
 [State -1, Nightmare Gattling Gun Air]
 type = ChangeState
-triggerall = var(51) = 3
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) > 0
+triggerall = var(16) = 0
 Triggerall = power >= 1500
 value = 6941
 triggerall = command = "Kenbunshoku Haki"
@@ -1167,7 +1351,10 @@ trigger1 = ctrl
 type = ChangeState
 value = 6940
 Triggerall = power >= 2400
-triggerall = var(51) = 3
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) > 0
+triggerall = var(16) = 0
 triggerall = command = "x"
 Triggerall = statetype = A
 trigger1 = ctrl
@@ -1177,7 +1364,10 @@ trigger1 = ctrl
 type = ChangeState
 value = 71000
 Triggerall = power >= 1000
-triggerall = var(51) = 6
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) > 0
 triggerall = command = "Red Hawk"
 Triggerall = statetype != A
 trigger1 = ctrl
@@ -1187,7 +1377,10 @@ trigger1 = ctrl
 type = ChangeState
 value = 71150
 Triggerall = power >= 1000
-triggerall = var(51) = 6
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) > 0
 triggerall = command = "Jet Pistol"
 Triggerall = statetype != A
 trigger1 = ctrl
@@ -1197,7 +1390,10 @@ trigger1 = ctrl
 type = ChangeState
 value = 71170
 Triggerall = power >= 1000
-triggerall = var(51) = 6
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) > 0
 triggerall = command = "Kenbunshoku Haki"
 trigger1 = ctrl
 ;---------------------------------------------------------------------------
@@ -1206,7 +1402,10 @@ trigger1 = ctrl
 type = ChangeState
 value = 71682
 Triggerall = power >= 1000
-triggerall = var(51) = 6
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) > 0
 triggerall = command = "Haoshoku Haki"
 trigger1 = ctrl
 ;---------------------------------------------------------------------------
@@ -1215,7 +1414,10 @@ trigger1 = ctrl
 type = ChangeState
 value = 71350
 Triggerall = power >= 2000
-triggerall = var(51) = 6
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) > 0
 triggerall = command = "Eagle Bazooka"
 trigger1 = ctrl
 ;---------------------------------------------------------------------------
@@ -1224,7 +1426,10 @@ trigger1 = ctrl
 type = ChangeState
 value = 71500
 Triggerall = power >= 2000
-triggerall = var(51) = 6
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) > 0
 triggerall = command = "Hawk Gatling"
 trigger1 = ctrl
 ;---------------------------------------------------------------------------
@@ -1233,7 +1438,10 @@ trigger1 = ctrl
 type = ChangeState
 value = 71550
 Triggerall = power >= 1000
-triggerall = var(51) = 6
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) > 0
 triggerall = command = "Sword MAX"
 trigger1 = ctrl
 ;---------------------------------------------------------------------------
@@ -1242,7 +1450,10 @@ trigger1 = ctrl
 type = ChangeState
 value = 71560
 Triggerall = power >= 1000
-triggerall = var(51) = 6
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) > 0
 triggerall = command = "Jet Python Left Arm"
 trigger1 = ctrl
 ;---------------------------------------------------------------------------
@@ -1251,7 +1462,10 @@ trigger1 = ctrl
 type = ChangeState
 value = 71570
 Triggerall = power >= 1000
-triggerall = var(51) = 6
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) > 0
 triggerall = command = "Jet Culverin Gatling"
 trigger1 = ctrl
 ;---------------------------------------------------------------------------
@@ -1260,7 +1474,10 @@ trigger1 = ctrl
 type = ChangeState
 value = 71615
 Triggerall = power >= 1000
-triggerall = var(51) = 6
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) > 0
 triggerall = command = "Python Deformed"
 trigger1 = ctrl
 ;===========================================================================
@@ -1270,8 +1487,11 @@ trigger1 = ctrl
 [State -1, A]
 type = ChangeState
 value = 200
-
-triggerall = var(51) = [0,2]
+type = PlaySnd
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 triggerall = command != "holddown"
 triggerall = command = "a"
 Triggerall = statetype != A
@@ -1281,8 +1501,8 @@ trigger1 = ctrl
 [State -1, A]
 type = ChangeState
 value = 2200
-
-triggerall = var(51) = 4
+type = PlaySnd
+triggerall = var(2) > 0
 triggerall = command != "holddown"
 triggerall = command = "a"
 Triggerall = statetype != A
@@ -1292,7 +1512,7 @@ trigger1 = ctrl
 [State -1, G4 A - Down]
 type = ChangeState
 value = 2221
-triggerall = var(51) = 4
+triggerall = var(2) > 0
 triggerall = command = "holddown"
 triggerall = command = "a"
 trigger1 = ctrl
@@ -1301,8 +1521,8 @@ trigger1 = ctrl
 [State -1, SnakeMan - A]
 type = ChangeState
 value = 4200
-
-triggerall = var(51) = 5
+type = PlaySnd
+triggerall = var(13) > 0
 triggerall = command != "holddown"
 triggerall = command = "a"
 Triggerall = statetype != A
@@ -1312,7 +1532,7 @@ trigger1 = ctrl
 [State -1, A - Down SnakeMan]
 type = ChangeState
 value = 4510
-triggerall = var(51) = 5
+triggerall = var(13) > 0
 triggerall = command = "holddown"
 triggerall = command = "a"
 Triggerall = statetype != A
@@ -1322,7 +1542,7 @@ trigger1 = ctrl
 [State -1, A - Down SnakeMan Air]
 type = ChangeState
 value = 4515
-triggerall = var(51) = 5
+triggerall = var(13) > 0
 triggerall = command = "holddown"
 triggerall = command = "a"
 Triggerall = statetype = A
@@ -1332,7 +1552,10 @@ trigger1 = ctrl
 [State -1, B]
 type = ChangeState
 value = 300
-triggerall = var(51) = [0,2]
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 triggerall = command != "holddown"
 triggerall = command = "b"
 Triggerall = statetype != A
@@ -1342,7 +1565,7 @@ trigger1 = ctrl
 [State -1, B]
 type = ChangeState
 value = 2300
-triggerall = var(51) = 4
+triggerall = var(2) > 0
 triggerall = command != "holddown"
 triggerall = command = "b"
 Triggerall = statetype != A
@@ -1352,7 +1575,7 @@ trigger1 = ctrl
 [State -1, G4 B - Down]
 type = ChangeState
 value = 2321
-triggerall = var(51) = 4
+triggerall = var(2) > 0
 triggerall = command = "holddown"
 triggerall = command = "b"
 trigger1 = ctrl
@@ -1361,8 +1584,8 @@ trigger1 = ctrl
 [State -1, SnakeMan - B]
 type = ChangeState
 value = 4300
-
-triggerall = var(51) = 5
+type = PlaySnd
+triggerall = var(13) > 0
 triggerall = command != "holddown"
 triggerall = command = "b"
 Triggerall = statetype != A
@@ -1372,7 +1595,7 @@ trigger1 = ctrl
 [State -1, B - Down SnakeMan]
 type = ChangeState
 value = 4520
-triggerall = var(51) = 5
+triggerall = var(13) > 0
 triggerall = command = "holddown"
 triggerall = command = "b"
 Triggerall = statetype != A
@@ -1382,7 +1605,7 @@ trigger1 = ctrl
 [State -1, B - Down SnakeMan Air]
 type = ChangeState
 value = 4521
-triggerall = var(51) = 5
+triggerall = var(13) > 0
 triggerall = command = "holddown"
 triggerall = command = "b"
 Triggerall = statetype = A
@@ -1392,7 +1615,10 @@ trigger1 = ctrl
 [State -1, C]
 type = ChangeState
 value = 400
-triggerall = var(51) = [0,2]
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 triggerall = command != "holddown"
 triggerall = command = "c"
 Triggerall = statetype != A
@@ -1402,7 +1628,7 @@ trigger1 = ctrl
 [State -1, C]
 type = ChangeState
 value = 2400
-triggerall = var(51) = 4
+triggerall = var(2) > 0
 triggerall = command != "holddown"
 triggerall = command = "c"
 Triggerall = statetype != A
@@ -1412,7 +1638,7 @@ trigger1 = ctrl
 [State -1, SnakeMan - C]
 type = ChangeState
 value = 4400
-triggerall = var(51) = 5
+triggerall = var(13) > 0
 triggerall = command != "holddown"
 triggerall = command = "c"
 Triggerall = statetype != A
@@ -1422,7 +1648,7 @@ trigger1 = ctrl
 [State -1, C - Down SnakeMan]
 type = ChangeState
 value = 4412
-triggerall = var(51) = 5
+triggerall = var(13) > 0
 triggerall = command = "holddown"
 triggerall = command = "c"
 Triggerall = statetype != A
@@ -1432,7 +1658,7 @@ trigger1 = ctrl
 [State -1, C - Down SnakeMan Air]
 type = ChangeState
 value = 4415
-triggerall = var(51) = 5
+triggerall = var(13) > 0
 triggerall = command = "holddown"
 triggerall = command = "c"
 Triggerall = statetype = A
@@ -1441,15 +1667,21 @@ trigger1 = ctrl
 ; SnakeMan - Y
 [State -1, SnakeMan - Y]
 type = ChangeState
-value = 70159
-triggerall = var(51) = 6
+value = 4632
+type = PlaySnd
+triggerall = var(13) > 0
+triggerall = command != "holddown"
 triggerall = command = "y"
+Triggerall = statetype != A
 trigger1 = ctrl
 ;---------------------------------------------------------------------------
 ; Power Charge
 [State -1, Power Charge]
 type = ChangeState
-triggerall = var(51) = [0,2]
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 Triggerall = power < 3000
 value = 500
 triggerall = command = "s"
@@ -1459,7 +1691,12 @@ trigger1 = ctrl
 ; Aire
 [State -1, Aire]
 type = ChangeState
-triggerall = var(51) = [0,2]
+triggerall = var(6) = 0
+triggerall = var(2)=0
+triggerall = var(5) = 0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 value = 600
 triggerall = command = "a"
 Triggerall = statetype = A
@@ -1468,7 +1705,7 @@ trigger1 = ctrl
 ; G4 Aire
 [State -1, Aire]
 type = ChangeState
-triggerall = var(51) = 4
+triggerall = var(2) > 0
 value = 2600
 triggerall = command = "a"
 Triggerall = statetype = A
@@ -1477,7 +1714,7 @@ trigger1 = ctrl
 ; SnakeMan - Aire - A
 [State -1, SnakeMan - Aire - A]
 type = ChangeState
-triggerall = var(51) = 5
+triggerall = var(13) > 0
 value = 4600
 triggerall = command = "a"
 Triggerall = statetype = A
@@ -1486,7 +1723,11 @@ trigger1 = ctrl
 ; Aire 2
 [State -1, Aire]
 type = ChangeState
-triggerall = var(51) = [0,2]
+triggerall = var(2) = 0
+triggerall = var(5) = 0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 value = 610
 triggerall = command = "b"
 Triggerall = statetype = A
@@ -1495,7 +1736,7 @@ trigger1 = ctrl
 ; G4 Aire 2
 [State -1, Aire]
 type = ChangeState
-triggerall = var(51) = 4
+triggerall = var(2) > 0
 triggerall = var(5) = 0
 value = 2610
 triggerall = command = "b"
@@ -1505,7 +1746,7 @@ trigger1 = ctrl
 ; SnakeMan - Aire - B
 [State -1, SnakeMan - Aire - B]
 type = ChangeState
-triggerall = var(51) = 5
+triggerall = var(13) > 0
 value = 4610
 triggerall = command = "b"
 Triggerall = statetype = A
@@ -1514,7 +1755,11 @@ trigger1 = ctrl
 ; Aire 2
 [State -1, Aire]
 type = ChangeState
-triggerall = var(51) = [0,2]
+triggerall = var(2) = 0
+triggerall = var(5) = 0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) = 0
 value = 800
 triggerall = command = "c"
 Triggerall = statetype = A
@@ -1523,7 +1768,7 @@ trigger1 = ctrl
 ; G4 Aire 2
 [State -1, Aire]
 type = ChangeState
-triggerall = var(51) = 4
+triggerall = var(2) > 0
 triggerall = var(5) = 0
 value = 2620
 triggerall = command = "c"
@@ -1533,7 +1778,7 @@ trigger1 = ctrl
 ; SnakeMan - Aire - C
 [State -1, SnakeMan - Aire - C]
 type = ChangeState
-triggerall = var(51) = 5
+triggerall = var(13) > 0
 value = 4630
 triggerall = command = "c"
 Triggerall = statetype = A
@@ -1542,7 +1787,7 @@ trigger1 = ctrl
 ; SnakeMan - Aire - Y
 [State -1, SnakeMan - Aire - Y]
 type = ChangeState
-triggerall = var(51) = 5
+triggerall = var(13) > 0
 value = 4632
 triggerall = command = "y"
 Triggerall = statetype = A
@@ -1551,7 +1796,7 @@ trigger1 = ctrl
 ; SnakeMan - Aire - Z
 [State -1, SnakeMan - Aire - Z]
 type = ChangeState
-triggerall = var(51) = 5
+triggerall = var(13) > 0
 value = 4640
 triggerall = command = "z"
 Triggerall = statetype = A
@@ -1560,7 +1805,10 @@ trigger1 = ctrl
 ; Nightmare A - 1
 [State -1, Nightmare A - 1]
 type = ChangeState
-triggerall = var(51) = 3
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) > 0
+triggerall = var(16) = 0
 value = 6200
 triggerall = command != "holddown"
 triggerall = command = "a"
@@ -1571,7 +1819,10 @@ trigger1 = ctrl
 [State -1, Nightmare A - Down]
 type = ChangeState
 value = 6425
-triggerall = var(51) = 3
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) > 0
+triggerall = var(16) = 0
 triggerall = command = "holddown"
 triggerall = command = "a"
 Triggerall = statetype != A
@@ -1580,7 +1831,10 @@ trigger1 = ctrl
 ; Nightmare B - 1
 [State -1, Nightmare B - 1]
 type = ChangeState
-triggerall = var(51) = 3
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) > 0
+triggerall = var(16) = 0
 value = 6300
 triggerall = command != "holddown"
 triggerall = command = "b"
@@ -1591,7 +1845,10 @@ trigger1 = ctrl
 [State -1, Nightmare B - Down]
 type = ChangeState
 value = 6322
-triggerall = var(51) = 3
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) > 0
+triggerall = var(16) = 0
 triggerall = command = "holddown"
 triggerall = command = "b"
 Triggerall = statetype != A
@@ -1600,7 +1857,10 @@ trigger1 = ctrl
 ; Nightmare C - 1
 [State -1, Nightmare C - 1]
 type = ChangeState
-triggerall = var(51) = 3
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) > 0
+triggerall = var(16) = 0
 value = 6400
 triggerall = command != "holddown"
 triggerall = command = "c"
@@ -1611,7 +1871,10 @@ trigger1 = ctrl
 [State -1, Nightmare C - Down]
 type = ChangeState
 value = 6405
-triggerall = var(51) = 3
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) > 0
+triggerall = var(16) = 0
 triggerall = command = "holddown"
 triggerall = command = "c"
 Triggerall = statetype != A
@@ -1620,7 +1883,10 @@ trigger1 = ctrl
 ; Nightmare Y - 1
 [State -1, Nightmare Y - 1]
 type = ChangeState
-triggerall = var(51) = 3
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) > 0
+triggerall = var(16) = 0
 value = 6444
 triggerall = command != "holddown"
 triggerall = command = "y"
@@ -1631,7 +1897,10 @@ trigger1 = ctrl
 [State -1, Nightmare Y - Down]
 type = ChangeState
 value = 6426
-triggerall = var(51) = 3
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) > 0
+triggerall = var(16) = 0
 triggerall = command = "holddown"
 triggerall = command = "y"
 Triggerall = statetype != A
@@ -1640,7 +1909,10 @@ trigger1 = ctrl
 ; Nightmare Z - 1
 [State -1, Nightmare Z - 1]
 type = ChangeState
-triggerall = var(51) = 3
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) > 0
+triggerall = var(16) = 0
 value = 6410
 triggerall = command != "holddown"
 triggerall = command = "z"
@@ -1651,7 +1923,10 @@ trigger1 = ctrl
 [State -1, Nightmare Z - Down]
 type = ChangeState
 value = 6427
-triggerall = var(51) = 3
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) > 0
+triggerall = var(16) = 0
 triggerall = command = "holddown"
 triggerall = command = "z"
 Triggerall = statetype != A
@@ -1661,7 +1936,10 @@ trigger1 = ctrl
 [State -1, Nightmare Aire - 1]
 type = ChangeState
 value = 6600
-triggerall = var(51) = 3
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) > 0
+triggerall = var(16) = 0
 triggerall = command = "a"
 Triggerall = statetype = A
 trigger1 = ctrl
@@ -1670,7 +1948,10 @@ trigger1 = ctrl
 [State -1, Nightmare Aire - 2]
 type = ChangeState
 value = 6605
-triggerall = var(51) = 3
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) > 0
+triggerall = var(16) = 0
 triggerall = command = "b"
 Triggerall = statetype = A
 trigger1 = ctrl
@@ -1679,7 +1960,10 @@ trigger1 = ctrl
 [State -1, Nightmare Aire - 3]
 type = ChangeState
 value = 6610
-triggerall = var(51) = 3
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) > 0
+triggerall = var(16) = 0
 triggerall = command = "c"
 Triggerall = statetype = A
 trigger1 = ctrl
@@ -1687,7 +1971,10 @@ trigger1 = ctrl
 ; Nightmare Power Charge
 [State -1, Nightmare Power Charge]
 type = ChangeState
-triggerall = var(51) = 3
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) > 0
+triggerall = var(16) = 0
 Triggerall = power < 3000
 value = 6500
 triggerall = command = "s"
@@ -1698,7 +1985,7 @@ trigger1 = ctrl
 ; SnakeMan Power Charge
 [State -1, Power Charge]
 type = ChangeState
-triggerall = var(51) = 5
+triggerall = var(13) > 0
 Triggerall = power < 3000
 value = 4500
 triggerall = command = "s"
@@ -1708,7 +1995,7 @@ trigger1 = ctrl
 ; SnakeMan Power Charge Air
 [State -1, Power Charge Air]
 type = ChangeState
-triggerall = var(51) = 5
+triggerall = var(13) > 0
 Triggerall = power < 3000
 value = 4500
 triggerall = command = "s"
@@ -1718,7 +2005,10 @@ trigger1 = ctrl
 ; Gear 5 A - 1
 [State -1, Gear 5 A - 1]
 type = ChangeState
-triggerall = var(51) = 6
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) > 0
 value = 70200
 triggerall = command != "holddown"
 triggerall = command = "a"
@@ -1728,7 +2018,10 @@ trigger1 = ctrl
 [State -1, Gear 5 A - Down]
 type = ChangeState
 value = 70300
-triggerall = var(51) = 6
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) > 0
 triggerall = command = "holddown"
 triggerall = command = "a"
 trigger1 = ctrl
@@ -1736,7 +2029,10 @@ trigger1 = ctrl
 ; Gear 5 B - 1
 [State -1, Gear 5 B - 1]
 type = ChangeState
-triggerall = var(51) = 6
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) > 0
 value = 70220
 triggerall = command != "holddown"
 triggerall = command = "b"
@@ -1746,7 +2042,10 @@ trigger1 = ctrl
 [State -1, Gear 5 B - Down]
 type = ChangeState
 value = 70310
-triggerall = var(51) = 6
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) > 0
 triggerall = command = "holddown"
 triggerall = command = "b"
 trigger1 = ctrl
@@ -1754,7 +2053,10 @@ trigger1 = ctrl
 ; Gear 5 C - 1
 [State -1, Gear 5 C - 1]
 type = ChangeState
-triggerall = var(51) = 6
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) > 0
 value = 70235
 triggerall = command != "holddown"
 triggerall = command = "c"
@@ -1764,7 +2066,10 @@ trigger1 = ctrl
 ; Gear 5 C - 1 - Air
 [State -1, Gear 5 C - 1 - Air]
 type = ChangeState
-triggerall = var(51) = 6
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) > 0
 value = 70236
 triggerall = command != "holddown"
 triggerall = command = "c"
@@ -1775,7 +2080,10 @@ trigger1 = ctrl
 [State -1, Gear 5 C - Down]
 type = ChangeState
 value = 70315
-triggerall = var(51) = 6
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) > 0
 triggerall = command = "holddown"
 triggerall = command = "c"
 Triggerall = statetype != A
@@ -1785,7 +2093,10 @@ trigger1 = ctrl
 [State -1, Gear 5 C - Down - Air]
 type = ChangeState
 value = 70316
-triggerall = var(51) = 6
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) > 0
 triggerall = command = "holddown"
 triggerall = command = "c"
 Triggerall = statetype = A
@@ -1794,7 +2105,10 @@ trigger1 = ctrl
 ; Gear 5 Y - 1
 [State -1, Gear 5 Y - 1]
 type = ChangeState
-triggerall = var(51) = 6
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) > 0
 value = 70245
 triggerall = command != "holddown"
 triggerall = command = "y"
@@ -1805,7 +2119,10 @@ trigger1 = ctrl
 type = ChangeState
 value = 70437
 Triggerall = power >= 500
-triggerall = var(51) = 6
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) > 0
 triggerall = var(28) = 0
 triggerall = command = "holddown"
 triggerall = command = "y"
@@ -1814,7 +2131,10 @@ trigger1 = ctrl
 ; Gear 5 Z - 1
 [State -1, Gear 5 Z - 1]
 type = ChangeState
-triggerall = var(51) = 6
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) > 0
 value = 70270
 triggerall = command != "holddown"
 triggerall = command = "z"
@@ -1824,7 +2144,10 @@ trigger1 = ctrl
 [State -1, Gear 5 Z - Down]
 type = ChangeState
 value = 70318
-triggerall = var(51) = 6
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) > 0
 Triggerall = p2dist x < 175
 triggerall = command = "holddown"
 triggerall = command = "z"
@@ -1835,7 +2158,10 @@ trigger1 = ctrl
 [State -1, Gear 5 Z - Down Air]
 type = ChangeState
 value = 70319
-triggerall = var(51) = 6
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) > 0
 Triggerall = p2dist x >= 175
 triggerall = command = "holddown"
 triggerall = command = "z"
@@ -1844,7 +2170,10 @@ trigger1 = ctrl
 ; Power Charge
 [State -1, Power Charge]
 type = ChangeState
-triggerall = var(51) = 6
+triggerall = var(2)=0
+triggerall = var(13) = 0
+triggerall = var(14) = 0
+triggerall = var(16) > 0
 Triggerall = power < 3000
 value = 70499
 triggerall = command = "s"
