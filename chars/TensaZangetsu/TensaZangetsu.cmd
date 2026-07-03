@@ -94,8 +94,6 @@ command = ~D,DF,F
 time = 15
 
 [Defaults]
-;===========================================================================
-;===========================================================================
 
 ;-| Double Tap |-----------------------------------------------------------
 [Command]
@@ -419,30 +417,11 @@ time = 1
 ;---------------------------------------------------------------------------
 [Statedef -1]
 
-[state 0]
-type = Helper
-triggerall = !ishelper
-trigger1 = !numhelper(30990)
-stateno = 30990
-id = 30990
-ownpal = 1
-facing = ifelse(teamside = 1,1,-1)
-postype = p1
-size.height = 2
-size.ground.back = 0
-size.air.front = 0 
-size.air.back = 0 
-size.head.pos = 30500, 0 
-size.mid.pos = (const(size.mid.pos.x) + 0), 0 
-size.xscale = .145
-size.yscale = .145
-supermovetime = 99999999999
-pausemovetime = 99999999999
-ignorehitpause = 1
-
 [State -1, Flash Step]
 type = ChangeState
 triggerall = (!ishelper)
+triggerall = numexplod(750)<1 
+triggerall = numexplod(751)<3
 triggerall = ailevel = 0
 triggerall = power >= cond(p2movetype =H,1000,500)
 triggerall = numhelper(700) > 0||ctrl||stateno = 60||stateno = 65
@@ -659,7 +638,7 @@ value = 440
 type = ChangeState
 triggerall = (command = "a") && (statetype != A)
 trigger1 = ctrl
-value = 2600
+value = 200
 
 [State -1, B]
 type = ChangeState

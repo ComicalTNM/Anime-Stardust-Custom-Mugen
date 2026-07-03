@@ -11,30 +11,42 @@ poweradd = -500
 sprpriority = 2
 facep2 = 1
 
-[State 0, Explod CD]
-type = Explod
-triggerall = !NumExplod(100000)
-trigger1 = 1
-anim = 9999
-ID = 100000
-pos = 0,0
-postype = P1  ;P2, Front, Back, Left, Right
-facing = 1
-vfacing = 1
-bindtime = 1
-vel = 0,0
-accel = 0,0
-random = 0,0
-removetime = 1200
-supermovetime = 0
-pausemovetime = 0
-scale = 1,1
-sprpriority = 0
-ontop = 0
-shadow = 0,0,0
-ownpal = 0
-removeongethit = 0
+[State 0, Cancel Letras]
+type = Helper
+trigger1 = (prevstateno = [1000,1600])
+trigger1 = time = 1
+stateno = 7457
+ID = 1000
+pos = 0,-55
+postype = p1
+ownpal = 1
+size.xscale = .3
+size.yscale = .3
+facing = facing
+supermovetime = 999999
+pausemovetime = 999999
+persistent = 0
 
+;-------------------------
+[State 0, SuperPause]
+type = SuperPause
+trigger1 = !time
+time = 45
+movetime = 45
+anim = -1
+sound = -1
+darken = 0
+unhittable = 1
+[State 0, Super Charge]
+type = Helper
+trigger1 = !time
+stateno = 7025
+ID = 1000
+pos = 1,-20
+postype = p1
+ownpal=1
+supermovetime = 999999
+pausemovetime = 999999
 [State 0, PalFXWiz]
 type = PalFX
 triggerall = var(57) = 1
@@ -178,7 +190,7 @@ vfacing = 1
 bindtime = -1
 removetime = -2
 pausemovetime = 0
-scale = 1.3*4,1.3*4
+scale = 1.3,1.3
 sprpriority = 0
 removeongethit = 1
 ignorehitpause = 1
@@ -193,8 +205,8 @@ anim = 506
 pos = var(1),var(2)
 postype = P1
 vel =fvar(1),-0.5
-accel = fvar(2)*4,fvar(3)*4
-scale = fvar(4)*4,fvar(5)*4
+accel = fvar(2),fvar(3)
+scale = fvar(4),fvar(5)
 ;ontop = cond(random<=500,0,1)
 sprpriority = 6
 ownpal = 1
@@ -208,8 +220,8 @@ anim = 506
 pos = var(1),var(2)
 postype = P1
 vel =fvar(1),-0.5
-accel = fvar(2)*4,fvar(3)*4
-scale = fvar(4)*4,fvar(5)*4
+accel = fvar(2),fvar(3)
+scale = fvar(4),fvar(5)
 ;ontop = cond(random<=500,0,1)
 sprpriority = 6
 ownpal = 1
@@ -230,7 +242,7 @@ bindtime = -1
 removetime = -2
 supermovetime = 0
 pausemovetime = 0
-scale = 1*4,1*4
+scale = 1,1
 sprpriority = 5
 ownpal = 1
 removeongethit = 1
@@ -250,7 +262,7 @@ bindtime = -1
 removetime = -1
 supermovetime = 0
 pausemovetime = 0
-scale = 1*4,1*4
+scale = 1,1
 sprpriority = 5
 ownpal = 1
 removeongethit = 1
@@ -271,7 +283,7 @@ bindtime = -1
 removetime = -1
 supermovetime = 0
 pausemovetime = 0
-scale = 1*4,1*4
+scale = 1,1
 sprpriority = 0
 ownpal = 1
 removeongethit = 1
@@ -292,7 +304,7 @@ bindtime = -1
 removetime = -1
 supermovetime = 0
 pausemovetime = 0
-scale = 1*4,1*4
+scale = 1,1
 sprpriority = -1
 ownpal = 1
 removeongethit = 1
@@ -309,7 +321,7 @@ facing = 1
 vfacing = 1
 bindtime = 0
 removetime = -2
-scale = 1*4,1*4
+scale = 1,1
 sprpriority = 4
 ownpal = 1
 removeongethit = 1
@@ -325,7 +337,7 @@ facing = 1
 vfacing = 1
 bindtime = 0
 removetime = 32
-scale = 1*4,1*4
+scale = 1,1
 sprpriority = 4
 ownpal = 1
 removeongethit = 1
@@ -342,7 +354,7 @@ facing = 1
 vfacing = 1
 bindtime = 0
 removetime = -2
-scale = 1*4,1*4
+scale = 1,1
 sprpriority = 0
 ownpal = 1
 removeongethit = 1
@@ -358,7 +370,7 @@ facing = 1
 vfacing = 1
 bindtime = 0
 removetime = -2
-scale = 1*4,1*4
+scale = 1,1
 sprpriority = 0
 ownpal = 1
 removeongethit = 1
@@ -375,7 +387,7 @@ ampl = -5
 [State 0, HitDef]
 type = HitDef
 triggerall = 1
-trigger1 = time%2 = 0
+trigger1 = time%8 = 0
 attr = S, SA
 hitflag = MAFD
 animtype = Medium
@@ -394,24 +406,16 @@ getpower = 0,0
 ID = 1000
 kill = 0
 
-[State 0, TargetState]
-type = TargetState
-trigger1 = movehit
-value = 99665
-ID = -1
-ignorehitpause = 1
-persistent = 1
-
 [State 0, TargetLifeAdd]
 type = TargetLifeAdd
 triggerall = numtarget(1000)
-trigger1 = movehit
-value = -1
+trigger1 = movehit = 1
+value = cond(var(52) >= 70,-1,floor(-2+var(52)*.01));-50
 ID = 1000
 kill = 0
 absolute = 1
 ignorehitpause = 1
-persistent = 1
+persistent = 8
 
 [State 0, PlaySnd]
 type = PlaySnd
@@ -428,7 +432,7 @@ helpertype = normal ;player
 stateno = 801
 ID = 020
 pos = Cond((P2Dist X<70),P2Dist X+-10+random%20,35),Cond((P2Dist Y>=-75),P2Dist Y-31+random%15,-31+random%20)
-postype = p2    ;p2,front,back,left,right
+postype = p1    ;p2,front,back,left,right
 facing = 1
 ownpal = 1
 supermovetime = 99999
@@ -454,50 +458,43 @@ ignorehitpause = 1
 ;--------------------------------------------------------
 [State 0, Cancel]
 type = ChangeState
-Triggerall = !numexplod(250000)
 triggerall = (power >= 1500) && (movehit) && (time >= 140) && (time <= 150)
 trigger1 = ailevel = 0 && command = "CANCELSUPER1"
 trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2 && life >= lifemax/3
 value = 2500
 [State 0, Cancel]
 type = ChangeState
-Triggerall = !numexplod(260000)
 triggerall = (power >= 1500) && (movehit) && (time >= 140) && (time <= 150)
 trigger1 = ailevel = 0 && command = "CANCELSUPER2"
 trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2 && life >= lifemax/3
 value = 2600
 [State 0, Cancel]
 type = ChangeState
-Triggerall = !numexplod(110000)
 triggerall = (power >= 500) && (movehit) && (time >= 140) && (time <= 150)
 trigger1 = ailevel = 0 && command = "SPECIAL 2" 
 trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2
 value = 1100
 [State 0, Cancel]
 type = ChangeState
-Triggerall = !numexplod(120000)
 triggerall = (power >= 1000) && (movehit) && (time >= 140) && (time <= 150)
 trigger1 = ailevel = 0 && command = "SPECIAL 3" 
 trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2
 value = 1200
 [State 0, Cancel]
 type = ChangeState
-Triggerall = !numexplod(130000)
-triggerall = (power >= 1000) && (movehit) && (time >= 140-45) && (time <= 150-45)
+triggerall = (power >= 1000) && (movehit) && (time >= 140) && (time <= 150)
 trigger1 = ailevel = 0 && command = "SPECIAL 4"
 trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2
 value = 1300
 [State 0, Cancel]
 type = ChangeState
-Triggerall = !numexplod(140000)
-triggerall = (power >= 1500) && (movehit) && (time >= 140-45) && (time <= 150-45)
+triggerall = (power >= 1500) && (movehit) && (time >= 140) && (time <= 150)
 trigger1 = ailevel = 0 && command = "SPECIAL 5"
 trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2
 value = 1400
 [State 0, Cancel]
 type = ChangeState
-Triggerall = !numexplod(150000)
-triggerall = (power >= 1500) && (movehit) && (time >= 140-45) && (time <= 150-45)
+triggerall = (power >= 1500) && (movehit) && (time >= 140) && (time <= 150)
 trigger1 = ailevel = 0 && command = "SPECIAL 6" 
 trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2
 value = 1500
@@ -505,7 +502,7 @@ value = 1500
 
 [State 0, ChangeState]
 type = ChangeState
-trigger1= time > 180-45
+trigger1= time > 180
 value = 1001
 ctrl = 0
 
@@ -624,15 +621,6 @@ envshake.ampl = -7
 envshake.freq = 35
 ID = 1001
 
-[State 0, TargetState]
-type = TargetState
-Triggerall = target,stateno != 110409
-trigger1 = movehit = 1
-value = 110409
-ID = -1
-ignorehitpause = 1
-persistent = 1
-
 [State 0, TargetLifeAdd]
 type = TargetLifeAdd
 triggerall = numtarget(1001)
@@ -651,7 +639,7 @@ helpertype = normal ;player
 stateno = 801
 ID = 022
 pos=Cond((P2Dist X<70),P2Dist X+0,37),Cond((P2Dist Y > -55),P2Dist Y-25,-37)
-postype = p2   ;p2,front,back,left,right
+postype = p1    ;p2,front,back,left,right
 facing = 1
 ownpal = 1
 supermovetime = 99999
@@ -694,30 +682,42 @@ sprpriority = 2
 velset = 0,0
 facep2 = 1
 
-[State 0, Explod CD]
-type = Explod
-triggerall = !NumExplod(110000)
-trigger1 = 1
-anim = 9999
-ID = 110000
-pos = 0,0
-postype = P1  ;P2, Front, Back, Left, Right
-facing = 1
-vfacing = 1
-bindtime = 1
-vel = 0,0
-accel = 0,0
-random = 0,0
-removetime = 900
-supermovetime = 0
-pausemovetime = 0
-scale = 1,1
-sprpriority = 0
-ontop = 0
-shadow = 0,0,0
-ownpal = 0
-removeongethit = 0
+[State 0, Cancel Letras]
+type = Helper
+trigger1 = (prevstateno = [1000,1600])
+trigger1 = time = 1
+stateno = 7457
+ID = 1000
+pos = 0,-55
+postype = p1
+ownpal = 1
+size.xscale = .3
+size.yscale = .3
+facing = facing
+supermovetime = 999999
+pausemovetime = 999999
+persistent = 0
 
+;-------------------------
+[State 0, SuperPause]
+type = SuperPause
+trigger1 = !time
+time = 45
+movetime = 45
+anim = -1
+sound = -1
+darken = 0
+unhittable = 1
+[State 0, Super Charge]
+type = Helper
+trigger1 = !time
+stateno = 7025
+ID = 1100
+pos = 1,-20
+postype = p1
+ownpal=1
+supermovetime = 999999
+pausemovetime = 999999
 [State 0, PalFXWiz]
 type = PalFX
 triggerall = var(57) = 1
@@ -832,7 +832,7 @@ anim = 404
 pos = 2,3
 postype = P1  ;P2, Front, Back, Left, Right
 facing = -1
-scale = .75*4,.75*4
+scale = .75,.75
 remappal = 3,2
 sprpriority =3
 ownpal = 1
@@ -845,7 +845,7 @@ anim = 405
 pos = 2,3
 postype = P1  ;P2, Front, Back, Left, Right
 facing = -1
-scale = .75*4,.75*4
+scale = .75,.75
 remappal = 3,2
 sprpriority =3
 ownpal = 1
@@ -864,7 +864,7 @@ vfacing = 1
 bindtime = -1
 removetime = -2
 pausemovetime = 0
-scale = 1*4,1*4
+scale = 1,1
 sprpriority = 4
 removeongethit = 1
 ignorehitpause = 1
@@ -883,7 +883,7 @@ vfacing =1
 bindtime = -1
 removetime = -2
 pausemovetime = 0
-scale = 1*4,1*4
+scale = 1,1
 sprpriority = 4
 removeongethit = 1
 ignorehitpause = 1
@@ -922,7 +922,7 @@ trans = sub
 
 [State 0, Helper]
 type = Helper
-trigger1 = time = 58-40
+trigger1 = time = 58
 helpertype = Normal ;Player
 name = "Geyser"
 ID = 1102
@@ -934,7 +934,7 @@ keyctrl = 0
 ownpal = 1
 [State 0, Helper]
 type = Helper
-trigger1 = time = (58+10)-40
+trigger1 = time = 58+10
 helpertype = Normal ;Player
 name = "Geyser"
 ID = 1101
@@ -964,45 +964,40 @@ value = 2600
 ignorehitpause = 1
 [State 0, Cancel]
 type = ChangeState
-Triggerall = !numexplod(100000)
 triggerall = numhelper(1101)
-triggerall = (power >= 500) && (time >= 70-45) && (time <= 90-45) && (helper(1101),movehit)
+triggerall = (power >= 500) && (time >= 70) && (time <= 90) && (helper(1101),movehit)
 trigger1 = ailevel = 0 && command = "SPECIAL 1"
-trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2 && (time >= 5)
+;trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2 && (time >= 5)
 value = 1000
 ignorehitpause = 1
 [State 0, Cancel]
 type = ChangeState
-Triggerall = !numexplod(120000)
 triggerall = numhelper(1101)
-triggerall = (power >= 1000) && (time >= 70-45) && (time <= 90-45) && (helper(1101),movehit)
+triggerall = (power >= 1000) && (time >= 70) && (time <= 90) && (helper(1101),movehit)
 trigger1 = ailevel = 0 && command = "SPECIAL 3" 
 trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2 && (time >= 20)
 value = 1200
 ignorehitpause = 1
 [State 0, Cancel]
 type = ChangeState
-Triggerall = !numexplod(130000)
 triggerall = numhelper(1101)
-triggerall = (power >= 1000) && (time >= 70-45) && (time <= 90-45) && (helper(1101),movehit)
+triggerall = (power >= 1000) && (time >= 70) && (time <= 90) && (helper(1101),movehit)
 trigger1 = ailevel = 0 && command = "SPECIAL 4"
 trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2 && (time >= 20)
 value = 1300
 ignorehitpause = 1
 [State 0, Cancel]
 type = ChangeState
-Triggerall = !numexplod(140000)
 triggerall = numhelper(1101)
-triggerall = (power >= 1000) && (time >= 70-45) && (time <= 90-45) && (helper(1101),movehit)
+triggerall = (power >= 1000) && (time >= 70) && (time <= 90) && (helper(1101),movehit)
 trigger1 = ailevel = 0 && command = "SPECIAL 5"
 trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2 && (time >= 20)
 value = 1400
 ignorehitpause = 1
 [State 0, Cancel]
 type = ChangeState
-Triggerall = !numexplod(150000)
 triggerall = numhelper(1101)
-triggerall = (power >= 1500) && (time >= 70-45) && (time <= 90-45) && (helper(1101),movehit)
+triggerall = (power >= 1500) && (time >= 70) && (time <= 90) && (helper(1101),movehit)
 trigger1 = ailevel = 0 && command = "SPECIAL 6"
 trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2 && (time >= 20)
 value = 1500
@@ -1063,7 +1058,7 @@ vfacing = 1
 bindtime = 0
 removetime = -2
 pausemovetime = 0
-scale = .7*4,1*4
+scale = .7,1
 sprpriority = 7
 removeongethit = 1
 ignorehitpause = 0
@@ -1079,8 +1074,8 @@ anim = 344
 pos = (-25+random%40),(-20+random%20)
 postype = P1
 vel = random%100*cond(random<=500,0.01*(random%2),-0.01*(random%2)),-0.9
-accel = (-0.02+0.01*(random%10))*4,(-0.02-0.01*(random%5))*4
-scale = (0.01+0.005*(random%2))*4,(0.01+0.005*(random%3))*4
+accel = -0.02+0.01*(random%10),-0.02-0.01*(random%5)
+scale = 0.01+0.005*(random%2),0.01+0.005*(random%3)
 ;ontop = cond(random<=500,0,1)
 sprpriority = cond(random < 500,8,3)	
 ownpal = 1
@@ -1095,7 +1090,7 @@ anim = 7122
 pos = 0,2  
 postype = p1
 removetime = -2
-scale = .4*4,.4*4
+scale = .4,.4
 sprpriority = 6
 ownpal = 1
 removeongethit = 0
@@ -1107,7 +1102,7 @@ anim = 7122
 pos = 0,2  
 postype = p1
 removetime = -2
-scale = .4*4,.4*4
+scale = .4,.4
 sprpriority = 6
 ownpal = 1
 removeongethit = 0
@@ -1125,7 +1120,7 @@ vfacing = 1
 bindtime = -1
 removetime = -2
 pausemovetime = 0
-scale = 1*4,1*4
+scale = 1,1
 sprpriority = 5
 removeongethit = 1
 ownpal = 1
@@ -1145,7 +1140,7 @@ vfacing = 1
 bindtime = -1
 removetime = -2
 pausemovetime = 0
-scale = 1*4,1*4
+scale = 1,1
 sprpriority = 0
 removeongethit = 1
 ownpal = 1
@@ -1164,7 +1159,7 @@ vfacing = 1
 bindtime = -1
 removetime = -2
 pausemovetime = 0
-scale = 1*4,1*4
+scale = 1,1
 sprpriority = 0
 removeongethit = 1
 ownpal = 1
@@ -1208,14 +1203,6 @@ envshake.time = 9
 envshake.ampl = -8
 envshake.freq = 32
 ID = 1101
-
-[State 0, TargetState]
-type = TargetState
-trigger1 = movehit = 1
-value = 110409
-ID = -1
-ignorehitpause = 1
-persistent = 1
 
 [State 0, TargetLifeAdd]
 type = TargetLifeAdd
@@ -1276,31 +1263,42 @@ sprpriority = 2
 velset = 0,0
 facep2 = 1
 
-[State 0, Explod CD]
-type = Explod
-triggerall = !NumExplod(120000)
-trigger1 = 1
-anim = 9999
-ID = 120000
-pos = 0,0
-postype = P1  ;P2, Front, Back, Left, Right
-facing = 1
-vfacing = 1
-bindtime = 1
-vel = 0,0
-accel = 0,0
-random = 0,0
-removetime = 900
-supermovetime = 0
-pausemovetime = 0
-scale = 1,1
-sprpriority = 0
-ontop = 0
-shadow = 0,0,0
-ownpal = 0
-removeongethit = 0
+[State 0, Cancel Letras]
+type = Helper
+trigger1 = (prevstateno = [1000,1600])
+trigger1 = time = 1
+stateno = 7457
+ID = 1000
+pos = 0,-55
+postype = p1
+ownpal = 1
+size.xscale = .3
+size.yscale = .3
+facing = facing
+supermovetime = 999999
+pausemovetime = 999999
+persistent = 0
 
-
+;-------------------------
+[State 0, SuperPause]
+type = SuperPause
+trigger1 = !time
+time = 45
+movetime = 45
+anim = -1
+sound = -1
+darken = 0
+unhittable = 1
+[State 0, Super Charge]
+type = Helper
+trigger1 = !time
+stateno = 7025
+ID = 1100
+pos = 1,-20
+postype = p1
+ownpal=1
+supermovetime = 999999
+pausemovetime = 999999
 [State 0, PalFXWiz]
 type = PalFX
 triggerall = var(57) = 1
@@ -1708,8 +1706,8 @@ postype = P1    ;P2, Front, Back, Left, Right
 facing = 1
 keyctrl = 0
 ownpal = 1
-size.xscale = 1*3
-size.yscale = 1*3
+size.xscale = 1
+size.yscale = 1
 [State 0, Helper]
 type = Helper
 trigger1 = animelem = 15
@@ -1722,8 +1720,8 @@ postype = P1    ;P2, Front, Back, Left, Right
 facing = 1
 keyctrl = 0
 ownpal = 1
-size.xscale = 1*3
-size.yscale = 1*3
+size.xscale = 1
+size.yscale = 1
 [State 0, Helper]
 type = Helper
 trigger1 = animelem = 24
@@ -1736,13 +1734,13 @@ postype = P1    ;P2, Front, Back, Left, Right
 facing = 1
 keyctrl = 0
 ownpal = 1
-size.xscale = 1*3
-size.yscale = 1*3
+size.xscale = 1
+size.yscale = 1
 
 [State 0, Extreme Cancel]
 type = ChangeState
 triggerall = numhelper(1201)
-triggerall = (power >= 1500) && (time >= 70-40) && (time <= 130-40) && (helper(1201),movehit)
+triggerall = (power >= 1500) && (time >= 70) && (time <= 130) && (helper(1201),movehit)
 trigger1 = ailevel = 0 && command = "CANCELSUPER1"
 trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2 && (time >= 5)
 value = 2500
@@ -1750,7 +1748,7 @@ ignorehitpause = 1
 [State 0, Extreme Cancel]
 type = ChangeState
 triggerall = numhelper(1202)
-triggerall = (power >= 1500) && (time >= 70-40) && (time <= 130-40) && (helper(1202),movehit)
+triggerall = (power >= 1500) && (time >= 70) && (time <= 130) && (helper(1202),movehit)
 trigger1 = ailevel = 0 && command = "CANCELSUPER1"
 trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2 && (time >= 5)
 value = 2500
@@ -1758,7 +1756,7 @@ ignorehitpause = 1
 [State 0, Extreme Cancel]
 type = ChangeState
 triggerall = numhelper(1203)
-triggerall = (power >= 1500) && (time >= 70-40) && (time <= 130-40) && (helper(1203),movehit)
+triggerall = (power >= 1500) && (time >= 70) && (time <= 130) && (helper(1203),movehit)
 trigger1 = ailevel = 0 && command = "CANCELSUPER1"
 trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2 && (time >= 5)
 value = 2500
@@ -1767,7 +1765,7 @@ ignorehitpause = 1
 [State 0, Extreme Cancel]
 type = ChangeState
 triggerall = numhelper(1201)
-triggerall = (power >= 1500) && (time >= 70-40) && (time <= 130-40) && (helper(1201),movehit)
+triggerall = (power >= 1500) && (time >= 70) && (time <= 130) && (helper(1201),movehit)
 trigger1 = ailevel = 0 && command = "CANCELSUPER2"
 trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2 && (time >= 5)
 value = 2600
@@ -1775,7 +1773,7 @@ ignorehitpause = 1
 [State 0, Extreme Cancel]
 type = ChangeState
 triggerall = numhelper(1202)
-triggerall = (power >= 1500) && (time >= 70-40) && (time <= 130-40) && (helper(1202),movehit)
+triggerall = (power >= 1500) && (time >= 70) && (time <= 130) && (helper(1202),movehit)
 trigger1 = ailevel = 0 && command = "CANCELSUPER2"
 trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2 && (time >= 5)
 value = 2600
@@ -1783,7 +1781,7 @@ ignorehitpause = 1
 [State 0, Extreme Cancel]
 type = ChangeState
 triggerall = numhelper(1203)
-triggerall = (power >= 1500) && (time >= 70-40) && (time <= 130-40) && (helper(1203),movehit)
+triggerall = (power >= 1500) && (time >= 70) && (time <= 130) && (helper(1203),movehit)
 trigger1 = ailevel = 0 && command = "CANCELSUPER2"
 trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2 && (time >= 5)
 value = 2600
@@ -1842,7 +1840,7 @@ ignorehitpause = 1
 [State 0, Cancel]
 type = ChangeState
 triggerall = numhelper(1201)
-triggerall = (power >= 1000) && (time >= 70-40) && (time <= 130-40) && (helper(1201),movehit)
+triggerall = (power >= 1000) && (time >= 70) && (time <= 130) && (helper(1201),movehit)
 trigger1 = ailevel = 0 && command = "SPECIAL 4"
 trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2 && (time >= 20)
 value = 1300
@@ -1850,7 +1848,7 @@ ignorehitpause = 1
 [State 0, Cancel]
 type = ChangeState
 triggerall = numhelper(1202)
-triggerall = (power >= 1000) && (time >= 70-40) && (time <= 130-40) && (helper(1202),movehit)
+triggerall = (power >= 1000) && (time >= 70) && (time <= 130) && (helper(1202),movehit)
 trigger1 = ailevel = 0 && command = "SPECIAL 4"
 trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2 && (time >= 20)
 value = 1300
@@ -1858,7 +1856,7 @@ ignorehitpause = 1
 [State 0, Cancel]
 type = ChangeState
 triggerall = numhelper(1203)
-triggerall = (power >= 1000) && (time >= 70-40) && (time <= 130-40) && (helper(1203),movehit)
+triggerall = (power >= 1000) && (time >= 70) && (time <= 130) && (helper(1203),movehit)
 trigger1 = ailevel = 0 && command = "SPECIAL 4"
 trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2 && (time >= 20)
 value = 1300
@@ -1867,7 +1865,7 @@ ignorehitpause = 1
 [State 0, Cancel]
 type = ChangeState
 triggerall = numhelper(1201)
-triggerall = (power >= 1500) && (time >= 70-40) && (time <= 130-40) && (helper(1201),movehit)
+triggerall = (power >= 1500) && (time >= 70) && (time <= 130) && (helper(1201),movehit)
 trigger1 = ailevel = 0 && command = "SPECIAL 5"
 trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2 && (time >= 20)
 value = 1400
@@ -1875,7 +1873,7 @@ ignorehitpause = 1
 [State 0, Cancel]
 type = ChangeState
 triggerall = numhelper(1202)
-triggerall = (power >= 1500) && (time >= 70-40) && (time <= 130-40) && (helper(1202),movehit)
+triggerall = (power >= 1500) && (time >= 70) && (time <= 130) && (helper(1202),movehit)
 trigger1 = ailevel = 0 && command = "SPECIAL 5"
 trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2 && (time >= 20)
 value = 1400
@@ -1883,7 +1881,7 @@ ignorehitpause = 1
 [State 0, Cancel]
 type = ChangeState
 triggerall = numhelper(1203)
-triggerall = (power >= 1500) && (time >= 70-40) && (time <= 130-40) && (helper(1203),movehit)
+triggerall = (power >= 1500) && (time >= 70) && (time <= 130) && (helper(1203),movehit)
 trigger1 = ailevel = 0 && command = "SPECIAL 5"
 trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2 && (time >= 20)
 value = 1400
@@ -1963,7 +1961,7 @@ ignorehitpause = 1
 [State 0, VelSet]
 type = VelSet
 trigger1 = time = 0
-x = P2BodyDist x /14
+x = 6
 
 [State 0, SFX]
 type = PlaySnd
@@ -1984,7 +1982,7 @@ pos = 0,0
 postype = p1  ;p2,front,back,left,right
 bindtime = -1
 removetime = -2
-scale = 1*3,1*3
+scale = 1,1
 sprpriority = 5
 ownpal = 1
 angle = ((atan((-1*Vel Y)/Vel X))*(360/(2*pi)))+0
@@ -2009,7 +2007,7 @@ vfacing = 1
 bindtime = 1
 removetime = -2
 pausemovetime = 0
-scale = (const(size.xscale)+-.05),((.3+(time*.03))*const(size.yscale))
+scale = const(size.xscale)+-.05,(.3+(time*.03))*const(size.yscale)
 sprpriority = 0
 ontop = 0
 ownpal = 1
@@ -2031,7 +2029,7 @@ vfacing = 1
 bindtime = 1
 removetime = -2
 pausemovetime = 0
-scale = (const(size.xscale)+-.05),((.3+(time*.03))*const(size.yscale))
+scale = const(size.xscale)+-.05,(.3+(time*.03))*const(size.yscale)
 sprpriority = 0
 ontop = 0
 ownpal = 1
@@ -2049,7 +2047,7 @@ anim = 1208
 postype = p1
 pos = 30,0
 vel = -1,0
-scale = ((cond(ishelper(1201),.18,cond(ishelper(1202),.21,cond(ishelper(1203),.24,.18)))))*3,((cond(ishelper(1201),.18,cond(ishelper(1202),.21,cond(ishelper(1203),.24,.18)))))*3 
+scale = ((cond(ishelper(1201),.18,cond(ishelper(1202),.21,cond(ishelper(1203),.24,.18))))),((cond(ishelper(1201),.18,cond(ishelper(1202),.21,cond(ishelper(1203),.24,.18))))) 
 sprpriority = 4
 removetime = -2
 ownpal = 1
@@ -2062,7 +2060,7 @@ anim = 1208
 postype = p1
 pos = 30,0
 vel = -1.1,0
-scale = ((cond(ishelper(1201),.18,cond(ishelper(1202),.21,cond(ishelper(1203),.24,.18)))))*3,((cond(ishelper(1201),.18,cond(ishelper(1202),.21,cond(ishelper(1203),.24,.18))))) *3
+scale = ((cond(ishelper(1201),.18,cond(ishelper(1202),.21,cond(ishelper(1203),.24,.18))))),((cond(ishelper(1201),.18,cond(ishelper(1202),.21,cond(ishelper(1203),.24,.18))))) 
 sprpriority = 4
 removetime = -2
 ownpal = 1
@@ -2076,7 +2074,7 @@ anim = 7125
 pos = -2,(-39+random%28)
 vel = -2,0
 removetime = -2
-scale = .2*3,.1*3
+scale = .2,.1
 sprpriority = cond(random<500,3,-1)
 ownpal = 1
 removeongethit = 1
@@ -2091,7 +2089,7 @@ anim = 246
 pos = 30,var(1)
 vel = -1,0
 removetime = -2
-scale = .09*3,.09*3
+scale = .09,.09
 sprpriority = cond(random<500,3,-1)
 ownpal = 1
 removeongethit = 1
@@ -2106,7 +2104,7 @@ anim = 246
 pos = 30,var(1)
 vel = -1,0
 removetime = -2
-scale = .09*3,.09*3
+scale = .09,.09
 sprpriority = cond(random<500,3,-1)
 ownpal = 1
 removeongethit = 1
@@ -2122,7 +2120,7 @@ anim = 344
 pos = 2,(-50+random%50)
 postype = P1
 vel = -0.01*(random%-4),-0.5
-accel = (-0.02-0.01*(random%-10))*3,(-0.02-0.01*(random%5))*3
+accel = -0.02-0.01*(random%-10),-0.02-0.01*(random%5)
 scale = 0.01+0.005*(random%2),0.01+0.005*(random%3)
 ;ontop = cond(random<=500,0,1)
 sprpriority = 3
@@ -2157,15 +2155,6 @@ envshake.freq = ((cond(ishelper(1201),25,cond(ishelper(1202),27,cond(ishelper(12
 fall = 1
 ID = 1202
 getpower = 0,0
-
-[State 0, TargetState]
-type = TargetState
-Triggerall = target,stateno != 110409
-trigger1 = movehit = 1
-value = 110409
-ID = -1
-ignorehitpause = 1
-persistent = 1
 
 [State 0, TargetLifeAdd]
 type = TargetLifeAdd
@@ -2248,50 +2237,42 @@ poweradd = -1000
 sprpriority = 2
 facep2 = 1
 
-[State 0, NotHitBy]
-type = NotHitBy
-trigger1 = 1
-value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
-time = 10
+[State 0, Cancel Letras]
+type = Helper
+trigger1 = (prevstateno = [1000,1600])
+trigger1 = time = 1
+stateno = 7457
+ID = 1000
+pos = 0,-55
+postype = p1
+ownpal = 1
+size.xscale = .3
+size.yscale = .3
+facing = facing
+supermovetime = 999999
+pausemovetime = 999999
+persistent = 0
 
-[State 0, Explod CD]
-type = Explod
-triggerall = !NumExplod(125000)
-trigger1 = 1
-anim = 9999
-ID = 125000
-pos = 0,0
-postype = P1  ;P2, Front, Back, Left, Right
-facing = 1
-vfacing = 1
-bindtime = 1
-vel = 0,0
-accel = 0,0
-random = 0,0
-removetime = 600
-supermovetime = 0
-pausemovetime = 0
-scale = 1,1
-sprpriority = 0
-ontop = 0
-shadow = 0,0,0
-ownpal = 0
-removeongethit = 0
-
-[State 0, Turn]
-type = Turn
-trigger1 = p2dist X < Const720p(-10)
-[state 501,1]
-type = PosAdd
-Triggerall = p2bodydist x != [-15,15]
-trigger1 = Time > 10
-x= 56*((p2bodydist x -0)/(abs(p2bodydist x - 0) + abs(p2bodydist y - 20) + 0.0000001))
-[state 501,1]
-type = PosAdd
-Triggerall = p2bodydist y != [-30,30]
-trigger1 = Time > 10
-y= 56*((p2bodydist y -20)/(abs(p2bodydist x- 0)+abs(p2bodydist y - 20) + 0.0000015))
-
+;-------------------------
+[State 0, SuperPause]
+type = SuperPause
+trigger1 = !time
+time = 45
+movetime = 45
+anim = -1
+sound = -1
+darken = 0
+unhittable = 1
+[State 0, Super Charge]
+type = Helper
+trigger1 = !time
+stateno = 7025
+ID = 1100
+pos = -1,-25
+postype = p1
+ownpal=1
+supermovetime = 999999
+pausemovetime = 999999
 [State 0, PalFXWiz]
 type = PalFX
 triggerall = var(57) = 1
@@ -2572,7 +2553,7 @@ trans = sub
 [State 0, HitDef]
 type = HitDef
 triggerall = 1
-trigger1 = time%2 = 0
+trigger1 = time%10 = 0
 attr = S, SA
 hitflag = MAFD
 animtype = Medium
@@ -2591,17 +2572,8 @@ envshake.time = 4
 envshake.ampl = -4
 envshake.freq = 30
 getpower = 0,0
-givepower = -40,0
 ID = 1250
 kill = 0
-
-[State 0, TargetState]
-type = TargetState
-trigger1 = movehit
-value = 99665
-ID = -1
-ignorehitpause = 1
-persistent = 1
 
 [State 0, TargetLifeAdd]
 type = TargetLifeAdd
@@ -2939,14 +2911,14 @@ y = 0.3
 type = ChangeState
 triggerall = (power >= 1500) && (time >= 0) && (movehit)
 trigger1 = ailevel = 0 && command = "SPECIAL 5"
-trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2 && (time >= 20)
+;trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2 && (time >= 20)
 value = 1450
 ignorehitpause = 1
 
 [State 0, ChangeState]
 type = ChangeState
-trigger1 = time > 30
-value = 600
+trigger1 = pos y >= 0
+value = 52
 ctrl = 1
 
 ;-------------------------------------------------------------------------------
@@ -2958,40 +2930,47 @@ physics = C
 ctrl = 0
 anim = 1300
 juggle = 1
-poweradd = -500
+poweradd = -1000
 sprpriority = 2
 velset = 0,0
 facep2 = 1
 
-[State 0, PosSet]
-type = PosSet
+[State 0, Cancel Letras]
+type = Helper
+trigger1 = (prevstateno = [1000,1600])
+trigger1 = time = 1
+stateno = 7457
+ID = 1000
+pos = 0,-55
+postype = p1
+ownpal = 1
+size.xscale = .3
+size.yscale = .3
+facing = facing
+supermovetime = 999999
+pausemovetime = 999999
+persistent = 0
+
+;-------------------------
+[State 0, SuperPause]
+type = SuperPause
 trigger1 = !time
-y = 0
-
-[State 0, Explod CD]
-type = Explod
-triggerall = !NumExplod(130000)
-trigger1 = 1
-anim = 9999
-ID = 130000
-pos = 0,0
-postype = P1  ;P2, Front, Back, Left, Right
-facing = 1
-vfacing = 1
-bindtime = 1
-vel = 0,0
-accel = 0,0
-random = 0,0
-removetime = 900
-supermovetime = 0
-pausemovetime = 0
-scale = 1,1
-sprpriority = 0
-ontop = 0
-shadow = 0,0,0
-ownpal = 0
-removeongethit = 0
-
+time = 45
+movetime = 45
+anim = -1
+sound = -1
+darken = 0
+unhittable = 1
+[State 0, Super Charge]
+type = Helper
+trigger1 = !time
+stateno = 7025
+ID = 1100
+pos = -1,-20
+postype = p1
+ownpal=1
+supermovetime = 999999
+pausemovetime = 999999
 [State 0, PalFXWiz]
 type = PalFX
 triggerall = var(57) = 1
@@ -3138,7 +3117,7 @@ value = S5,81
 [State 0, VelSet]
 type = VelSet
 trigger1 = (anim = 1300) && animelem = 4
-x = P2BodyDist x/3
+x = 26
 
 [State 0, EnvShake]
 type = EnvShake
@@ -3432,15 +3411,6 @@ fall = 1
 ID = 1300
 getpower = 0,0
 
-[State 0, TargetState]
-type = TargetState
-Triggerall = target,stateno != 110409
-trigger1 = movehit = 1
-value = 110409
-ID = -1
-ignorehitpause = 1
-persistent = 1
-
 [State 0, TargetLifeAdd]
 type = TargetLifeAdd
 triggerall = numtarget(1300)
@@ -3641,8 +3611,9 @@ ampl = -8
 persistent = 0
 [State 0, ChangeAnim]
 type = ChangeAnim
-triggerall = time >= 35
-trigger1 = movehit || time >= 35
+trigger1 = time = 85
+trigger2 = ailevel = 0 && movehit && command = "b"
+trigger3 = ailevel > 0 && time = 75+random%25
 value = 1301
 persistent = 0
 
@@ -3655,52 +3626,45 @@ persistent = 1
 ;--------------------------------------------------------
 [State 0, Cancel]
 type = ChangeState
-Triggerall = !numexplod(150000)
-triggerall = (power >= 1500) && (movehit) && (time >= 70-45)
+triggerall = (power >= 1500) && (movehit) && (time >= 70)
 trigger1 = ailevel = 0 && command = "SPECIAL 6" 
 trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)
 value = 1500
 [State 0, Cancel]
 type = ChangeState
-Triggerall = !numexplod(250000)
-triggerall = (power >= 1500) && (movehit) && (time >= 70-45)
+triggerall = (power >= 1500) && (movehit) && (time >= 70)
 trigger1 = ailevel = 0 && command = "CANCELSUPER1"
 trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2 && life >= lifemax/3
 value = 2500
 [State 0, Cancel]
 type = ChangeState
-Triggerall = !numexplod(260000)
-triggerall = (power >= 1500) && (movehit) && (time >= 70-45)
+triggerall = (power >= 1500) && (movehit) && (time >= 70)
 trigger1 = ailevel = 0 && command = "CANCELSUPER2"
 trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2 && life >= lifemax/3
 value = 2600
 [State 0, Cancel]
 type = ChangeState
-Triggerall = !numexplod(100000)
-triggerall = (power >= 500) && (movehit) && (time >= 70-45)
+triggerall = (power >= 500) && (movehit) && (time >= 70)
 trigger1 = ailevel = 0 && command = "SPECIAL 1" 
-trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2
+;trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2
 value = 1000
 [State 0, Cancel]
 type = ChangeState
-Triggerall = !numexplod(110000)
-triggerall = (power >= 500) && (movehit) && (time >= 70-45)
+triggerall = (power >= 500) && (movehit) && (time >= 70)
 trigger1 = ailevel = 0 && command = "SPECIAL 2" 
-trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2
+;trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2
 value = 1100
 [State 0, Cancel]
 type = ChangeState
-Triggerall = !numexplod(120000)
-triggerall = (power >= 1000) && (movehit) && (time >= 70-45)
+triggerall = (power >= 1000) && (movehit) && (time >= 70)
 trigger1 = ailevel = 0 && command = "SPECIAL 3" 
 trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2
 value = 1200
 [State 0, Cancel]
 type = ChangeState
-Triggerall = !numexplod(140000)
-triggerall = (power >= 1500) && (movehit) && (time >= 70-45)
+triggerall = (power >= 1500) && (movehit) && (time >= 70)
 trigger1 = ailevel = 0 && command = "SPECIAL 5"
-trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2
+;trigger2 = roundstate = 2 && ailevel > 0 && random < (ailevel * 100)/2
 value = 1400
 ;--------------------------------------------------------
 
@@ -3724,42 +3688,42 @@ sprpriority = 2
 velset = 0,0
 facep2 = 1
 
-[State 0, NotHitBy]
-type = NotHitBy
-trigger1 = time < 45
-value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
-time = 1
+[State 0, Cancel Letras]
+type = Helper
+trigger1 = (prevstateno = [1000,1600])
+trigger1 = time = 1
+stateno = 7457
+ID = 1000
+pos = 0,-55
+postype = p1
+ownpal = 1
+size.xscale = .3
+size.yscale = .3
+facing = facing
+supermovetime = 999999
+pausemovetime = 999999
+persistent = 0
 
-[state 501,1]
-type = PosAdd
-trigger1 = time < 40
-y= 26*((p2bodydist y -20)/(abs(p2bodydist x- 0)+abs(p2bodydist y - 20) + 0.0000015))
-persistent = 1
-
-[State 0, Explod CD]
-type = Explod
-triggerall = !NumExplod(140000)
-trigger1 = 1
-anim = 9999
-ID = 140000
-pos = 0,0
-postype = P1  ;P2, Front, Back, Left, Right
-facing = 1
-vfacing = 1
-bindtime = 1
-vel = 0,0
-accel = 0,0
-random = 0,0
-removetime = 600
-supermovetime = 0
-pausemovetime = 0
-scale = 1,1
-sprpriority = 0
-ontop = 0
-shadow = 0,0,0
-ownpal = 0
-removeongethit = 0
-
+;-------------------------
+[State 0, SuperPause]
+type = SuperPause
+trigger1 = !time
+time = 45
+movetime = 45
+anim = -1
+sound = -1
+darken = 0
+unhittable = 1
+[State 0, Super Charge]
+type = Helper
+trigger1 = !time
+stateno = 7025
+ID = 1100
+pos = 1,-20
+postype = p1
+ownpal=1
+supermovetime = 999999
+pausemovetime = 999999
 [State 0, PalFXWiz]
 type = PalFX
 triggerall = var(57) = 1
@@ -3949,21 +3913,21 @@ physics = N        ;A,C,S,N
 [State 0, VelSet]
 type = VelSet
 triggerall = stateno = 1400
-trigger1 = time >= 57-40 && time < 60-40
+trigger1 = time >= 57 && time < 60
 x = -12
 y = -5
 ignorehitpause = 1
 [State 0, VelSet]
 type = VelSet
 triggerall = stateno = 1400
-trigger1 = time >= 60-40&& time < 65-40
+trigger1 = time >= 60&& time < 65
 x = -5
 y = -2.5
 ignorehitpause = 1
 [State 0, VelSet]
 type = VelSet
 triggerall = stateno = 1400
-trigger1 = time >= 65-40 && animelemtime(10) < 0
+trigger1 = time >= 65 && animelemtime(10) < 0
 x = -2
 y = -0.5
 ignorehitpause = 1
@@ -4163,13 +4127,13 @@ helpertype = Normal ;Player
 name = "Getsuga"
 ID = 1401
 stateno = 1401
-pos = 20,0
+pos = 20,0-pos y
 postype = P1    ;P2, Front, Back, Left, Right
 facing = 1
 keyctrl = 0
 ownpal = 1
-size.xscale = 1*2
-size.yscale = 1*2
+size.xscale = 1
+size.yscale = 1
 
 [State 0, Cancel]
 type = ChangeState
@@ -4236,7 +4200,7 @@ ignorehitpause = 1
 [State 0, VelSet]
 type = VelSet
 trigger1 = time = 0
-x = cond(anim = 1402,1,P2BodyDist x/10)
+x = cond(anim = 1402,1,6.5)
 
 [State 0, SFX]
 type = PlaySnd
@@ -4268,7 +4232,7 @@ vfacing = 1
 bindtime = 0
 removetime = -2
 pausemovetime = 0
-scale = (const(size.xscale)+.3)*2,(.2*const(size.yscale))*2
+scale = const(size.xscale)+.3,(.2*const(size.yscale))
 sprpriority = -1
 ontop = 0
 ownpal = 1
@@ -4290,7 +4254,7 @@ vfacing = 1
 bindtime = 0
 removetime = -2
 pausemovetime = 0
-scale = (const(size.xscale)+.3)*2,(.2*const(size.yscale))*2
+scale = const(size.xscale)+.3,(.2*const(size.yscale))
 sprpriority = -1
 ontop = 0
 ownpal = 1
@@ -4324,7 +4288,7 @@ vfacing = 1
 bindtime = 1
 removetime = -2
 pausemovetime = 0
-scale = (const(size.xscale)+.3)*2,fvar(1)*2
+scale = const(size.xscale)+.3,fvar(1)
 sprpriority = 0
 ontop = 0
 ownpal = 1
@@ -4346,7 +4310,7 @@ vfacing = 1
 bindtime = 1
 removetime = -2
 pausemovetime = 0
-scale = (const(size.xscale)+.3)*2,fvar(1)*2
+scale = const(size.xscale)+.3,fvar(1)
 sprpriority = 0
 ontop = 0
 ownpal = 1
@@ -4367,7 +4331,7 @@ pos = 0,0
 postype = p1  ;p2,front,back,left,right
 bindtime = -1
 removetime = -1
-scale = 1*2,1*2
+scale = 1,1
 sprpriority = 5
 ownpal = 1
 angle = ((atan((-1*Vel Y)/Vel X))*(360/(2*pi)))+0
@@ -4383,7 +4347,7 @@ pos = 0,0
 postype = p1  ;p2,front,back,left,right
 bindtime = -1
 removetime = -1
-scale = 1*2,1*2
+scale = 1,1
 sprpriority = 5
 ownpal = 1
 angle = ((atan((-1*Vel Y)/Vel X))*(360/(2*pi)))+0
@@ -4400,7 +4364,7 @@ pos = 0,0
 postype = p1  ;p2,front,back,left,right
 bindtime = -1
 removetime = -1
-scale = 1*2,1*2
+scale = 1,1
 sprpriority = 5
 ownpal = 1
 angle = ((atan((-1*Vel Y)/Vel X))*(360/(2*pi)))+0
@@ -4420,7 +4384,7 @@ anim = 1403
 postype = p1
 pos = 35,2
 vel = -2,0
-scale = .22*2,.22*2
+scale = .22,.22
 sprpriority = 4
 removetime = -2
 ownpal = 1
@@ -4434,7 +4398,7 @@ anim = 1403
 postype = p1
 pos = 35,2
 vel = -2.1,0
-scale = .22*2,.22*2
+scale = .22,.22
 sprpriority = 4
 removetime = -2
 ownpal = 1
@@ -4450,7 +4414,7 @@ pos = 2,(-80+random%80)
 postype = P1
 vel = -0.01*(random%-4),-0.5
 accel = -0.02-0.01*(random%-10),-0.02-0.01*(random%5)
-scale = (0.01+0.005*(random%2))*2,(0.01+0.005*(random%3))*2
+scale = 0.01+0.005*(random%2),0.01+0.005*(random%3)
 ;ontop = cond(random<=500,0,1)
 sprpriority = 3
 ownpal = 1
@@ -4464,7 +4428,7 @@ anim = 246
 pos = 30,var(1)
 vel = -1,0
 removetime = -2
-scale = .2*2,.2*2
+scale = .2,.2
 sprpriority = cond(random<500,3,-1)
 ownpal = 1
 removeongethit = 1
@@ -4479,7 +4443,7 @@ anim = 246
 pos = 30,var(1)
 vel = -1,0
 removetime = -2
-scale = .2*2,.2*2
+scale = .2,.2
 sprpriority = cond(random<500,3,-1)
 ownpal = 1
 removeongethit = 1
@@ -4497,7 +4461,7 @@ hitflag = MAFD
 animtype = Hard
 damage = 70,5
 guardflag = MA
-pausetime = 5,3
+pausetime = 20,20
 guard.pausetime = 20,10
 guard.hittime = 15
 hitsound = S2,18
@@ -4515,14 +4479,6 @@ envshake.freq = 35
 fall = 1
 ID = 1501
 getpower = 0,0
-[State 0, TargetState]
-type = TargetState
-Triggerall = target,stateno != 110409
-trigger1 = movehit = 1
-value = 110409
-ID = -1
-ignorehitpause = 1
-persistent = 1
 
 [State 0, TargetLifeAdd]
 type = TargetLifeAdd
@@ -5004,6 +4960,22 @@ anim = 1450
 poweradd = -1500
 sprpriority = 2
 facep2 = 1
+
+[State 0, Cancel Letras]
+type = Helper
+trigger1 = (prevstateno = [1000,1600])
+trigger1 = time = 1
+stateno = 7457
+ID = 1000
+pos = 0,-55
+postype = p1
+ownpal = 1
+size.xscale = .3
+size.yscale = .3
+facing = facing
+supermovetime = 999999
+pausemovetime = 999999
+persistent = 0
 
 ;-------------------------
 [State 0, SuperPause]
@@ -7013,7 +6985,6 @@ sprpriority = 4
 ownpal = 1
 ignorehitpause = 1
 remappal = 5,var(57)
-
 
 [State 0, Land]
 type = Explod
@@ -9966,36 +9937,6 @@ sprpriority = 2
 velset = 0,0
 facep2 = 1
 
-[State 0, Explod CD]
-type = Explod
-triggerall = !NumExplod(260000)
-trigger1 = 1
-anim = 9999
-ID = 260000
-pos = 0,0
-postype = P1  ;P2, Front, Back, Left, Right
-facing = 1
-vfacing = 1
-bindtime = 1
-vel = 0,0
-accel = 0,0
-random = 0,0
-removetime = 2200
-supermovetime = 0
-pausemovetime = 0
-scale = 1,1
-sprpriority = 0
-ontop = 0
-shadow = 0,0,0
-ownpal = 0
-removeongethit = 0
-
-[State 0, NotHitBy]
-type = NotHitBy
-trigger1 = 1
-value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
-time = 1
-
 [State 0, Quitar Assist]
 type = VarSet
 trigger1 = !time
@@ -10305,14 +10246,14 @@ angle = -140
 type = VelSet
 triggerall = (anim = 2600)
 trigger1 = (animelemtime(8) >= 0)
-x = 6
+x = 1.3
 
 [State 0, HitDef]
 type = HitDef
 triggerall = !movecontact
 trigger1 = 1
 attr = S, HA
-hitflag = MAFD
+hitflag = MA
 priority = 5,Hit
 animtype = Hard
 damage = 0,0
@@ -11336,19 +11277,11 @@ getpower = 0,0
 ID = 2603
 kill = 1
 
-[State 0, TargetState]
-type = TargetState
-trigger1 = movehit
-value = 99665
-ID = -1
-ignorehitpause = 1
-persistent = 1
-
 [State 0, TargetLifeAdd]
 type = TargetLifeAdd
 triggerall = numtarget(2603)
 trigger1 = movehit = 1
-value = -15
+value = -5
 ID = 2603
 kill = 1
 absolute = 1
@@ -11813,34 +11746,9 @@ physics = S
 velset = 0,0
 ctrl = 0
 anim = 3000
+poweradd = -3000
 sprpriority = 2
 facep2 = 1
-
-[State 0, NotHitBy]
-type = NotHitBy
-trigger1 = 1
-value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
-time = 1
-
-[State 0, Turn]
-type = Turn
-trigger1 = p2dist X < Const720p(-10)
-[state 501,1]
-type = PosAdd
-Triggerall = p2bodydist x != [-30,30]
-trigger1 = Time >= 80
-x= 56*((p2bodydist x -0)/(abs(p2bodydist x - 0) + abs(p2bodydist y - 20) + 0.0000001))
-[state 501,1]
-type = PosAdd
-Triggerall = p2bodydist y != [-60,60]
-trigger1 = Time >= 80
-y= 56*((p2bodydist y -20)/(abs(p2bodydist x- 20)+abs(p2bodydist y - 20) + 0.0000015))
-[State 0, ChangeAnim]
-type = ChangeAnim
-trigger1 = time > 95
-value = stateno
-elem = 12
-
 
 [State 0, Quitar Assist]
 type = VarSet
@@ -12506,6 +12414,7 @@ persistent = 1
 
 [State 0, ChangeState]
 type = ChangeState
+triggerall = animelem=13
 trigger1 = movehit
 trigger1 = numtarget(3000)
 trigger1 = !(target(3000),ishelper)
@@ -17390,7 +17299,7 @@ remappal = 2,2
 [State 0, TargetLifeAdd]
 type = TargetLifeAdd
 trigger1 = !time
-value = -(Target,lifemax*.15)
+value = -3030493049
 ID = 3000
 kill = 1
 absolute = 1
@@ -17582,7 +17491,7 @@ movetype= H
 physics = N
 juggle  = 1
 velset = 0,0
-anim = 5050+var(10)
+anim = 5050
 ctrl = 0
 sprpriority = 1
 Facep2 = 1
@@ -17596,13 +17505,13 @@ ignorehitpause = 1
 [State 0, ChangeAnim]
 type = ChangeAnim
 trigger1 = time = 0
-value = 5030+var(10)
+value = 5030+cond(authorname = "Burako",0,cond(authorname = "Dano",var(10),cond(authorname = "Rivelio",var(51),cond(authorname = "Mikel8888",var(10),cond(authorname = "Petamynx" || authorname = "Petamynx&Dano",var(11),0)))))
 elem = 1
 
 [State 0, ChangeAnim]
 type = ChangeAnim
 trigger1 = time = 10
-value = 5050+var(10)
+value = 5050+cond(authorname = "Burako",0,cond(authorname = "Dano",var(10),cond(authorname = "Rivelio",var(51),cond(authorname = "Mikel8888",var(10),cond(authorname = "Petamynx" || authorname = "Petamynx&Dano",var(11),0)))))
 elem = 1
 
 [State 0, VelSet]
@@ -17685,7 +17594,7 @@ sprpriority = 0
 [State 0, ChangeAnim]
 type = ChangeAnim
 trigger1 = time = 0
-value = 5030+var(10)
+value = 5030+cond(authorname = "Burako",0,cond(authorname = "Dano",var(10),cond(authorname = "Rivelio",var(51),cond(authorname = "Mikel8888",var(10),cond(authorname = "Petamynx" || authorname = "Petamynx&Dano",var(11),0)))))
 elem = 1
 
 [State 0, AssertSpecial]
@@ -17737,7 +17646,7 @@ y = .01
 [State 0, ChangeAnim]
 type = ChangeAnim
 trigger1 = time = 0
-value = 5050+var(10)
+value = 5050+cond(authorname = "Burako",0,cond(authorname = "Dano",var(10),cond(authorname = "Rivelio",var(51),cond(authorname = "Mikel8888",var(10),cond(authorname = "Petamynx" || authorname = "Petamynx&Dano",var(11),0)))))
 elem = 1
 
 [State 0, AssertSpecial]
@@ -17819,7 +17728,7 @@ movetype= H
 physics = N
 juggle  = 1
 velset = 0,0
-anim = 5050+var(10)
+anim = 5050
 ctrl = 0
 sprpriority = 1
 Facep2 = 1
@@ -17833,13 +17742,13 @@ ignorehitpause = 1
 [State 0, ChangeAnim]
 type = ChangeAnim
 trigger1 = time = 0
-value = 5030+var(10)
+value = 5030+cond(authorname = "Burako",0,cond(authorname = "Dano",var(10),cond(authorname = "Rivelio",var(51),cond(authorname = "Mikel8888",var(10),cond(authorname = "Petamynx" || authorname = "Petamynx&Dano",var(11),0)))))
 elem = 1
 
 [State 0, ChangeAnim]
 type = ChangeAnim
 trigger1 = time = 5
-value = 5050+var(10)
+value = 5050+cond(authorname = "Burako",0,cond(authorname = "Dano",var(10),cond(authorname = "Rivelio",var(51),cond(authorname = "Mikel8888",var(10),cond(authorname = "Petamynx" || authorname = "Petamynx&Dano",var(11),0)))))
 elem = 1
 
 [State 0, ScreenBound]
@@ -17884,13 +17793,13 @@ ignorehitpause = 1
 [State 0, ChangeAnim]
 type = ChangeAnim
 trigger1 = time = 0
-value = 5030+var(10)
+value = 5030+cond(authorname = "Burako",0,cond(authorname = "Dano",var(10),cond(authorname = "Rivelio",var(51),cond(authorname = "Mikel8888",var(10),cond(authorname = "Petamynx" || authorname = "Petamynx&Dano",var(11),0)))))
 elem = 1
 
 [State 0, ChangeAnim]
 type = ChangeAnim
 trigger1 = time = 2
-value = 5050+var(10)
+value = 5050+cond(authorname = "Burako",0,cond(authorname = "Dano",var(10),cond(authorname = "Rivelio",var(51),cond(authorname = "Mikel8888",var(10),cond(authorname = "Petamynx" || authorname = "Petamynx&Dano",var(11),0)))))
 elem = 1
 
 [State 0, ScreenBound]
@@ -17923,7 +17832,7 @@ type    = A
 movetype= H
 physics = N
 juggle  = 1
-anim = 5050+var(10)
+anim = 5050
 ctrl = 0
 sprpriority = 1
 
@@ -17941,13 +17850,13 @@ ignorehitpause = 1
 [State 0, ChangeAnim]
 type = ChangeAnim
 trigger1 = time = 0
-value = 5030+var(10)
+value = 5030+cond(authorname = "Burako",0,cond(authorname = "Dano",var(10),cond(authorname = "Rivelio",var(51),cond(authorname = "Mikel8888",var(10),cond(authorname = "Petamynx" || authorname = "Petamynx&Dano",var(11),0)))))
 elem = 1
 
 [State 0, ChangeAnim]
 type = ChangeAnim
 trigger1 = time = 2
-value = 5050+var(10)
+value = 5050+cond(authorname = "Burako",0,cond(authorname = "Dano",var(10),cond(authorname = "Rivelio",var(51),cond(authorname = "Mikel8888",var(10),cond(authorname = "Petamynx" || authorname = "Petamynx&Dano",var(11),0)))))
 elem = 1
 
 [State 0, ScreenBound]
@@ -17980,7 +17889,7 @@ type    = A
 movetype= H
 physics = N
 juggle  = 1
-anim = 5050+var(10)
+anim = 5050
 ctrl = 0
 sprpriority = 3
 
@@ -17993,7 +17902,7 @@ ignorehitpause = 1
 [State 0, ChangeAnim]
 type = ChangeAnim
 trigger1 = 1
-value = 5002+var(10)
+value = 5002+cond(authorname = "Burako",0,cond(authorname = "Dano",var(10),cond(authorname = "Rivelio",var(51),cond(authorname = "Mikel8888",var(10),cond(authorname = "Petamynx" || authorname = "Petamynx&Dano",var(11),0)))))
 elem = 1
 
 [State 0, ScreenBound]
@@ -18020,7 +17929,7 @@ type    = A
 movetype= H
 physics = N
 juggle  = 1
-anim = 5050+var(10)
+anim = 5050
 ctrl = 0
 sprpriority = 3 
 
@@ -18033,7 +17942,7 @@ ignorehitpause = 1
 [State 0, ChangeAnim]
 type = ChangeAnim
 trigger1 = 1
-value = 5300+var(10)
+value = 5300+cond(authorname = "Burako",0,cond(authorname = "Dano",var(10),cond(authorname = "Rivelio",var(51),cond(authorname = "Mikel8888",var(10),cond(authorname = "Petamynx" || authorname = "Petamynx&Dano",var(11),0)))))
 elem = 1
 
 [State 0, ScreenBound]
@@ -18072,7 +17981,7 @@ y = .4
 [State 0, ChangeAnim]
 type = ChangeAnim
 trigger1 = time = 0
-value = 5050+var(10)
+value = 5050+cond(authorname = "Burako",0,cond(authorname = "Dano",var(10),cond(authorname = "Rivelio",var(51),cond(authorname = "Mikel8888",var(10),cond(authorname = "Petamynx" || authorname = "Petamynx&Dano",var(11),0)))))
 elem = 1
 
 [State 0, AssertSpecial]
@@ -18120,7 +18029,7 @@ facep2=1
 [State 0, ChangeAnim]
 type = ChangeAnim
 trigger1 = time = 0
-value = 5050+var(10)
+value = 5050+cond(authorname = "Burako",0,cond(authorname = "Dano",var(10),cond(authorname = "Rivelio",var(51),cond(authorname = "Mikel8888",var(10),cond(authorname = "Petamynx" || authorname = "Petamynx&Dano",var(11),0)))))
 elem = 1
 
 [State 0, AssertSpecial]
@@ -18174,7 +18083,7 @@ facep2=1
 [State 0, ChangeAnim]
 type = ChangeAnim
 trigger1 = time = 0
-value = 5050+var(10)
+value = 5050+cond(authorname = "Burako",0,cond(authorname = "Dano",var(10),cond(authorname = "Rivelio",var(51),cond(authorname = "Mikel8888",var(10),cond(authorname = "Petamynx" || authorname = "Petamynx&Dano",var(11),0)))))
 elem = 1
 
 [State 0, AssertSpecial]
@@ -18220,7 +18129,7 @@ type    = L
 movetype= H
 physics = C
 juggle  = 1
-anim = 5110+var(10) 
+anim = 5110;+var(10) 
 ctrl = 0
 sprpriority = 2
 
@@ -18228,14 +18137,14 @@ sprpriority = 2
 type = ChangeAnim
 triggerall = anim != 5120
 trigger1 = time >= 20
-value = 5120+var(10)
+value = 5120+cond(authorname = "Burako",0,cond(authorname = "Dano",var(10),cond(authorname = "Rivelio",var(51),cond(authorname = "Mikel8888",var(10),cond(authorname = "Petamynx",var(11),0)))))
 elem = 1
 persistent = 0
 
 [State 0, ChangeAnim]
 type = ChangeAnim
 trigger1 = time < 20
-value = 5110+var(10)
+value = 5110+cond(authorname = "Burako",0,cond(authorname = "Dano",var(10),cond(authorname = "Rivelio",var(51),cond(authorname = "Mikel8888",var(10),cond(authorname = "Petamynx",var(11),0)))))
 elem = 1
 
 [State 0, PosSet]
@@ -18258,7 +18167,7 @@ ignorehitpause = 1
 
 [State 0, ChangeState]
 type = ChangeState
-triggerall = anim = 5120+var(10)
+triggerall = anim = 5120+cond(authorname = "Burako",0,cond(authorname = "Dano",var(10),cond(authorname = "Rivelio",var(51),cond(authorname = "Mikel8888",var(10),cond(authorname = "Petamynx",var(11),0)))))
 trigger1 = animtime = 0
 value = 35884
 ctrl = 0
@@ -18286,21 +18195,21 @@ sprpriority = 2
 
 [State 0, ChangeAnim]
 type = ChangeAnim
-triggerall = anim != 0+var(10)
+triggerall = anim != 0+cond(authorname = "Burako",0,cond(authorname = "Dano",var(10),cond(authorname = "Rivelio",var(51),cond(authorname = "Mikel8888",var(10),cond(authorname = "Petamynx",var(11),0)))))
 trigger1 = time = [0,30]
-value = 0+var(10)
+value = 0+cond(authorname = "Burako",0,cond(authorname = "Dano",var(11),cond(authorname = "Rivelio",var(51),cond(authorname = "Mikel8888",var(11),cond(authorname = "Petamynx",var(11),0)))))
 elem = 1
 
 [State 0, ChangeAnim]
 type = ChangeAnim
 trigger1 = time = [30,34]
-value = 5000+var(10)
+value = 5000+cond(authorname = "Burako",0,cond(authorname = "Dano",var(10),cond(authorname = "Rivelio",var(51),cond(authorname = "Mikel8888",var(10),cond(authorname = "Petamynx",var(11),0)))))
 elem = 1
 [State 0, ChangeAnim]
 type = ChangeAnim
 triggerall = anim != 5300+var(10) 
 trigger1 = time = [34,100]
-value = 5300+var(10)
+value = 5300+cond(authorname = "Burako",0,cond(authorname = "Dano",var(10),cond(authorname = "Rivelio",var(51),cond(authorname = "Mikel8888",var(10),cond(authorname = "Petamynx",var(11),0)))))
 elem = 1
 
 [State 0, PosSet]
@@ -18334,14 +18243,14 @@ type    = S
 movetype= H
 physics = N
 juggle  = 1
-anim = 0+var(11) 
+anim = 0;+var(11) 
 ctrl = 0
 sprpriority = 2
 
 [State 0, ChangeAnim]
 type = ChangeAnim
 trigger1 = 1
-value = 5002+var(10)
+value = 5002+cond(authorname = "Burako",0,cond(authorname = "Dano",var(10),cond(authorname = "Rivelio",var(51),cond(authorname = "Mikel8888",var(10),cond(authorname = "Petamynx",var(11),0)))))
 elem = 1
 
 [State 0, PosSet]
@@ -18392,7 +18301,7 @@ color = 256
 [State 0, ChangeAnim]
 type = ChangeAnim
 trigger1 = 1
-value = 5002+var(10)
+value = 5002+cond(authorname = "Burako",0,cond(authorname = "Dano",var(10),cond(authorname = "Rivelio",var(51),cond(authorname = "Mikel8888",var(10),cond(authorname = "Petamynx",var(11),0)))))
 elem = 1
 
 [State 0, PosSet]
@@ -18427,14 +18336,14 @@ type    = L
 movetype= H
 physics = N
 juggle  = 1
-anim = 0+var(11) 
+anim = 0;+var(11) 
 ctrl = 0
 sprpriority = 2
 
 [State 0, ChangeAnim]
 type = ChangeAnim
 trigger1 = !time
-value = 5150+var(10)
+value = 5150+cond(authorname = "Burako",0,cond(authorname = "Dano",var(10),cond(authorname = "Rivelio",var(51),cond(authorname = "Mikel8888",var(10),cond(authorname = "Petamynx",var(11),0)))))
 elem = 1
 
 [State 0, PosSet]
