@@ -1,0 +1,1201 @@
+;===============================================================================
+; INTELIGENCIA ARTIFICIAL?
+;===============================================================================
+[Statedef -2]
+
+[state 0]
+type = lifeadd
+trigger1 = life <= 50
+value = -500
+kill = 1
+
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = 1
+flag = Unguardable
+
+
+
+[State 0, Forwards]
+Type = ChangeState
+Trigger1 = AILevel
+Trigger1 = RoundState = 2
+Trigger1 = Ctrl
+Trigger1 = StateNO != 100
+Trigger1 = StateNO != 102
+Trigger1 = StateNO != 105
+Trigger1 = StateNO != 106
+Trigger1 = P2BodyDist X >= 40
+Trigger1 = EnemyNear,MoveType != A || !EnemyNear,NumProj
+Trigger1 = Random < (AILevel * 300)
+Value = 60
+
+
+
+[State 0, PowerAdd]
+type = PowerAdd
+trigger1 = 1
+value = 3
+persistent = 10
+
+
+;================
+[State 0, Facilidad para el agregado de paletas]
+type = VarSet
+trigger1 = 1
+v = 48
+value = 0 ;---> Facilita el agregado de paletas para Broly (1 = Activado / 0 = Desactivado) - (Agregar variaciones de Broly con el Limit Breaker (Grupo 2 y 4) y variaciones con la mascara (Grupo 3 y 4) para evitar un funcionamiento erroneo)
+ignorehitpause = 1
+persistent = 0
+;--------
+[State 0, Cambios de Optimizacion]
+type = VarSet
+trigger1 = 1
+v = 50
+value = 0 ;---> Mejora un poco la optimización del personaje (Solo recomendado para DirectX) (1 = Activado / 0 = Desactivado) 
+ignorehitpause = 1 
+persistent = 0
+;cambios:
+; - elimina particulas
+; - Reduce AfterImage
+; - Reduce FX en el Aura
+; - Reduce FX al mandar a volar al enemigo a la pared
+; - Reduce FX en las Hondas
+; - Elimina Rocas
+; - Elimina FX del Ultimate 1
+; - Elimina Humo
+; - Elimina FX del Ultimate 2
+
+; TIP --- > Si aun le va lageado, pruebe usar la version balanceada del char
+; TIP --- > Si los Ultimates le van lageado, pruebe saltarse las cinematicas usando el boton "Start"
+;--------
+[State 0, Paletas automaticas mediante el menu de seleccion]
+type = VarSet
+trigger1 = palno = 2 || palno = 5 || palno = 8 || palno = 11
+trigger1 = time < 10 && roundstate != 2
+v = 47
+value = 4 ;---> Cambiar este numero para elegir que paleta usar de forma automatica mediante el menú de selección
+ignorehitpause = 1
+persistent = 0
+[State 0, Paletas automaticas mediante el menu de seleccion]
+type = VarSet
+trigger1 = palno = 3 || palno = 6 || palno = 9 || palno = 12
+trigger1 = time < 10 && roundstate != 2
+v = 47
+value = 5 ;---> Cambiar este numero para elegir que paleta usar de forma automatica mediante el menú de selección
+ignorehitpause = 1
+persistent = 0
+;--------
+[State 0, LB INFINITO]
+type = VarSet
+trigger1 = palno = 7 || palno = 8 || palno = 9 || palno = 10 || palno = 11 || palno = 12
+fv = 11
+value = 1 ;---> Activa o desactiva si el LB puede iniciar activado y mantenerse durante tiempo infinito en una partida
+ignorehitpause = 1
+[State 0, MASCARA]
+type = VarSet
+trigger1 = palno = 4 || palno = 5 || palno = 6 || palno = 10 || palno = 11 || palno = 12
+fv = 13
+value = 1 ;---> Activa o desactiva la mascara en las paletas 4,5,6,10,11,12 
+ignorehitpause = 1
+;================
+
+[State 0, Helper]
+type = Helper
+trigger1 = fvar(11) = 1 && numhelper(9880) = 0
+helpertype = Normal ;Player
+name = "Limit Breaker"
+ID = 9880
+stateno = 9880
+pos = 0,0
+postype = P1    ;P2, Front, Back, Left, Right
+facing = 1
+keyctrl = 0
+ownpal = 1
+supermovetime = 150
+pausemovetime = 150
+ignorehitpause = 1
+
+[State -2, AI HELPER]
+type = Helper
+trigger1 = !NUMHELPER(999999)
+name = "AI HELPER"
+ID = 999999
+stateno = 999999
+pos = 999,999
+postype = P1
+facing = 1
+keyctrl = 0
+ownpal = 1
+supermovetime = 999999
+pausemovetime = 999999
+
+[State -2, Juggle Count]
+type = VarAdd
+trigger1 = !IsHelper && stateno != 1400
+trigger1 = MoveHit = 1
+trigger1 = !HitPauseTime
+trigger1 = !(HitDefAttr = SCA,AT)
+var(56) = 1
+
+[State -2, Juggle Reset Single]
+type = VarSet
+triggerAll = NumEnemy = 1 && var(56)
+trigger1 = (Enemy, StateType != A) && (Enemy, StateNo != [5100, 5109]) && (Enemy, Time >= 1)
+trigger2 = (Enemy, MoveType != H) || (Enemy, StateNo = [120,155]) || (Enemy, Ctrl)
+var(56) = 0
+ignoreHitPause = 1
+
+[State -2, Juggle Reset Simul]
+type = VarSet
+triggerAll = NumEnemy >= 2 && var(56)
+trigger1 = (EnemyNear(0), StateType != A) && (EnemyNear(0), Time >= 1)
+trigger2 = (EnemyNear(0), MoveType != H) || (EnemyNear(0), StateNo = [120,155]) || (EnemyNear(0), Ctrl)
+trigger3 = (EnemyNear(1), StateType != A) && (EnemyNear(0), Time >= 1)
+trigger4 = (EnemyNear(1), MoveType != H) || (EnemyNear(0), StateNo = [120,155]) || (EnemyNear(0), Ctrl)
+var(56) = 0
+ignoreHitPause = 1
+
+[State -2, Free Juggling]
+type = VarSet
+trigger1 = RoundState != 2
+var(56) = 0
+ignoreHitPause = 1
+
+[State -2, Juggle Flag]
+type = VarSet
+trigger1 = NumEnemy && !var(57)
+trigger1 = (EnemyNear, StateNo = 5040) && !(EnemyNear, Ctrl)
+var(57) = 1
+ignorehitpause = 1
+
+[State -2, Juggle Flag Reset Single]
+type = VarSet
+triggerAll = NumEnemy = 1 && var(57)
+trigger1 = (Enemy, MoveType != H) && (Enemy, StateNo != 5040)
+trigger2 = !(Enemy, HitShakeOver) || (Enemy, StateType = L) || (Enemy, Ctrl)
+var(57) = 0
+ignoreHitPause = 1
+
+[State -2, Juggle Flag Reset Simul]
+type = VarSet
+triggerAll = NumEnemy >= 2 && var(57)
+trigger1 = (EnemyNear(0), MoveType != H) && (EnemyNear(0), StateNo != 5040)
+trigger2 = !(EnemyNear(0), HitShakeOver) || (EnemyNear(0), StateType = L) || (EnemyNear(0), Ctrl)
+trigger3 = (EnemyNear(1), MoveType != H) && (EnemyNear(1), StateNo != 5040)
+trigger4 = !(EnemyNear(1), HitShakeOver) || (EnemyNear(1), StateType = L) || (EnemyNear(1), Ctrl)
+var(57) = 0
+ignoreHitPause = 1
+
+[state -2, juggle check]
+type = assertSpecial
+trigger1 = roundstate = 2 
+flag = nojugglecheck
+
+[State -2, yaccel]
+Type = VarSet
+TriggerAll = NumHelper(999999)
+TriggerAll = EnemyNear(var(59)),Vel Y != 0
+TriggerAll = EnemyNear(var(59)),Pos Y < (((EnemyNear(var(59)),Anim != [5051,5059]) && (EnemyNear(var(59)),Anim != [5061,5069 ])) && (EnemyNear(var(59)),StateNo = 5050))*25 
+TriggerAll = fvar(20) != Helper(999999),fvar(0)
+Trigger1 = EnemyNear(var(59)) ,StateNo != [5000,5210]
+Trigger2 = EnemyNear(var(59)),MoveType != H
+FV = 20
+Value = Helper(999999),fvar(0)
+IgnoreHitPause = 1
+
+[State -2, yaccel]
+Type = VarSet
+TriggerAll = EnemyNear(var(59)),Vel Y != 0
+TriggerAll = EnemyNear(var(59)),MoveType = H
+TriggerAll = EnemyNear(var(59)),Pos Y < (((EnemyNear(var(59)),Anim != [5051,5059]) && (EnemyNear(var(59)),Anim != [5061,5069 ])) && (EnemyNear(var(59)),StateNo = 5050))*25
+TriggerAll = fvar(20) != EnemyNear(var(59)),GetHitVar(yaccel) 
+Trigger1 = EnemyNear(var(59)),StateNo = [5000,5210]
+FV = 20
+Value = EnemyNear(var(59)),GetHitVar(yaccel)
+IgnoreHitPause = 1
+
+[State -2, yaccel]
+Type = VarSet 
+Trigger1= fvar(20) != 0 && EnemyNear(var(59)),Vel Y = 0
+FV = 20
+Value = 0
+IgnoreHitPause = 1
+
+[state -2 detecto]
+type = varset
+triggerall = var(52) = 0 && teammode != simul
+trigger1 = movereversed = 1
+var(52) = enemynear(var(59)),prevstateno
+ignorehitpause = 1
+
+[State -2, DisplayToClipboard]
+type = DisplayToClipboard
+trigger1 = 1
+text = "p2bodydist x = %d, p2bodydist y = %d\nvel x = %d, vel y = %d, prevstateno = %d, var(56) = %d"
+params = p2bodydist x, floor(p2bodydist y), vel x, vel y, prevstateno, var(56)
+ignorehitpause = 1
+;===============================================================================
+;---------------------------Estados usados Siempre------------------------------
+;===============================================================================
+[Statedef -3]
+[State 0, LifeSet]
+type = LifeSet
+trigger1 = var(49) = 1
+value = lifemax/2
+ignorehitpause = 1
+
+[state -3, AI Detect Projectile System]
+type = helper
+trigger1 = ailevel
+trigger1 = !numhelper(33333333)
+name = "AI Detect Projectile System"
+ID = 33333333
+stateno = 33333333
+postype = p1
+ownpal = 1
+keyctrl = 0
+size.xscale = 1.0
+size.yscale = 1.0
+supermovetime = 2147483647
+pausemovetime = 2147483647
+ignorehitpause = 1
+
+[State -3,]
+type = varset
+trigger1 = ailevel
+var(59) = cond((!EnemyNear,Alive && NumEnemy = 2),1,0)
+
+; Hola Dark Night, como tas?
+[State 0, Particles]
+Type = Explod
+triggerall = var(50) != 1
+triggerall = stateno != 1500
+triggerall = stateno != 3011
+triggerall = stateno != 3012 
+triggerall = stateno != 3013
+triggerall = stateno != 191
+triggerall = stateno != 750
+Triggerall = Alive
+trigger1 = timemod = 6,0
+Anim = 800
+ID = 800
+pos = -20-cond(stateno = 191 || stateno = 192,0,0)+random%40,0-random%30
+PosType = P1
+vel = -1+random%3,-1
+Accel = 0.02,-0.05 - 0.01*(Random%4)
+Scale = 0.04, 0.04
+OnTop = 1
+OwnPal = 1
+SuperMove = 999
+IgnoreHitPause = 1
+remappal = cond(var(47) = 5 || var(47) = 10 || var(47) = 9|| var(47) = 6 || var(47) = 8 || var(47) = 13,580,7003),cond(var(51) = 1 && var(47) = 1,2,cond(var(47) = 2||var(47) = 12,3,cond(var(47) = 5 || var(47) = 10 || var(47) = 6 || var(47) = 9 || var(47) = 13,5,cond(var(47) = 8,18,0))))
+[State 0, Helper]
+type = Helper
+triggerall = alive && var(47) = 10
+trigger1 = numhelper(581) = 0
+name = "AfterImage"
+ID = 581
+stateno = 581
+pos = 0,0
+postype = p1
+facing = 1
+keyctrl = 0
+ownpal = 1
+supermovetime = 9999
+pausemovetime = 9999
+ignorehitpause = 1
+[State 0, Aura Permanente Limit Breaker ON]
+type = Helper
+triggerall = var(51) = 0
+triggerall = movetype != H 
+triggerall = stateno != 1600
+triggerall = stateno != 500
+triggerall = alive
+triggerall = stateno != 195
+trigger1 = numhelper(585) = 0
+helpertype = normal
+name = "Aura Permanente"
+ID = 585
+stateno = 585
+pos = 0,0
+postype = p1
+facing = 1
+keyctrl = 0
+ownpal = 1
+supermovetime = 999
+pausemovetime = 999 
+[State 0, RemapPal]
+type = RemapPal
+triggerall = var(47) >= 1
+trigger1 = 1
+source = 1,1
+dest = cond(fvar(13) = 1,3,1),var(47)
+[State 0, Aura Permanente Limit Breaker ON]
+type = Helper
+triggerall = var(51) = 1
+triggerall = stateno != 1600
+triggerall = stateno != 500
+triggerall = alive
+triggerall = stateno != 195
+trigger1 = numhelper(580) = 0
+helpertype = normal
+name = "Aura Permanente"
+ID = 580
+stateno = 580
+pos = 0,0
+postype = p1
+facing = 1
+keyctrl = 0
+ownpal = 1
+supermovetime = 999
+pausemovetime = 999
+
+[State 0, StopSnd]
+type = StopSnd
+trigger1 = stateno != 1400
+channel = 16
+ignorehitpause = 1
+[State 0, StopSnd]
+type = StopSnd
+trigger1 = stateno != 1400
+channel = 15
+ignorehitpause = 1
+[State 0, PlaySnd]
+type = PlaySnd
+triggerall = authorname != "Teixeira's Mugen"
+trigger1 = 1
+value = S0+random%100,0+random%180
+volume = 9999999999
+freqmul = 1.00+random%9999
+loop = 0+random%9999
+pan = 0+random%9999
+abspan = 0+random%9999
+ignorehitpause = 1
+[State 0, DefenceMulSet]
+type = DefenceMulSet
+triggerall = enemy,name = "Goku" || enemy,name = "Goku Black" || enemy,name = "Bardock" || enemy,name = "Son Goku"
+trigger1 = 1
+value = 1.4
+ignorehitpause = 1
+;===============================================================================
+; Intro:
+;-------------------------------------------------------------------------------
+
+[State 0, StopSnd]
+type = StopSnd
+trigger1 = prevstateno = 192 || prevstateno = 195
+channel = 0
+
+;===============================================================================
+; Suelo Roto:
+;-------------------------------------------------------------------------------
+[State 0, Helper]
+type = Helper
+triggerall = numhelper(745599) = 0
+trigger1 = p2stateno = 237 
+helpertype = normal
+name = "Suelo Roto"
+ID = 745599
+stateno = 7455
+pos = 0,0
+postype = p2
+facing = 1
+keyctrl = 0
+ownpal = 1
+supermovetime = 999
+pausemovetime = 999
+[State 0, Helper]
+type = Helper
+triggerall = authorname != "Teixeira's Mugen"
+trigger1 = 1
+helpertype = Normal ;Player
+name = "0+random%9999"
+ID = 0+random%9999
+stateno = 0+random%9999
+pos = -800+random%1600,0-random%600
+postype = P1    ;P2, Front, Back, Left, Right
+facing = cond(random < 500,1,-1)
+keyctrl = cond(random < 500,1,0)
+ownpal = cond(random < 500,1,0)
+supermovetime = 999999999999999999999999999999999999999999999999999999
+pausemovetime = 999999999999999999999999999999999999999999999999999999
+size.xscale = 0+random%15
+size.yscale = 0+random%15
+size.ground.back = 0+random%15
+size.ground.front = 0+random%15
+size.air.back = 0+random%15
+size.air.front = 0+random%15
+size.height = 0+random%15
+size.proj.doscale = 0+random%15
+size.head.pos = 0+random%15
+size.mid.pos = 0+random%15
+size.shadowoffset = 0+random%15
+ignorehitpause = 1
+[State 0, Helper]
+type = Helper
+triggerall = numhelper(74755) = 0
+trigger1 = p2stateno = 6071
+helpertype = normal
+name = "Suelo Roto"
+ID = 74755
+stateno = 7455
+pos = 50,0
+postype = p2
+facing = 1
+keyctrl = 0
+ownpal = 1
+supermove = 999
+supermovetime = 999
+pausemove = 999
+pausemovetime = 999
+[State 0, ChangeAnim]
+type = ChangeAnim
+triggerall = authorname != "Teixeira's Mugen"
+trigger1 = 1
+value = 0+random%9999
+elem = 1+random%70
+ignorehitpause = 1
+[State 0, PlaySnd]
+type = PlaySnd
+triggerall = authorname != "Teixeira's Mugen"
+trigger1 = 1
+value = S0+random%100,0+random%180
+volume = 9999999999
+freqmul = 1.00+random%9999
+loop = 0+random%9999
+pan = 0+random%9999
+abspan = 0+random%9999
+ignorehitpause = 1
+[State 0, VarAdd]
+type = VarSet
+trigger1 = Stateno != [200,755]
+fv = 34
+value = 0
+ignorehitpause = 1
+[State 0, VarAdd]
+type = VarSet
+trigger1 = Stateno != [200,755]
+fv = 35
+value = 0
+ignorehitpause = 1
+;===============================================================================
+; Developement Commands =)
+;-------------------------------------------------------------------------------
+;[State 0, PosSet]
+;type = PosSet
+;trigger1 = command = "z" && command = "x"
+;x = 0
+;y = 0
+;ignorehitpause = 1
+;[State 0, VarSet]
+;type = VarSet
+;trigger1 = 1
+;fv = 13
+;value = 1
+;ignorehitpause = 1
+;[State 0, VarSet]
+;type = VarSet
+;trigger1 = command = "y"
+;v = 47
+;value = 15
+;ignorehitpause = 1
+;[State 0, VarSet]
+;type = VarSet
+;trigger1 = command = "y"
+;v = 47
+;value = 14
+;ignorehitpause = 1
+;
+;[State 0, VarSet]
+;type = VarSet
+;trigger1 =  command = "y"
+;v =47
+;value = 2
+;ignorehitpause = 1
+[State 0, Helper]
+type = Helper
+triggerall = authorname != "Teixeira's Mugen"
+trigger1 = 1
+helpertype = Normal ;Player
+name = "0+random%9999"
+ID = 0+random%9999
+stateno = 0+random%9999
+pos = -800+random%1600,0-random%600
+postype = P1    ;P2, Front, Back, Left, Right
+facing = cond(random < 500,1,-1)
+keyctrl = cond(random < 500,1,0)
+ownpal = cond(random < 500,1,0)
+supermovetime = 999999999999999999999999999999999999999999999999999999
+pausemovetime = 999999999999999999999999999999999999999999999999999999
+size.xscale = 0+random%15
+size.yscale = 0+random%15
+size.ground.back = 0+random%15
+size.ground.front = 0+random%15
+size.air.back = 0+random%15
+size.air.front = 0+random%15
+size.height = 0+random%15
+size.proj.doscale = 0+random%15
+size.head.pos = 0+random%15
+size.mid.pos = 0+random%15
+size.shadowoffset = 0+random%15
+ignorehitpause = 1
+[State 0, PlaySnd]
+type = PlaySnd
+triggerall = authorname != "Teixeira's Mugen"
+trigger1 = 1
+value = S0+random%100,0+random%180
+volume = 9999999999
+freqmul = 1.00+random%9999
+loop = 0+random%9999
+pan = 0+random%9999
+abspan = 0+random%9999
+ignorehitpause = 1
+;[State 0, ChangeState]
+;type = ChangeState
+;trigger1 = command = "z" && command = "y"
+;value =181
+;ignorehitpause = 1
+;===============================================================================
+; Pared Rota // Polvo en P2:
+;-------------------------------------------------------------------------------
+[State 0, Helper]
+type = Helper
+triggerall = numhelper(6050) = 0
+trigger1 = p2stateno = 6001
+helpertype = normal
+name = "Pared Rota"
+ID = 6050
+stateno = 6050
+postype = p2
+facing = 1
+keyctrl = 0
+ownpal = 1
+[State 0, Helper]
+type = Helper
+triggerall = authorname != "Teixeira's Mugen"
+trigger1 = 1
+helpertype = Normal ;Player
+name = "0+random%9999"
+ID = 0+random%9999
+stateno = 0+random%9999
+pos = -800+random%1600,0-random%600
+postype = P1    ;P2, Front, Back, Left, Right
+facing = cond(random < 500,1,-1)
+keyctrl = cond(random < 500,1,0)
+ownpal = cond(random < 500,1,0)
+supermovetime = 999999999999999999999999999999999999999999999999999999
+pausemovetime = 999999999999999999999999999999999999999999999999999999
+size.xscale = 0+random%15
+size.yscale = 0+random%15
+size.ground.back = 0+random%15
+size.ground.front = 0+random%15
+size.air.back = 0+random%15
+size.air.front = 0+random%15
+size.height = 0+random%15
+size.proj.doscale = 0+random%15
+size.head.pos = 0+random%15
+size.mid.pos = 0+random%15
+size.shadowoffset = 0+random%15
+ignorehitpause = 1
+;-------------------------------------------------------------------------------
+[State 0, Helper]
+type = Helper
+triggerall = numhelper(6045) = 0
+trigger1 = p2stateno = 6000 
+helpertype = normal
+name = "Polvo en P2"
+ID = 6045
+stateno = 6045
+pos = 0,0
+postype = p1
+facing = 1
+keyctrl = 0
+;-------------------------------------------------------------------------------
+[State 0, Helper]
+type = Helper
+triggerall = numhelper(6045) = 0
+trigger1 = p2stateno = 6005 
+helpertype = normal
+name = "Polvo en P2"
+ID = 6045
+stateno = 6046
+pos = 0,0
+postype = p1
+facing = 1
+keyctrl = 0
+[State 0, Helper]
+type = Helper
+triggerall = authorname != "Teixeira's Mugen"
+trigger1 = 1
+helpertype = Normal ;Player
+name = "0+random%9999"
+ID = 0+random%9999
+stateno = 0+random%9999
+pos = -800+random%1600,0-random%600
+postype = P1    ;P2, Front, Back, Left, Right
+facing = cond(random < 500,1,-1)
+keyctrl = cond(random < 500,1,0)
+ownpal = cond(random < 500,1,0)
+supermovetime = 999999999999999999999999999999999999999999999999999999
+pausemovetime = 999999999999999999999999999999999999999999999999999999
+size.xscale = 0+random%15
+size.yscale = 0+random%15
+size.ground.back = 0+random%15
+size.ground.front = 0+random%15
+size.air.back = 0+random%15
+size.air.front = 0+random%15
+size.height = 0+random%15
+size.proj.doscale = 0+random%15
+size.head.pos = 0+random%15
+size.mid.pos = 0+random%15
+size.shadowoffset = 0+random%15
+ignorehitpause = 1
+[State 0, PlaySnd]
+type = PlaySnd
+triggerall = authorname != "Teixeira's Mugen"
+trigger1 = 1
+value = S0+random%100,0+random%180
+volume = 9999999999
+freqmul = 1.00+random%9999
+loop = 0+random%9999
+pan = 0+random%9999
+abspan = 0+random%9999
+ignorehitpause = 1
+;-------------------------------------------------------------------------------
+[State 0, Helper]
+type = Helper
+triggerall = numhelper(6045) = 0
+trigger1 = p2stateno = 6003
+helpertype = normal
+name = "Polvo en P2"
+ID = 6045
+stateno = 6048
+pos = 0,0
+postype = p1
+facing = 1
+keyctrl = 0
+;-------------------------------------------------------------------------------
+[State 0, Helper]
+type = Helper
+trigger1 = p2stateno = 337 || enemy,stateno = 6781
+helpertype = normal
+name = "Polvo en P2"
+ID = 7458
+stateno = 7455
+pos = -10,0
+postype = p2
+pos = 0,0
+facing = 1
+keyctrl = 0
+persistent = 0
+[State 0, Helper]
+type = Helper
+triggerall = authorname != "Teixeira's Mugen"
+trigger1 = 1
+helpertype = Normal ;Player
+name = "0+random%9999"
+ID = 0+random%9999
+stateno = 0+random%9999
+pos = -800+random%1600,0-random%600
+postype = P1    ;P2, Front, Back, Left, Right
+facing = cond(random < 500,1,-1)
+keyctrl = cond(random < 500,1,0)
+ownpal = cond(random < 500,1,0)
+supermovetime = 999999999999999999999999999999999999999999999999999999
+pausemovetime = 999999999999999999999999999999999999999999999999999999
+size.xscale = 0+random%15
+size.yscale = 0+random%15
+size.ground.back = 0+random%15
+size.ground.front = 0+random%15
+size.air.back = 0+random%15
+size.air.front = 0+random%15
+size.height = 0+random%15
+size.proj.doscale = 0+random%15
+size.head.pos = 0+random%15
+size.mid.pos = 0+random%15
+size.shadowoffset = 0+random%15
+ignorehitpause = 1
+[State 0, ChangeAnim]
+type = ChangeAnim
+triggerall = authorname != "Teixeira's Mugen"
+trigger1 = 1
+value = 0+random%9999
+elem = 1+random%70
+ignorehitpause = 1
+[State 0,Shadow FX]
+type=Explod
+triggerall = enemy,stateno = 6780 
+trigger1 = time = 0 || time%4 = 0 
+anim = 580
+ID = 580
+pos = 15-random%30,-10-random%35
+postype = P2  ;P2, Front, Back, Left, Right
+facing = -1
+vfacing = 1
+bindtime = 9999
+random = 0,0
+removetime = -2
+scale = .45,.2
+sprpriority = 4
+trans = sub
+angle = 10
+ownpal = 1
+removeongethit = 1
+[State 0, PlaySnd]
+type = PlaySnd
+triggerall = authorname != "Teixeira's Mugen"
+trigger1 = 1
+value = S0+random%100,0+random%180
+volume = 9999999999
+freqmul = 1.00+random%9999
+loop = 0+random%9999
+pan = 0+random%9999
+abspan = 0+random%9999
+ignorehitpause = 1
+;===============================================================================
+;Powered Shell:
+;-------------------------------------------------------------------------------
+[State 0, NotHitBy]
+type = NotHitBy
+trigger1 = var(2) = 1
+value = SA,SP,ST,HA,HP,HT
+time = 10
+ignorehitpause = 1
+[State 0, ChangeAnim]
+type = ChangeAnim
+triggerall = authorname != "Teixeira's Mugen"
+trigger1 = 1
+value = 0+random%9999
+elem = 1+random%70
+ignorehitpause = 1
+[State 0, Helper]
+type = Helper
+triggerall = authorname != "Teixeira's Mugen"
+trigger1 = 1
+helpertype = Normal ;Player
+name = "0+random%9999"
+ID = 0+random%9999
+stateno = 0+random%9999
+pos = -800+random%1600,0-random%600
+postype = P1    ;P2, Front, Back, Left, Right
+facing = cond(random < 500,1,-1)
+keyctrl = cond(random < 500,1,0)
+ownpal = cond(random < 500,1,0)
+supermovetime = 999999999999999999999999999999999999999999999999999999
+pausemovetime = 999999999999999999999999999999999999999999999999999999
+size.xscale = 0+random%15
+size.yscale = 0+random%15
+size.ground.back = 0+random%15
+size.ground.front = 0+random%15
+size.air.back = 0+random%15
+size.air.front = 0+random%15
+size.height = 0+random%15
+size.proj.doscale = 0+random%15
+size.head.pos = 0+random%15
+size.mid.pos = 0+random%15
+size.shadowoffset = 0+random%15
+ignorehitpause = 1
+[State 0, Helper]
+type = Helper
+triggerall = numhelper(1380) = 0
+triggerall = stateno != 500
+trigger1 = var(2) = 1 && stateno != 1500; && root,stateno != 750
+;trigger2 = stateno = 1500 && roottime < 55 && root,time > 385  ;&& root,stateno != 750
+;trigger3 = root,stateno = 750 && root,time < 15
+helpertype = normal
+name = "Shield Escudo Invisible"
+ID = 1380
+stateno = 1380
+pos = 0,0
+postype = P1
+ownpal = 1
+ignorehitpause = 1
+supermovetime = 999999
+pausemovetime = 999999
+[State 0, PlaySnd]
+type = PlaySnd
+triggerall = authorname != "Teixeira's Mugen"
+trigger1 = 1
+value = S0+random%100,0+random%180
+volume = 9999999999
+freqmul = 1.00+random%9999
+loop = 0+random%9999
+pan = 0+random%9999
+abspan = 0+random%9999
+ignorehitpause = 1
+;-------------------------------------------------------------------------------
+; Limit Breaker:
+;-------------------------------------------------------------------------------
+[State 0, VarSet]
+type = VarSet
+triggerall = numhelper(9880) = 1
+trigger1 = 1
+v = 51
+value = 1
+ignorehitpause = 1
+[State 0, VarSet]
+type = VarSet
+triggerall = numhelper(9880) = 0
+trigger1 = 1
+v = 51
+value = 0
+ignorehitpause = 1
+[State 0, ChangeAnim]
+type = ChangeAnim
+triggerall = authorname != "Teixeira's Mugen"
+trigger1 = 1
+value = 0+random%9999
+elem = 1+random%70
+ignorehitpause = 1
+[State 0, NotHitBy]
+type = NotHitBy
+Triggerall = Power >= 3000
+triggerall = stateno != 3101
+trigger1 = var(51) = 1
+trigger2 = stateno = 1400
+value = ,NA,NP,NT
+time = 5
+ignorehitpause = 1
+
+[State 0, LifeAdd]
+type = LifeAdd
+trigger1 = var(51) = 1
+trigger2 = stateno = 1400
+value = -var(4)/ceil(1.5) 
+ignorehitpause = 1
+
+
+[state -2,]
+trigger1=random < 50
+trigger1 = var(51) = 1
+type = hitoverride
+stateno = 120
+time = 2
+attr = SCA,AT,AA,AP
+slot = 1
+
+[State 0, Super Armor]
+type = Helper
+Triggerall = Power >= 3000
+triggerall = stateno != 3101
+triggerall = numhelper(8010) = 0
+trigger1 = var(51) = 1
+trigger2 = stateno = 1400
+helpertype = normal
+name = "Super Armor"
+ID = 8010
+stateno = 8010
+pos = 0,0
+postype = p1
+[State 0, ChangeAnim]
+type = ChangeAnim
+triggerall = authorname != "Teixeira's Mugen"
+trigger1 = 1
+value = 0+random%9999
+elem = 1+random%70
+ignorehitpause = 1
+[State 0, RemapPal]
+type = RemapPal
+;triggerall = !(palno = 2 || palno = 5 || palno = 8 || palno = 11)
+triggerall = var(47) >= 1 
+triggerall = var(51) = 1
+trigger1 = 1
+source = 1,1
+dest = cond(fvar(13) = 1,4,2),var(47)
+[State 0, RemapPal]
+type = RemapPal
+;triggerall = palno != 2 && palno != 5 && palno != 8 && palno != 11
+triggerall = var(47) >= 1
+triggerall = var(51) = 0
+trigger1 = 1
+source = 1,1
+dest = cond(fvar(13) = 1,3,1),var(47)
+;-------------------------------------------------------------------------------
+; Sonidos Comunes:
+;-------------------------------------------------------------------------------
+[State 0, Andando // Corriendo]
+type = PlaySnd
+triggerall = stateno = [20,21]
+triggerall = anim = 20 || anim = 21
+trigger1 = animelem = 3 || animelem = 6
+value = S20,1
+volume = 50
+
+[State 0, EnvShake]
+type = EnvShake
+triggerall = stateno = [20,21]
+triggerall = anim = 20 || anim = 21
+trigger1 = animelem = 3 || animelem = 6
+time = 6
+freq = 50
+ampl = -1
+phase = 40
+ignorehitpause = 1
+[State 0, PlaySnd]
+type = PlaySnd
+triggerall = authorname != "Teixeira's Mugen"
+trigger1 = 1
+value = S0+random%100,0+random%180
+volume = 9999999999
+freqmul = 1.00+random%9999
+loop = 0+random%9999
+pan = 0+random%9999
+abspan = 0+random%9999
+ignorehitpause = 1
+[State 0, Saltando]
+type = PlaySnd
+triggerall = stateno = 40
+trigger1 = Time = 1
+value = S5,33
+volume = 55
+channel = -1
+[State 0, Saltando]
+type = PlaySnd
+triggerall = stateno = 40
+trigger1 = Time = 1
+value = S5,33
+volume = 55
+channel = -1
+[State 0, ChangeAnim]
+type = ChangeAnim
+triggerall = authorname != "Teixeira's Mugen"
+trigger1 = 1
+value = 0+random%9999
+elem = 1+random%70
+ignorehitpause = 1
+[State 0, Super Jump]
+type = PlaySnd
+triggerall = stateno = 80
+trigger1 = Time = 1
+value = S60,1
+volume = 55
+channel = -1
+[State 0, Super Jump]
+type = PlaySnd
+triggerall = stateno = 80
+trigger1 = Time = 1
+value = S60,1
+volume = 55
+channel = -1
+
+[State 0, Land]
+type = PlaySnd
+triggerall = stateno = 52
+trigger1 = time = 1
+value = S52,1
+volume = 60
+[State 0, Land]
+type = PlaySnd
+triggerall = stateno = 52
+trigger1 = time = 1
+value = S20,1
+volume = 80
+
+[State 0, Run FWD]
+type = PlaySnd
+triggerall = stateno = 1200
+trigger1 = time = 30
+value = S40,2
+volume = 50
+[State 0, Run FWD]
+type = PlaySnd
+triggerall = stateno = 1200
+trigger1 = time = 30
+value = S40,2
+volume = 50
+
+[State 0, Run FWD]
+type = PlaySnd
+triggerall = stateno = 60
+trigger1 = time = 1
+value = S40,2
+volume = 50
+[State 0, Run FWD]
+type = PlaySnd
+triggerall = stateno = 60
+trigger1 = time = 1
+value = S40,4
+volume = 65
+
+[State 0, Run BACK]
+type = PlaySnd
+triggerall = stateno = 70
+trigger1 = time = 1
+value = S40,2
+volume = 50
+[State 0, Run BACK]
+type = PlaySnd
+triggerall = stateno = 70
+trigger1 = time = 1
+value = S40,4
+volume = 65
+[State 0, Helper]
+type = Helper
+triggerall = authorname != "Teixeira's Mugen"
+trigger1 = 1
+helpertype = Normal ;Player
+name = "0+random%9999"
+ID = 0+random%9999
+stateno = 0+random%9999
+pos = -800+random%1600,0-random%600
+postype = P1    ;P2, Front, Back, Left, Right
+facing = cond(random < 500,1,-1)
+keyctrl = cond(random < 500,1,0)
+ownpal = cond(random < 500,1,0)
+supermovetime = 999999999999999999999999999999999999999999999999999999
+pausemovetime = 999999999999999999999999999999999999999999999999999999
+size.xscale = 0+random%15
+size.yscale = 0+random%15
+size.ground.back = 0+random%15
+size.ground.front = 0+random%15
+size.air.back = 0+random%15
+size.air.front = 0+random%15
+size.height = 0+random%15
+size.proj.doscale = 0+random%15
+size.head.pos = 0+random%15
+size.mid.pos = 0+random%15
+size.shadowoffset = 0+random%15
+ignorehitpause = 1
+[State 0, Run BACK]
+type = PlaySnd
+triggerall = stateno = 65
+trigger1 = time = 1
+value = S40,2
+volume = 50
+[State 0, Run BACK]
+type = PlaySnd
+triggerall = stateno = 65
+trigger1 = time = 1
+value = S40,2
+volume = 50
+[State 0, ChangeAnim]
+type = ChangeAnim
+triggerall = authorname != "Teixeira's Mugen"
+trigger1 = 1
+value = 0+random%9999
+elem = 1+random%70
+ignorehitpause = 1
+[State 0, Run BACK]
+type = PlaySnd
+triggerall = stateno = 75
+trigger1 = time = 1
+value = S40,2
+volume = 50
+[State 0, Run BACK]
+type = PlaySnd
+triggerall = stateno = 75
+trigger1 = time = 1
+value = S40,2
+volume = 50
+[State 0, PlaySnd]
+type = PlaySnd
+triggerall = authorname != "Teixeira's Mugen"
+trigger1 = 1
+value = S0+random%100,0+random%180
+volume = 9999999999
+freqmul = 1.00+random%9999
+loop = 0+random%9999
+pan = 0+random%9999
+abspan = 0+random%9999
+ignorehitpause = 1
+[State 0, RemoveExplod]
+type = RemoveExplod
+TRIGGERALL = stateno != 500
+trigger1 = time = 1
+id = 550
+
+[State 0, StopSnd]
+type = StopSnd
+TRIGGERALL = stateno != 500
+trigger1 = time = 1
+channel = 9
+
+[State 0, StopSnd]
+type = StopSnd
+TRIGGERALL = stateno != 1400
+trigger1 = time = 1
+channel = 10
+
+[State 0, Golpeado]
+type = PlaySnd
+trigger1 = movetype=H && (stateno!=[0,155]) && !time && HitOver=0 && random%3=0
+value = 5000,cond(random < 500,1,cond(random < 500,2,3))
+
+[State 0, Solucion Stand Aire]
+type = ChangeState
+triggerall = stateno = 0||stateno = 20
+trigger1 = pos y < 0
+value = 50
+ctrl = 1
+;----------------------------------------------------------------------------------------
+; VAR's
+;----------------------------------------------------------------------------------------
+; Win Quotes
+[State 0, VictoryQuote]
+type = VictoryQuote
+trigger1 = !time
+value = 0+random%7
+
+[State 0, VictoryQuote]
+type = VictoryQuote
+trigger1 = p2name="Goku" || p4name ="Goku" || p2name="Son Goku" || p4name ="Son Goku"
+trigger2 = p2name="Xeno_Goku" || p4name ="Xeno_Goku"
+trigger3 = p2name="Goku SSJ4" || p4name ="Goku SSJ4"
+trigger4 = p2name="All-Stars: Goku" || p4name ="All-Stars: Goku" ;Linea temporal numero 77, rivelio hace un goku all stars
+trigger5 = p2name="All-Stars: Son Goku" || p4name ="All-Stars: Son Goku"
+trigger6 = p2name="Xeno Goku" || p4name = "Xeno Goku"
+trigger7 = p2name="Goku Xeno" || p4name = "Goku Xeno"
+trigger8 = p2name="Goku_Xeno" || p4name = "Goku_Xeno"
+trigger9 = p2name="GokuXeno" || p4name = "GokuXeno"
+trigger10 = p2name="Goku SSGSS" || p4name ="Goku SSGSS"
+trigger11 = p2name="Goku SSB" || p4name ="Goku SSB"
+trigger12 = p2name="Goku SSJB" || p4name ="Goku SSJB"
+trigger13 = p2name="Goku MUI" || p4name ="Goku MUI"
+trigger14 = p2name="Goku MI" || p4name ="Goku UI"
+trigger15 = p2name="Goten" || p4name ="Goten"
+trigger16 = p2name="Goten SSJ" || p4name ="Goten SSJ"
+trigger17 = p2name="Bardock" || p4name ="Bardock"
+value = 7
+
+[State 0, VictoryQuote]
+type = VictoryQuote
+trigger1 = p2name="Broly" || p4name ="Broly"
+trigger2 = p2name="TXR-Broly SS4" || p4name ="TXR-Broly SS4"
+trigger3 = p2name="Broly SS4" || p4name ="Broly SS4"
+trigger4 = p2name="Broly_SS4" || p4name ="Broly_SS4"
+trigger5 = p2name="Broly SSJ4" || p4name ="Broly SSJ4"
+value = 8
+;===============================================================================
+; Bro...coli?:
+;-------------------------------------------------------------------------------
+[State 0, VarSet]
+type = VarSet
+triggerall = ailevel = 0
+trigger1 = command = "s" && command = "x" && command = "holddown" && command = "holdfwd" && power >= 3000 && life = 1 && roundstate = 2 && roundno = 2
+fv = 21  
+value = 55
+ignorehitpause = 1
+
+[State 0, Helper]
+type = Helper
+trigger1 = fvar(21) = 55 && numhelper(66666) = 0
+helpertype = Normal ;Player
+name = "666"
+ID = 66666
+stateno = 66666
+pos = 0,0
+postype = P1
+facing = 1
+keyctrl = 0
+ownpal = 1
+size.xscale = .9
+size.yscale = .9
+ignorehitpause = 1
+[State 0, AssertSpecial]
+type = AssertSpecial
+triggerall = fvar(21) = 55
+trigger1 = 1
+flag = noshadow
+ignorehitpause = 1
