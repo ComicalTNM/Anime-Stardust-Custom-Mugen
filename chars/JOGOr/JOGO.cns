@@ -247,6 +247,13 @@ range = 0,1
 ;
 [Statedef -2]
 
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = time = 330
+value = 2501
+ctrl = 0
+
 [State 0, Execution]
 type = SelfState
 Triggerall = !ishelper
@@ -270,9 +277,8 @@ triggerall = power >= 2000
 triggerall = statetype != A
 triggerall = ailevel > 0 && roundstate = 2
 triggerall = ctrl 
-triggerall = p2bodydist x >100
 triggerall = !numexplod(47000)
-trigger1 = random < (ailevel * 100)/1
+trigger1 = random < (ailevel * 1000000000)
 value = 4700
 
 
@@ -284,10 +290,30 @@ triggerall = !Helper(30990),Var(1)
 trigger1 = life <= lifemax*.40
 value = 2000
 
-[State 0, StopSnd]
-type = StopSnd
-trigger1 = stateno !=[190,199]
-channel = 5
+[State 0, Air Run]
+type = ChangeState
+triggerall = ctrl
+triggerall = p2bodydist x < 50
+triggerall = p2bodydist x > 8
+trigger1 = 1
+value = 300
+
+[State 0, Air Run]
+type = ChangeState
+triggerall = ctrl
+triggerall = p2bodydist x > 200
+triggerall = life < lifemax
+triggerall = ctrl 
+trigger1 = 1
+value = 105
+
+[State 0, Air Run]
+type = ChangeState
+triggerall = ctrl
+triggerall = p2bodydist x < 10
+trigger1 = 1
+value = 200
+
 
 [State 0, Air Run]
 type = ChangeState
@@ -297,84 +323,6 @@ triggerall = ctrl
 triggerall = p2bodydist x > 100
 trigger1 = random < (ailevel * 100)
 value = 105
-
-[State 0, Run Atras]
-type = ChangeState
-triggerall = statetype != A
-triggerall = ailevel > 0 && roundstate = 2
-triggerall = ctrl
-trigger1 = power >= 0
-triggerall = p2bodydist x < 70
-trigger1 = random < (ailevel * 300)
-value = 110
-
-[State 0, Escape]
-type = SelfState
-Triggerall = Pos y = [-10,10]
-Triggerall = !numexplod(400)
-Triggerall = Alive && Roundstate = 2
-Triggerall = !ishelper
-Triggerall = (Enemynear,stateno >= 200+(enemynear,Var(11))&& Enemynear,stateno < 1000+(enemynear,Var(11)))
-Triggerall = Incustomstate && Name = "Jogo"
-trigger1 = random < (ailevel * 100)/10
-value = 400
-[State 0, Smoke Evade]
-type = SelfState
-Triggerall = Stateno != 400
-Triggerall = Alive
-Triggerall = Pos y >= 0
-triggerall = AILevel
-trigger1 = !NumExplod(400)
-triggerall = stateno != 400
-triggerall = p2statetype = S
-triggerall = p2movetype = A
-triggerall = p2bodydist x < 70
-triggerall = (Cond((Stateno = [120,155]) || Stateno = 199 || Stateno = 195 || Stateno = 60 || Stateno = 61 || Stateno = 65 || Stateno = 66 || Stateno = 70 || Stateno = 80 || Stateno = 450 || Stateno = 650 || Stateno = 200 || Stateno = 300||Stateno = [200,400],!Ctrl,Ctrl))
-value = 400
-ctrl = 0
-[State 0, Smoke Evade]
-type = SelfState
-Triggerall = Alive
-Triggerall = Stateno != 400
-Triggerall = Pos y >= 0
-triggerall = !NumExplod(400)
-triggerall = stateno != 750
-triggerall = ailevel > 0 && roundstate = 2
-triggerall = (Cond((Stateno = [120,155]) || Stateno = 199 || Stateno = 195 || Stateno = 60 || Stateno = 61 || Stateno = 65 || Stateno = 66 || Stateno = 70 || Stateno = 80 || Stateno = 450 || Stateno = 650 || Stateno = 200 || Stateno = 300||Stateno = [200,400],!Ctrl,Ctrl))
-triggerall = frontedgebodydist > 70
-triggerall = p2bodydist x < 60 && p2movetype = A || (enemy,numproj > 0)
-trigger1 = random < (ailevel * 100)/6
-trigger2 = backedgebodydist < 30
-trigger2 = random < (ailevel * 100)/3
-value = 400
-[State 0, Smoke Evade]
-Type = SelfState
-Triggerall = Alive
-Triggerall = Stateno != 400
-Triggerall = Pos y >= 0
-triggerall = !NumExplod(400)
-Triggerall = P2Stateno = 200 || P2Stateno = 300 || P2Stateno = 400
-Triggerall = AILevel > 0 && RoundState = 2
-Triggerall = (Cond((Stateno = [120,155]) || Stateno = 199 || Stateno = 195 || Stateno = 60 || Stateno = 61 || Stateno = 65 || Stateno = 66 || Stateno = 70 || Stateno = 80 || Stateno = 450 || Stateno = 650 || Stateno = 200 || Stateno = 300||Stateno = [200,400],!Ctrl,Ctrl))
-triggerall = stateno != 400
-Trigger1 = P2BodyDist x>=100
-Trigger1 = Random < (AILevel * 100)/6
-Trigger2 = P2BodyDist x = [50,100]
-Trigger2 = Random < (AILevel * 100)/8
-Trigger3=P2BodyDist x < 50
-Trigger3=Random < (AILevel * 100)/10
-Value = 400
-[State 0, Smoke Evade]
-type = SelfState
-value = 400
-Triggerall = Stateno != 400
-Triggerall = Alive
-Triggerall = Pos y >= 0
-triggerall = !NumExplod(400)
-trigger1 = stateno != 400
-triggerall = (ailevel )&& (roundstate = 2) && (numenemy) 
-trigger1 =(random<((50)*(ailevel**2/64.0))) &&(Cond((Stateno = [120,155]) || Stateno = 199 || Stateno = 195 || Stateno = 60 || Stateno = 61 || Stateno = 65 || Stateno = 66 || Stateno = 70 || Stateno = 80 || Stateno = 450 || Stateno = 650 || Stateno = 200 || Stateno = 300||Stateno = [200,400],!Ctrl,Ctrl))
-trigger1 = inguarddist
 
 [State 0, NotHitBy]
 type = NotHitBy
@@ -398,7 +346,7 @@ Triggerall = Helper(30990),Var(1)
 Triggerall = !numexplod(2500)
 triggerall = statetype != A
 triggerall = ailevel > 0 && roundstate = 2
-triggerall = ctrl || Stateno = 99664 
+triggerall = ctrl
 Triggerall = p2bodydist x >= 60
 trigger1 = random < (ailevel * 100)/2
 value = 2500
@@ -409,7 +357,7 @@ Triggerall = Numhelper(2005)
 Triggerall = !numexplod(2200)
 triggerall = statetype != A
 triggerall = ailevel > 0 && roundstate = 2
-triggerall = ctrl || Stateno = 99664 
+triggerall = ctrl
 Triggerall = p2bodydist x >= 60
 trigger1 = random < (ailevel * 100)/2
 value = 2200
@@ -420,7 +368,7 @@ Triggerall = Helper(30990),Var(1)
 Triggerall = !numexplod(2150)
 triggerall = statetype != A
 triggerall = ailevel > 0 && roundstate = 2
-triggerall = ctrl || Stateno = 99664 
+triggerall = ctrl 
 Triggerall = p2bodydist x >= 60
 trigger1 = random < (ailevel * 100)/2
 value = 2150
@@ -431,7 +379,7 @@ Triggerall = Numhelper(2005)
 Triggerall = !numexplod(1200)
 triggerall = statetype != A
 triggerall = ailevel > 0 && roundstate = 2
-triggerall = ctrl || Stateno = 99664 
+triggerall = ctrl
 Triggerall = p2bodydist x >= 100
 triggerall = p2bodydist y = [-30,30]
 trigger1 = random < (ailevel * 100)/2
@@ -443,7 +391,7 @@ Triggerall = Power >= 3000
 Triggerall = !numexplod(1250)
 triggerall = statetype != A
 triggerall = ailevel > 0 && roundstate = 2
-triggerall = ctrl || Stateno = 99664 
+triggerall = ctrl
 Triggerall = p2bodydist x >= 60
 triggerall = p2bodydist y = [-80,80]
 trigger1 = random < (ailevel * 100)/2
@@ -455,7 +403,7 @@ Triggerall = Power >= 500
 Triggerall = !numexplod(1000)
 triggerall = statetype != A
 triggerall = ailevel > 0 && roundstate = 2
-triggerall = ctrl || Stateno = 99664 
+triggerall = ctrl
 Triggerall = p2bodydist x >= 60
 triggerall = p2bodydist y = [-30,30]
 trigger1 = random < (ailevel * 100)/2
@@ -467,7 +415,7 @@ Triggerall = Power >= 500
 Triggerall = !numexplod(1050)
 triggerall = statetype != A
 triggerall = ailevel > 0 && roundstate = 2
-triggerall = ctrl || Stateno = 99664 
+triggerall = ctrl 
 Triggerall = p2bodydist x >= 60
 trigger1 = random < (ailevel * 100)
 value = 1050
@@ -478,7 +426,7 @@ Triggerall = Power >= 1500
 Triggerall = !numexplod(1100)
 triggerall = statetype != A
 triggerall = ailevel > 0 && roundstate = 2
-triggerall = ctrl || Stateno = 99664 
+triggerall = ctrl 
 Triggerall = p2bodydist x >= 100
 triggerall = p2bodydist y = [-60,60]
 trigger1 = random < (ailevel * 100)/2
@@ -487,11 +435,9 @@ value = 1100
 [State 0, Ember Insects Release]
 type = ChangeState
 Triggerall = Power >= 500
-Triggerall = !numexplod(1150) && Fighttime > 600
 Triggerall = !Numhelper(1151)
 triggerall = statetype != A
 triggerall = ailevel > 0 && roundstate = 2
-triggerall = ctrl || Stateno = 99664 
 Triggerall = p2bodydist x >= 100
 trigger1 = random < (ailevel * 100)/2
 value = 1150
@@ -518,8 +464,7 @@ value = .8
 
 [State 0, Valcano Seed]
 type = Helper
-Triggerall = Roundstate = 2 && Fighttime > 1800
-Triggerall = !standby
+Triggerall = Roundstate = 2
 Triggerall = Pos y >= 0
 trigger1 = Random < 1 
 helpertype = normal ;player
@@ -540,7 +485,7 @@ size.yscale = .5
 type = Helper
 Triggerall = !numexplod(20510)
 Triggerall = Helper(30990),Var(1)
-Triggerall = Roundstate = 2 && Fighttime > 900
+Triggerall = Roundstate = 2 
 Triggerall = !standby
 trigger1 = Random < 1 
 helpertype = normal ;player
@@ -1473,7 +1418,7 @@ envshake.ampl = 1
 [State 0, TargetState]
 type = TargetState
 trigger1 = movehit = 1
-value = 99665
+value = 0
 ID = -1
 ignorehitpause = 1
 persistent = 1
@@ -1624,7 +1569,7 @@ envshake.ampl = 1
 [State 0, TargetState]
 type = TargetState
 trigger1 = movehit = 1
-value = 99665
+value = 0
 ID = -1
 ignorehitpause = 1
 persistent = 1
@@ -1978,7 +1923,7 @@ envshake.ampl = 1
 [State 0, TargetState]
 type = TargetState
 trigger1 = movehit = 1
-value = 99665
+value = 0
 ID = -1
 ignorehitpause = 1
 persistent = 1
@@ -2122,7 +2067,7 @@ envshake.ampl = 1
 [State 0, TargetState]
 type = TargetState
 trigger1 = movehit = 1
-value = 99665
+value = 0
 ID = -1
 ignorehitpause = 1
 persistent = 1
@@ -2666,11 +2611,6 @@ type = NotHitBy
 trigger1 = 1
 value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
 time = 1
-
-[State 0, PlayerPush]
-type = PlayerPush
-trigger1 = 1
-value = 1
 
 [State 0, DestroySelf]
 type = DestroySelf
@@ -4224,10 +4164,6 @@ trigger1 = !movehit
 x = .1
 y = -.2
 
-[State 0, PlayerPush]
-type = PlayerPush
-trigger1 = 1
-value = 0
 
 
 
@@ -4754,13 +4690,6 @@ ignorehitpause = 1
 
 [State 0, Erruption | Enemy 1]
 type = HItby
-Triggerall = (((Target,life > Target,lifemax*.10)&&Target, vel x != 0)||((Target,life <= Target,lifemax*.10)&&(Helper(30990),Var(22))))
-Triggerall = (((Target,Name = "Gojo Satoru [Iso/Kuro/Jt]"||Target,Name = "Gojo Satoru")&&Target,Numhelper(502550) = 0)||((Target,Name = "Gojo Satoru [Iso/Kuro/Jt]"||Target,Name = "Gojo Satoru")&&(Numhelper(2005)))||(Target,Name != "Gojo Satoru [Iso/Kuro/Jt]"&&Target,Name != "Gojo Satoru"))
-Triggerall = (Target,Name = "Sasuke Uchiha")&&(Target,Stateno != [39000,39600])&&(Target,Stateno != [1900,1920]) || (Target,Name != "Sasuke Uchiha")
-Triggerall = ((Target,Name = "Senju - Hashirama")&&(Target,Stateno != [30000,40000]) || (Target,Name != "Senju - Hashirama"))
-Triggerall = ((Target,Name = "Uchiha Obito")&&(Target,Stateno != [600,610]) || (Target,Name != "Uchiha Obito"))
-Triggerall = (Target,Name = "Naruto" || Target,Name = "Naruto Uzumaki"  || Target,Name = "Naruto Boss")&&(Target,Stateno != [33000,34290] && Target,Stateno != [40000,40970]) || (Target,Name != "Naruto" && Target,Name != "Naruto Uzumaki"  && Target,Name != "Naruto Boss") 
-Triggerall = !Target,Standby
 Triggerall = Target,Alive
 Triggerall = !Target,IsHelper
 triggerall = playeridexist(root,var(52))
@@ -4772,13 +4701,6 @@ time = 2
 RedirectID = root,var(52)
 [State 0, Erruption | Enemy 2]
 type = HItby
-Triggerall = (((Target,life > Target,lifemax*.10)&&Target, vel x != 0)||((Target,life <= Target,lifemax*.10)&&(Helper(30990),Var(22))))
-Triggerall = (((Target,Name = "Gojo Satoru [Iso/Kuro/Jt]"||Target,Name = "Gojo Satoru")&&Target,Numhelper(502550) = 0)||((Target,Name = "Gojo Satoru [Iso/Kuro/Jt]"||Target,Name = "Gojo Satoru")&&(Numhelper(2005)))||(Target,Name != "Gojo Satoru [Iso/Kuro/Jt]"&&Target,Name != "Gojo Satoru"))
-Triggerall = (Target,Name = "Sasuke Uchiha")&&(Target,Stateno != [39000,39600])&&(Target,Stateno != [1900,1920]) || (Target,Name != "Sasuke Uchiha")
-Triggerall = ((Target,Name = "Senju - Hashirama")&&(Target,Stateno != [30000,40000]) || (Target,Name != "Senju - Hashirama"))
-Triggerall = ((Target,Name = "Uchiha Obito")&&(Target,Stateno != [600,610]) || (Target,Name != "Uchiha Obito"))
-Triggerall = (Target,Name = "Naruto" || Target,Name = "Naruto Uzumaki"  || Target,Name = "Naruto Boss")&&(Target,Stateno != [33000,34290] && Target,Stateno != [40000,40970]) || (Target,Name != "Naruto" && Target,Name != "Naruto Uzumaki"  && Target,Name != "Naruto Boss") 
-Triggerall = !Target,Standby
 Triggerall = Target,Alive
 Triggerall = !Target,IsHelper
 triggerall = playeridexist(root,var(53))
@@ -4790,13 +4712,6 @@ time = 2
 RedirectID = root,var(53)
 [State 0, Erruption | Enemy 3]
 type = HItby
-Triggerall = (((Target,life > Target,lifemax*.10)&&Target, vel x != 0)||((Target,life <= Target,lifemax*.10)&&(Helper(30990),Var(22))))
-Triggerall = (((Target,Name = "Gojo Satoru [Iso/Kuro/Jt]"||Target,Name = "Gojo Satoru")&&Target,Numhelper(502550) = 0)||((Target,Name = "Gojo Satoru [Iso/Kuro/Jt]"||Target,Name = "Gojo Satoru")&&(Numhelper(2005)))||(Target,Name != "Gojo Satoru [Iso/Kuro/Jt]"&&Target,Name != "Gojo Satoru"))
-Triggerall = (Target,Name = "Sasuke Uchiha")&&(Target,Stateno != [39000,39600])&&(Target,Stateno != [1900,1920]) || (Target,Name != "Sasuke Uchiha")
-Triggerall = ((Target,Name = "Senju - Hashirama")&&(Target,Stateno != [30000,40000]) || (Target,Name != "Senju - Hashirama"))
-Triggerall = ((Target,Name = "Uchiha Obito")&&(Target,Stateno != [600,610]) || (Target,Name != "Uchiha Obito"))
-Triggerall = (Target,Name = "Naruto" || Target,Name = "Naruto Uzumaki"  || Target,Name = "Naruto Boss")&&(Target,Stateno != [33000,34290] && Target,Stateno != [40000,40970]) || (Target,Name != "Naruto" && Target,Name != "Naruto Uzumaki"  && Target,Name != "Naruto Boss") 
-Triggerall = !Target,Standby
 Triggerall = Target,Alive
 Triggerall = !Target,IsHelper
 triggerall = playeridexist(root,var(54))
@@ -4852,113 +4767,6 @@ Kill = 0
 absolute = 1
 ignorehitpause = 1
 persistent = 5
-
-[State 0, Impact Catch | Enemy 1]
-Type = TargetState
-Triggerall = (((Root,Stateno != 10000 && Root,Stateno != 3000 && Root,Stateno != 11810 && Target, vel x != 0)) || ((Root,Stateno = 10000 || Root,Stateno = 3000 || Root,Stateno = 11810)))
-Triggerall = (((Target,Name = "Gojo Satoru [Iso/Kuro/Jt]"||Target,Name = "Gojo Satoru")&&Target,Numhelper(502550) = 0)||((Target,Name = "Gojo Satoru [Iso/Kuro/Jt]"||Target,Name = "Gojo Satoru")&&(Numhelper(2005)))||(Target,Name != "Gojo Satoru [Iso/Kuro/Jt]"&&Target,Name != "Gojo Satoru"))
-Triggerall = (Target,Name = "Sasuke Uchiha")&&(Target,Stateno != [39000,39600])&&(Target,Stateno != [1900,1920]) || (Target,Name != "Sasuke Uchiha")
-Triggerall = (Target,Name = "Naruto" || Target,Name = "Naruto Uzumaki"  || Target,Name = "Naruto Boss")&&(Target,Stateno != [33000,34290] && Target,Stateno != [40000,40970]) || (Target,Name != "Naruto" && Target,Name != "Naruto Uzumaki"  && Target,Name != "Naruto Boss") 
-Triggerall = (Target,Movetype = H||((Root,Stateno = 200||Root,Stateno = 99664||Root,Stateno = 300||Root,Stateno = 2300||Root,Stateno = 620||Root,Stateno = 2600)&&Root,time = 2)||Root,stateno = 1000||(Root,Stateno = 1600 && Root,Prevstateno = 72)||Root,Stateno = 3002||Root,Stateno = 1500||Root,Stateno = 1202||Root,Stateno = 4600||Numhelper(9250)||Numhelper(4950)||Numhelper(9450)||Numhelper(9550)||Numhelper(9650)||Numhelper(9750)||Numhelper(9850)||Numhelper(9950)||Numhelper(17750)||Numexplod(99051)||(Numhelper(50000)&&helper(50000),Stateno = 53496)||NumHelper(29450))
-Triggerall = !Target,IsHelper
-Triggerall = Target,Alive
-Triggerall = Target,stateno != [6565600,6565611] && Target,Stateno != 0
-triggerall = playeridexist(root,var(52))
-Triggerall = NumHelper(99450)
-Triggerall = Target,Stateno != 99666
-Trigger13 = (Numhelper(50000))
-Trigger13 = (helper(50000),Stateno = 53496||Helper(29450),Pos x < Target,pos x+400&&Helper(29450),Pos x > Target,pos x-400)
-Trigger12 = (Root,stateno = 3342000)
-Trigger11 = (Numhelper(1051))
-Trigger11 = (Helper(1051),Pos x < Target,pos x +80&&Helper(1251),Pos x > Target,pos x-80 && Target,Movetype != H)
-Trigger10 = (Numhelper(1251))
-Trigger10 = (Helper(1251),Pos x < Target,pos x+400&&Helper(1251),Pos x > Target,pos x-400 && Target,Movetype != H)
-Trigger9 = (Root,Stateno = 4600 && Target,movetype != H)
-Trigger8 = (Root,Stateno = 1202 && Target,movetype != H)
-Trigger7 = (Root,Stateno = 3002 && Target,movetype != H)
-Trigger6 = (Root,Stateno = 1500 && Target,movetype != H)
-Trigger5 = ((Root,Stateno = 1600)&&(Target,pos y = [-60,60])&&(Target,pos x <= Root,pos x +30)&&(Target,pos y >= Root,pos x -30)&& Target,movetype != H)
-Trigger4 = ((Root,Stateno = 1000)&&(Target,pos y = [-60,60])&& Target,movetype != H)
-Trigger3 = ((Root,Stateno = 99664)&&(Target,pos y >= Root,pos y -30) && (Target,pos y <= Root,pos y +30) && (Target,pos x <= Root,pos x +60) && (Target,pos y >= Root,pos x -60))
-Trigger2 = ((Root,Stateno = 620||Root,Stateno = 2600&&(Target,pos y >= Root,pos y -30) && (Target,pos y <= Root,pos y +30) && (Target,pos x <= Root,pos x +40) && (Target,pos y >= Root,pos x -40))&& Target,movetype != H)
-Trigger1 = ((Root,Stateno = 200||Root,Stateno = 2200||Root,Stateno = 300||Root,Stateno = 2300)&&Root,time = 2&&(Target,pos y >= Root,pos y -30) && (Target,pos y <= Root,pos y +30) && (Target,pos x <= Root,pos x +40) && (Target,pos y >= Root,pos x -40))
-Value = 99666
-IgnoreHitPause = 1
-persistent = 1
-[State 0, Impact Catch | Enemy 2]
-Type = TargetState
-Triggerall = (((Root,Stateno != 3800 && Root,Stateno != 3901 && Root,Stateno != 11810 && Target, vel x != 0)) || ((Root,Stateno = 3800 || Root,Stateno = 3901 || Root,Stateno = 11810)))
-Triggerall = (((Target,Name = "Gojo Satoru [Iso/Kuro/Jt]"||Target,Name = "Gojo Satoru")&&Target,Numhelper(502550) = 0)||((Target,Name = "Gojo Satoru [Iso/Kuro/Jt]"||Target,Name = "Gojo Satoru")&&(Numhelper(2005)))||(Target,Name != "Gojo Satoru [Iso/Kuro/Jt]"&&Target,Name != "Gojo Satoru"))
-Triggerall = (Target,Name = "Sasuke Uchiha")&&(Target,Stateno != [39000,39600])&&(Target,Stateno != [1900,1920]) || (Target,Name != "Sasuke Uchiha")
-Triggerall = (Target,Name = "Naruto" || Target,Name = "Naruto Uzumaki"  || Target,Name = "Naruto Boss")&&(Target,Stateno != [33000,34290] && Target,Stateno != [40000,40970]) || (Target,Name != "Naruto" && Target,Name != "Naruto Uzumaki"  && Target,Name != "Naruto Boss") 
-Triggerall = (Target,Movetype = H||((Root,Stateno = 200+(root,var(11))||Root,Stateno = 300+(root,var(11)))&&Root,time = 2)||Root,stateno = 680||Root,Stateno = 3800||Root,Stateno = 3901||Root,Stateno = 11810||Root,Stateno = 3342000||(Numhelper(9150)||Numhelper(9250)||Numhelper(9350)||Numhelper(9450)||Numhelper(9550)||Numhelper(9650)||Numhelper(9750)||Numhelper(9850)||Numhelper(9950)||Numhelper(17750)||Numexplod(99051)||(Numhelper(50000)&&helper(50000),Stateno = 53496)||NumHelper(29450)))
-Triggerall = !Target,IsHelper
-Triggerall = Target,Alive
-Triggerall = Target,stateno != [6565600,6565611] && Target,Stateno != 0
-triggerall = playeridexist(root,var(53))
-Triggerall = NumHelper(99450)
-Triggerall = Target,Stateno != 99666
-Trigger13 = (Numhelper(50000))
-Trigger13 = (helper(50000),Stateno = 53496||Helper(29450),Pos x < Target,pos x+400&&Helper(29450),Pos x > Target,pos x-400)
-Trigger12 = (Root,stateno = 3342000)
-Trigger11 = (Root,stateno = 680)
-Trigger10 = (Numhelper(17750))
-Trigger10 = (Helper(17750),Pos x < Target,pos x+400&&Helper(17750),Pos x > Target,pos x-400)
-Trigger9 = (Numhelper(3530))
-Trigger9 = (Helper(3530),Pos x < Target,pos x+400&&Helper(3530),Pos x > Target,pos x-400)
-Trigger8 = (Numhelper(34220)||Numhelper(34230))
-Trigger8 = ((Helper(34220),Pos x < (playerid(root,var(52)),pos x + 400)||(Helper(34230),Pos x < (playerid(root,var(52)),pos x + 400))))
-Trigger7 = (Numhelper(9550)||Numhelper(9650)||Numhelper(9750)||Numhelper(9850)||Numhelper(9950))
-Trigger7 = ((Helper(9550),Pos x < Target,pos x+400&&Helper(9550),Pos x > Target,pos x-400)||(Helper(9650),Pos x < Target,pos x+400&& Helper(9650),Pos x > Target,pos x-400)||(Helper(9750),Pos x < Target,pos x+400&&Helper(9750),Pos x > Target,pos x-400)||(Helper(9850),Pos x < Target,pos x+400&&Helper(9850),Pos x > Target,pos x-400)||(Helper(9950),Pos x < Target,pos x+400&&Helper(9950),Pos x > Target,pos x-400))
-Trigger6 = (Numhelper(9150)||Numhelper(9250)||Numhelper(9350)||Numhelper(9450))
-Trigger6 = ((Helper(9150),Pos x < Target,pos x+400& Helper(9150),Pos x > Target,pos x-400)||(Helper(9250),Pos x < Target,pos x+400&& Helper(9250),Pos x > Target,pos x-400)||(Helper(9350),Pos x < Target,pos x+400&&Helper(9350),Pos x > Target,pos x-400)||(Helper(9450),Pos x < Target,pos x+400&&Helper(9450),Pos x > Target,pos x-400))
-Trigger5 = (Root,Stateno = 11810)
-Trigger4 = ((Root,Stateno = 3901)&&(Target,pos y = [-60,60]))
-Trigger3 = (Root,time < 30)
-Trigger3 = ((Root,Stateno = 3800&&Target,Movetype != H)&&(Target,pos y = [-60,60]))
-Trigger2 = ((Root,Stateno = 600||Root,Stateno = 610||Root,Stateno = 17611)&&Root,time = 2)
-Trigger1 = (Root,Var(2) = [2,4])
-Trigger1 = ((Root,Stateno = 200+(root,var(11))||Root,Stateno = 300+(root,var(11)))&&Root,time = 2)
-Value = 99666
-IgnoreHitPause = 1
-persistent = 1
-[State 0, Impact Catch | Enemy 3]
-Type = TargetState
-Triggerall = (((Root,Stateno != 3800 && Root,Stateno != 3901 && Root,Stateno != 11810 && Target, vel x != 0)) || ((Root,Stateno = 3800 || Root,Stateno = 3901 || Root,Stateno = 11810)))
-Triggerall = (((Target,Name = "Gojo Satoru [Iso/Kuro/Jt]"||Target,Name = "Gojo Satoru")&&Target,Numhelper(502550) = 0)||((Target,Name = "Gojo Satoru [Iso/Kuro/Jt]"||Target,Name = "Gojo Satoru")&&(Numhelper(2005)))||(Target,Name != "Gojo Satoru [Iso/Kuro/Jt]"&&Target,Name != "Gojo Satoru"))
-Triggerall = (Target,Name = "Sasuke Uchiha")&&(Target,Stateno != [39000,39600])&&(Target,Stateno != [1900,1920]) || (Target,Name != "Sasuke Uchiha")
-Triggerall = (Target,Name = "Naruto" || Target,Name = "Naruto Uzumaki"  || Target,Name = "Naruto Boss")&&(Target,Stateno != [33000,34290] && Target,Stateno != [40000,40970]) || (Target,Name != "Naruto" && Target,Name != "Naruto Uzumaki"  && Target,Name != "Naruto Boss") 
-Triggerall = (Target,Movetype = H||((Root,Stateno = 200+(root,var(11))||Root,Stateno = 300+(root,var(11)))&&Root,time = 2)||Root,stateno = 680||Root,Stateno = 3800||Root,Stateno = 3901||Root,Stateno = 11810||Root,Stateno = 3342000||(Numhelper(9150)||Numhelper(9250)||Numhelper(9350)||Numhelper(9450)||Numhelper(9550)||Numhelper(9650)||Numhelper(9750)||Numhelper(9850)||Numhelper(9950)||Numhelper(17750)||Numexplod(99051)||(Numhelper(50000)&&helper(50000),Stateno = 53496)||NumHelper(29450)))
-Triggerall = !Target,IsHelper
-Triggerall = Target,Alive
-Triggerall = Target,stateno != [6565600,6565611] && Target,Stateno != 0
-triggerall = playeridexist(root,var(54))
-Triggerall = NumHelper(99450)
-Triggerall = Target,Stateno != 99666
-Trigger13 = (Numhelper(50000))
-Trigger13 = (helper(50000),Stateno = 53496||Helper(29450),Pos x < Target,pos x+400&&Helper(29450),Pos x > Target,pos x-400)
-Trigger12 = (Root,stateno = 3342000)
-Trigger11 = (Root,stateno = 680)
-Trigger10 = (Numhelper(17750))
-Trigger10 = (Helper(17750),Pos x < Target,pos x+400&&Helper(17750),Pos x > Target,pos x-400)
-Trigger9 = (Numhelper(3530))
-Trigger9 = (Helper(3530),Pos x < Target,pos x+400&&Helper(3530),Pos x > Target,pos x-400)
-Trigger8 = (Numhelper(34220)||Numhelper(34230))
-Trigger8 = ((Helper(34220),Pos x < (playerid(root,var(52)),pos x + 400)||(Helper(34230),Pos x < (playerid(root,var(52)),pos x + 400))))
-Trigger7 = (Numhelper(9550)||Numhelper(9650)||Numhelper(9750)||Numhelper(9850)||Numhelper(9950))
-Trigger7 = ((Helper(9550),Pos x < Target,pos x+400&&Helper(9550),Pos x > Target,pos x-400)||(Helper(9650),Pos x < Target,pos x+400&& Helper(9650),Pos x > Target,pos x-400)||(Helper(9750),Pos x < Target,pos x+400&&Helper(9750),Pos x > Target,pos x-400)||(Helper(9850),Pos x < Target,pos x+400&&Helper(9850),Pos x > Target,pos x-400)||(Helper(9950),Pos x < Target,pos x+400&&Helper(9950),Pos x > Target,pos x-400))
-Trigger6 = (Numhelper(9150)||Numhelper(9250)||Numhelper(9350)||Numhelper(9450))
-Trigger6 = ((Helper(9150),Pos x < Target,pos x+400& Helper(9150),Pos x > Target,pos x-400)||(Helper(9250),Pos x < Target,pos x+400&& Helper(9250),Pos x > Target,pos x-400)||(Helper(9350),Pos x < Target,pos x+400&&Helper(9350),Pos x > Target,pos x-400)||(Helper(9450),Pos x < Target,pos x+400&&Helper(9450),Pos x > Target,pos x-400))
-Trigger5 = (Root,Stateno = 11810)
-Trigger4 = ((Root,Stateno = 3901)&&(Target,pos y = [-60,60]))
-Trigger3 = (Root,time < 30)
-Trigger3 = ((Root,Stateno = 3800&&Target,Movetype != H)&&(Target,pos y = [-60,60]))
-Trigger2 = ((Root,Stateno = 600||Root,Stateno = 610||Root,Stateno = 17611)&&Root,time = 2)
-Trigger1 = (Root,Var(2) = [2,4])
-Trigger1 = ((Root,Stateno = 200+(root,var(11))||Root,Stateno = 300+(root,var(11)))&&Root,time = 2)
-Value = 99666
-IgnoreHitPause = 1
-persistent = 1
 
 [state 0, Health Bar | Enemy 1]
 type = explod
@@ -5465,177 +5273,9 @@ Type = ReversalDef
 Trigger1 = 1
 Reversal.attr = C, HT
 P1Stateno = -1
-;---------------------------------------------------------------
-;Chase
-[Statedef 99664]
-type    = S
-movetype= I
-physics = S
-juggle  = 2
-velset = 0,0
-ctrl = 0
-anim = 20+var(11)
-sprpriority = 2
 
-[State 0, End]
-type = ChangeState
-trigger1 =  Roundstate != 2
-value = 0
-ctrl = 1
-[State 0, PosSet]
-type = PosSet
-trigger1 = !time
-y = 0
-[State 0, NotHitBy]
-type = NotHitBy
-trigger1 = 1
-value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
-time = 10
-[State 0, PlayerPush]
-type = PlayerPush
-trigger1 = 1
-value = 0
-[State 0, Turn]
-type = Turn
-Triggerall = playerid(var(52)),stateno != [6565600,6565611] && playerid(var(52)),Alive && !playerid(var(52)),standby
-trigger1 = playerid(var(52)),P2BodyDist x < 0 && P2BodyDist x < 0
-[State 0, Turn]
-type = Turn
-Triggerall = playerid(var(52)),stateno = [6565600,6565611] || !playerid(var(52)),Alive || !playerid(var(52)),standby
-Triggerall = playerid(var(53)),stateno != [6565600,6565611] && playerid(var(53)),Alive && !playerid(var(53)),standby
-trigger1 =  playerid(var(53)),P2BodyDist x < 0 && P2BodyDist x < 0
-[State 0, Turn]
-type = Turn
-Triggerall = playerid(var(52)),stateno = [6565600,6565611] || !playerid(var(52)),Alive || !playerid(var(52)),standby
-Triggerall = playerid(var(53)),stateno = [6565600,6565611] ||!playerid(var(53)),Alive || !playerid(var(53)),standby
-Triggerall = playerid(var(54)),stateno != [6565600,6565611] && playerid(var(54)),Alive && !playerid(var(54)),standby
-trigger1 = playerid(var(54)),P2BodyDist x < 0 && P2BodyDist x < 0
-[State 0, VelSet]
-type = VelSet
-Triggerall = playerid(var(52)),stateno != [6565600,6565611] && playerid(var(52)),Alive && !playerid(var(52)),standby
-trigger1 = 1
-x = 30
-y = 0
-[State 0, VelSet]
-type = VelSet
-Triggerall = playerid(var(52)),stateno = [6565600,6565611] || !playerid(var(52)),Alive || !playerid(var(52)),standby
-Triggerall = playerid(var(53)),stateno != [6565600,6565611] && playerid(var(53)),Alive && !playerid(var(53)),standby
-trigger1 = 1
-x = 30
-y = 0
-[State 0, VelSet]
-type = VelSet
-Triggerall = playerid(var(52)),stateno = [6565600,6565611] || !playerid(var(52)),Alive || !playerid(var(52)),standby
-Triggerall = playerid(var(53)),stateno = [6565600,6565611] ||!playerid(var(53)),Alive || !playerid(var(53)),standby
-Triggerall = playerid(var(54)),stateno != [6565600,6565611] && playerid(var(54)),Alive && !playerid(var(54)),standby
-trigger1 = 1
-x = 30
-y = 0
 
-[State 0, ChangeState]
-type = ChangeState
-trigger1 = time >= 50
-value = 0
-ctrl = 1
-[State 0, ChangeState]
-type = ChangeState
-Triggerall = playerid(var(52)),stateno != [6565600,6565611] && playerid(var(52)),Alive && !playerid(var(52)),standby
-trigger1 = playerid(var(52)),pos x >= pos x -30 && playerid(var(52)),pos x <= pos x +30
-value = cond(Random < 555,200,300)
-ctrl = 0
-[State 0, ChangeState]
-type = ChangeState
-Triggerall = playerid(var(52)),stateno = [6565600,6565611] || !playerid(var(52)),Alive || !playerid(var(52)),standby
-Triggerall = playerid(var(53)),stateno != [6565600,6565611] && playerid(var(53)),Alive && !playerid(var(53)),standby
-trigger1 = playerid(var(53)),pos x >= pos x -30 && playerid(var(53)),pos x <= pos x +30
-value = cond(Random < 555,200,300)
-ctrl = 0
-[State 0, ChangeState]
-type = ChangeState
-Triggerall = playerid(var(52)),stateno = [6565600,6565611] || !playerid(var(52)),Alive || !playerid(var(52)),standby
-Triggerall = playerid(var(53)),stateno = [6565600,6565611] ||!playerid(var(53)),Alive || !playerid(var(53)),standby
-Triggerall = playerid(var(54)),stateno != [6565600,6565611] && playerid(var(54)),Alive && !playerid(var(54)),standby
-trigger1 = playerid(var(54)),pos x >= pos x -30 && playerid(var(54)),pos x <= pos x +30
-value = cond(Random < 555,200,300)
-ctrl = 0
-;-------------------------------------------------------------------------------
-; Catch P2
-[StateDef 99666]
-Type = S
-Physics = N
-MoveType = H
-SprPriority = 2
-Ctrl = 0
-facep2 = 1
-VelSet = 0,0
 
-[State 0, HitBy]
-type = HitBy
-trigger1 = 1
-value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
-time = 100
-ignorehitpause = 1
-persistent = 1
-[State 0, ChangeAnim]
-type = ChangeAnim
-trigger1 = 1
-value = Anim
-elem = 1
-ignorehitpause = 1
-persistent = 1
-
-[State 0, ChangeState]
-type = ChangeState
-trigger1 = P2,stateno = 1202
-value = 1295
-ctrl = 0
-
-[State 0, PosSet]
-type = PosSet
-Triggerall = P2,stateno = 3000
-trigger1 = !time
-y = 0
-
-[State 0, SelfState]
-type = SelfState
-trigger1 = Time >= cond(p2stateno = 3000,500,20)
-value = cond(pos y < 0,50,0)
-ctrl = 1
-;ignorehitpause = 0
-;persistent = 1
-;============================================================================
-;-----------------------------------------------------------------
-;P2 Hurt
-[Statedef 99667]
-type    = S
-movetype= H
-physics = N
-juggle  = 1
-velset = 0,0
-ctrl = 0
-sprpriority = 1
-Facep2 = 1
-
-[State 0, Posset]
-type = posset
-Triggerall = p2,stateno != 3342001
-trigger1 = pos y >= 0 || p2,pos y >= 0
-y = 0
-[State 0, HitBy]
-type = HitBy
-trigger1 = 1
-value = SCA,AA,AP,AT
-time = 10
-[State 0, Anim]
-type = ChangeAnim
-trigger1 = 1
-value = 5000+var(10)
-
-[State 0, End]
-type = Selfstate
-trigger1 = time >= 300
-value = 0
-ctrl = 1
 ;-------------------------------------------------------------------------------
 ; P2 Hacia la Pared
 [Statedef 99668]
@@ -5668,11 +5308,6 @@ type = ChangeAnim
 trigger1 = 1
 value = 5020+var(10)
 elem = 2
-
-[State 0, PlayerPush]
-type = PlayerPush
-trigger1 = 1
-value = 0
 
 [State 0, NotHitBy]
 type = NotHitBy
@@ -5741,107 +5376,7 @@ value = 5050
 ctrl = 0
 
 ;--------------------------------------------------------------
-; HITG_SHAKE
-[Statedef 99665]
-type    = S
-movetype= H
-physics = N
-velset = 0,0
-ctrl = 0
 
-[State 2120]
-type = ScreenBound
-trigger1 = 1
-value = 1
-movecamera = 1,0
-
-[State 0, HitBy]
-type = HitBy
-trigger1 = 1
-value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
-time = 100
-ignorehitpause = 1
-persistent = 1
-
-;[state 0]
-;type = SelfState
-;Trigger1 = IsHelper
-;value = PrevStateno
-
-[State 0, PosSet]
-type = PosSet
-Triggerall = P2,stateno != 1000 && P2,stateno != [39400,39500]
-trigger1 = time = 0
-y = 0
-ignorehitpause = 1
-
-[State 5000, 1] 
-type = ChangeAnim
-trigger1 = Time = 0
-trigger1 = GetHitVar(animtype) != [3,5]
-value = (ifelse((GetHitVar(groundtype) = 1),5000,5010) + GetHitVar(animtype))+var(10)
-
-[State 5000, 2] 
-type = ChangeAnim
-trigger1 = Time = 0
-trigger1 = GetHitVar(animtype) = [3,5]
-value = 5030+var(10)
-
-[State 5000, 3] 
-type = ChangeAnim
-trigger1 = Time = 0
-trigger1 = (GetHitVar(animtype) = [4,5]) && (SelfAnimExist(5047 + GetHitVar(animtype)))
-value = (5047 + GetHitVar(animtype))+var(10)
-
-[State 5000, 4] 
-type = ChangeAnim
-trigger1 = Time > 0
-value = anim
-
-[State 5000, 5] 
-type = StateTypeSet
-trigger1 = Time = 0
-trigger1 = GetHitVar(yvel) != 0 || GetHitVar(fall)
-trigger2 = Pos Y != 0
-statetype = a
-
-[State 5000, 6]
-type = ChangeState
-trigger1 = HitShakeOver
-trigger1 = GetHitVar(yvel) = 0 && !GetHitVar(fall)
-value = 116001 
-
-[State 5000, 7]
-type = ChangeState
-trigger1 = HitShakeOver
-value = 116030
-
-[State 5000, FFB Light]
-type = ForceFeedback
-trigger1 = anim = 5000+var(10)
-trigger2 = anim = 5010+var(10)
-persistent = 0
-time = 6
-waveform = square
-
-[State 5000, FFB Medium]
-type = ForceFeedback
-trigger1 = anim = 5001+var(10)
-trigger2 = anim = 5011+var(10)
-persistent = 0
-time = 8
-waveform = sinesquare
-ampl = 110,-1,-.3
-
-[State 5000, FFB Hard]
-type = ForceFeedback
-trigger1 = anim = 5012+var(10)
-trigger2 = anim = 5002+var(10)
-trigger3 = anim = 5030+var(10)
-persistent = 0
-time = 15
-waveform = sinesquare
-ampl = 140
 
 ;---------------------------------------------------------------------------
 ; HITG_SLIDE
@@ -6687,12 +6222,6 @@ time = 5
 freq = 60
 ampl = -10
 phase = 90
-
-[State 0, PlayerPush]
-type = PlayerPush
-trigger1 = 1
-value = 0
-ignorehitpause = 1
 
 [State 0, ChangeAnim]
 type = ChangeAnim
