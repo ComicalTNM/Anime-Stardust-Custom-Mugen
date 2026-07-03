@@ -1,0 +1,1567 @@
+;===============================================================================
+;----------------------Ultimates------------------------------------------------
+;===============================================================================
+;===============================================================================
+; Excalibur: Sword of Promised Victory
+;-------------------------------------------------------------------------------
+[StateDef 3000]
+Type    = S
+MoveType= A
+Physics = S
+Juggle  = 1
+VelSet = 0,0
+Ctrl = 0
+Anim = 3000
+SprPriority = 2
+
+[State 0, Activating Ultimate Flag]
+Type = VarSet
+Trigger1 = !Time
+fvar(6) = 3.1415
+
+[State 0, PlaySnd]
+Type = PlaySnd
+Trigger1 = !Time
+Value = S3000,Random%3
+VolumeScale = 100
+Channel = 0
+
+[State 0, NotHitBy]
+type = NotHitBy
+trigger1 = 1
+value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+time = 1
+
+[State 0, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = 1
+Flag = UnGuardable
+IgnoreHitPause = 1
+
+[State 0]
+Type = Explod
+Trigger1 = Time = [20,100]
+Trigger2 = MoveContact
+Anim = 3022
+ID = 3022
+Pos = 12*Facing*Const(Size.XScale),3*Const(Size.YScale)
+Space = Stage
+Facing = Facing
+BindID = ID
+BindTime = -1
+RemoveTime = 1
+Scale = .15*Const(Size.XScale),.65*Const(Size.YScale)
+SprPriority = 5
+Shadow = 0,0,0
+OwnPal = 1
+IgnoreHitPause = 1
+RemapPal = 5,2
+Trans = AddAlpha
+Alpha = 0 + Ceil((Time - 20) * 5),256
+Angle = 90
+
+[State 0, EnvShake]
+Type = EnvShake
+Trigger1 = Time = 70
+Time = 5
+Freq = 20
+[State 0, PlaySnd]
+Type = PlaySnd
+Trigger1 = Time = 70
+Value = S5,23
+VolumeScale = 75
+
+[State 200, 1]
+Type = Projectile
+Trigger1 = !Time
+ProjAnim = 3002
+Attr = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT,AA,AP,AT
+AnimType  = Light
+ProjRemoveTime = 100
+Damage    = 0
+HitFlag = MAFD
+Ground.Type = None
+P2StateNO = 3090
+Fall = 0
+EnvShake.Time = 15
+NumHits = 0
+ID = 3000
+
+[State 0, TargetState]
+Type = TargetState
+Trigger1 = Time <= 100
+Trigger1 = NumTarget(3000)
+Trigger1 = !Target(3000),IsHelper
+Trigger1 = Target(3000),StateNO != 3090
+Value = 3090
+ID = 3000
+
+[State 0]
+Type = Explod
+Trigger1 = NumTarget(3000)
+Trigger1 = Time = [100,165]
+Anim = 11012
+ID = 11012
+Pos = Cond(TeamSide = 1,0,ScreenWIDth),0
+Space = Screen
+Facing = Cond(TeamSide = 1,1,-1)
+RemoveTime = 1
+Scale = 10,10
+SprPriority = 6
+Shadow = 0,0,0
+OwnPal = 1
+IgnoreHitPause = 1
+Trans = AddAlpha
+Alpha = 0 + Ceil((Time - 100) * 4),256
+
+[State 0, ]
+Type = ChangeState
+TriggerAll = NumTarget(3000)
+Trigger1 = Time = 165
+Value = 3001
+IgnoreHitPause = 1
+
+[State 200, End]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = 0
+Ctrl = 1
+;-------------------------------------------------------------------------------
+; Excalibur - P1 - Release True Name
+[StateDef 3001]
+Type    = S
+MoveType= I
+Physics = S
+Juggle  = 1
+VelSet = 0,0
+Ctrl = 0
+Anim = 3001
+SprPriority = 402
+
+[State 0, Voice Select]
+Type = VarSet
+Trigger1 = !Time
+var(2) = Random%2
+
+[State 0, PlaySnd]
+Type = PlaySnd
+Trigger1 = Time = 25
+Value = S3001,0 + var(2)
+VolumeScale = 100
+Channel = 0
+
+[State 0, PlaySnd]
+Type = PlaySnd
+Trigger1 = Time = 305
+Value = S3001,10 + var(2) + Cond(var(2) = 1, Random%2, 0)
+VolumeScale = 100
+Channel = 0
+
+[State 0, PlaySnd]
+Type = PlaySnd
+Trigger1 = Time = 415
+Value = S3001,20 + var(2)
+VolumeScale = 100
+Channel = 0
+
+[State 0, PlaySnd]
+Type = PlaySnd
+Trigger1 = Time = 495
+Value = S3001,30 + var(2)
+VolumeScale = 100
+Channel = 0
+
+[State 0, Hyper Escenario]
+Type = Helper
+Trigger1 = !Time
+Name = "Hyper BG"
+ID = 3080
+StateNO = 3080
+Pos = 0,0
+PosType = Left
+OwnPal = 1
+Facing = Facing
+IgnoreHitPause = 1
+
+[State 0, PosSet]
+Type = PosSet
+Trigger1 = !Time
+X = Cond(Facing = 1,-200,200)
+Y = 0
+
+[State 0, ScreenBound]
+Type = ScreenBound
+Trigger1 = 1
+Value = 0
+
+[State 0, PosAdd]
+Type = PosAdd
+Trigger1 = Time < 20
+X = 10
+
+[State 0, Zoom Scale]
+Type = VarSet
+Trigger1 = !Time
+fvar(4) = 1.75
+IgnoreHitPause = 1
+
+[State 0, Zoom Scale]
+Type = VarAdd
+Trigger1 = Time = [25,174] 
+fvar(4) = 0.005
+IgnoreHitPause = 1
+
+[State 0, Zoom Scale]
+Type = VarSet
+Trigger1 = Time = 175
+fvar(4) = 9
+IgnoreHitPause = 1
+
+[State 0, Zoom Scale]
+Type = VarAdd
+Trigger1 = Time = [175,294] 
+fvar(4) = -0.01
+IgnoreHitPause = 1
+
+[State 0, Zoom Scale]
+Type = VarAdd
+Trigger1 = Time = [295,299]
+fvar(4) = -1.2
+IgnoreHitPause = 1
+
+[State 0, Zoom Scale]
+Type = VarAdd
+Trigger1 = Time = [300,389]
+fvar(4) = -.003
+IgnoreHitPause = 1
+
+[State 0, Zoom Scale]
+Type = VarAdd
+Trigger1 = Time = [430,474]
+fvar(4) = .035
+IgnoreHitPause = 1
+
+[State 0, Zoom Scale]
+Type = VarAdd
+Trigger1 = Time = [475,505]
+fvar(4) = -.065
+IgnoreHitPause = 1
+
+[State 0, Zoom Pos Y]
+Type = VarSet
+Trigger1 = !Time
+fvar(5) = 0
+IgnoreHitPause = 1
+
+[State 0, Zoom Pos Y]
+Type = VarAdd
+Trigger1 = Time = 175
+fvar(5) = -33
+IgnoreHitPause = 1
+
+[State 0, Zoom Pos Y]
+Type = VarAdd
+Trigger1 = Time = [295,299]
+fvar(5) = 6.6
+IgnoreHitPause = 1
+
+[State 0, Zoom Pos Y]
+Type = VarAdd
+Trigger1 = Time = [300,389]
+fvar(5) = .15
+IgnoreHitPause = 1
+
+[State 0, Zoom Scale]
+Type = VarAdd
+Trigger1 = Time = [430,474]
+fvar(5) = -.3
+IgnoreHitPause = 1
+
+[State 0, Zoom Pos Y]
+Type = VarAdd
+Trigger1 = Time = [491,505]
+fvar(5) = 1
+IgnoreHitPause = 1
+
+[State 0] 
+Type = Zoom
+Trigger1 = Time = [0,174] 
+Scale = fvar(4)
+Pos = Pos X/fvar(4) * CameraZoom, (Pos Y + fvar(5))* CameraZoom
+IgnoreHitPause = 1
+
+[State 0] 
+Type = Zoom
+Trigger1 = Time = [175,294] 
+Scale = fvar(4)
+Pos = Pos X/fvar(4) * CameraZoom, (Pos Y + fvar(5)) * CameraZoom
+IgnoreHitPause = 1
+
+[State 0] 
+Type = Zoom
+Trigger1 = Time = [295,299]
+Scale = fvar(4)
+Pos = Pos X/fvar(4) * CameraZoom,  (Pos Y + fvar(5)) * CameraZoom
+IgnoreHitPause = 1
+
+[State 0] 
+Type = Zoom
+Trigger1 = Time = [300,475]
+Scale = fvar(4)
+Pos = Pos X/fvar(4) * CameraZoom,  (Pos Y + fvar(5)) * CameraZoom
+IgnoreHitPause = 1
+
+[State 0] 
+Type = Zoom
+Trigger1 = Time > 475
+Scale = fvar(4)
+Pos = Pos X/fvar(4) * CameraZoom,  (Pos Y + fvar(5)) * CameraZoom
+IgnoreHitPause = 1
+
+[State 0, VelAdd]
+Type = VelAdd
+Trigger1 = Time > 540
+Trigger1 = BackEdgeDist > 0
+X = -Time%30
+
+[State 0, Flash]
+Type = Explod
+Trigger1 = !AnimElemTime(6)
+Anim = 3510
+ID = 3510
+Pos = 0*Facing*Const(Size.XScale),-35*Const(Size.YScale)
+Space = Stage
+Facing = Facing
+BindTime = -1
+BindID = ID
+Scale = .3*Const(Size.XScale),.3*Const(Size.YScale)
+SprPriority = 403
+Shadow = 0,0,0
+OwnPal = 1
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+Trans = AddAlpha
+Alpha = 256,256
+[State 0, PlaySnd]
+Type = PlaySnd
+Trigger1 = Time = 40
+Value = S5,35
+VolumeScale = 50
+
+[State 0, Aura FX]
+Type = Explod
+TriggerAll = AnimElemTime(15) < 0
+Trigger1 = !AnimElemTime(8)
+Trigger2 = AnimElemTime(8) >= 0
+Trigger2 = TimeMod = 25,0
+Anim = 3550
+ID = 3550
+Pos = 0*Facing*Const(Size.XScale),5*Const(Size.YScale)
+Space = Stage
+Facing = Facing
+BindTime = -1
+BindID = ID
+Scale = .3*Const(Size.XScale),.3*Const(Size.YScale)
+SprPriority = 400
+Shadow = 0,0,0
+OwnPal = 1
+RemapPal = 5,2
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+Trans = AddAlpha
+Alpha = 256,256
+
+[State 0, Aura FX]
+Type = Explod
+TriggerAll = AnimElemTime(15) < 0
+Trigger1 = !AnimElemTime(8)
+Trigger2 = AnimElemTime(8) >= 0
+Trigger2 = TimeMod = 20,0
+Anim = 3551
+ID = 3551
+Pos = 0*Facing*Const(Size.XScale),0*Const(Size.YScale)
+Space = Stage
+Facing = Facing
+BindTime = -1
+BindID = ID
+Scale = .25*Const(Size.XScale),.15*Const(Size.YScale)
+SprPriority = 401
+Shadow = 0,0,0
+OwnPal = 1
+RemapPal = 5,2
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+Trans = AddAlpha
+Alpha = 256,256
+
+[State 0]
+Type = Explod
+TriggerAll = AnimElemTime(15) < 0
+Trigger1 = !AnimElemTime(8)
+Anim = 3552
+ID = 3552
+Pos = 0*Facing*Const(Size.XScale),0*Const(Size.YScale)
+Space = Stage
+Facing = Facing
+BindTime = -1
+BindID = ID
+RemoveTime = -1
+Scale = .45*Const(Size.XScale),.45*Const(Size.YScale)
+SprPriority = 403
+Shadow = 0,0,0
+OwnPal = 1
+RemapPal = 5,2
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+Trans = AddAlpha
+Alpha = 256,256
+
+[State 0, Charge Particles]
+Type = Helper
+Trigger1 = AnimElemTime(8) >= 55
+Trigger1 = AnimElemTime(8) < 145
+Name = "Charge Particles"
+ID = 3120
+StateNO = 3120
+Pos = Cond(Random < 500,-30 + Random%30,40 - Random%30)*Const(Size.XScale),Cond(Random<500,-20 - Random%30,-110 + Random%30)*Const(Size.YScale)
+OwnPal = 1
+Size.XScale = .025*Const(Size.XScale)
+Size.YScale = .025*Const(Size.YScale)
+IgnoreHitPause = 1
+[State 0, Charge Particles]
+Type = Helper
+Trigger1 = AnimElemTime(8) >= 55
+Trigger1 = AnimElemTime(8) < 145
+Name = "Charge Particles"
+ID = 3120
+StateNO = 3120
+Pos = Cond(Random < 500,-30 + Random%30,40 - Random%30)*Const(Size.XScale),Cond(Random<500,-20 - Random%30,-110 + Random%30)*Const(Size.YScale)
+OwnPal = 1
+Size.XScale = .025*Const(Size.XScale)
+Size.YScale = .025*Const(Size.YScale)
+IgnoreHitPause = 1
+
+[State 0, Glowing Blade]
+Type = Helper
+Trigger1 = !AnimElemTime(9)
+Name = "Glowing Blade"
+ID = 3130
+StateNO = 3130
+Pos = 0*Const(Size.XScale),0*Const(Size.YScale)
+PosType = p1
+OwnPal = 1
+Size.XScale = 1*Const(Size.XScale)
+Size.YScale = 1*Const(Size.YScale)
+IgnoreHitPause = 1
+
+[State 0]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(6)
+Value = S3011,0
+VolumeScale = 70
+IgnoreHitPause = 1
+
+[State 0] 
+Type = Explod
+Trigger1 = !AnimElemTime(8)
+Anim = 3011
+ID = 3011
+Pos = -100*Const(Size.XScale), -100*Const(Size.YScale)
+Space = Stage
+Facing = Facing
+BindID = ID
+BindTime = -1
+RemoveTime = -1
+Scale = .15*Const(Size.XScale),.15*Const(Size.YScale)
+SprPriority = 401
+Shadow = 0,0,0
+OwnPal = 1
+RemapPal = 5,2
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+Trans =  AddAlpha
+Alpha = 0,256
+
+[State 0]
+Type = ModifyExplod
+Trigger1 = NumExplod(3011)
+ID = 3011
+Trans = AddAlpha
+Alpha = 0 + Ceil((Time - 53) * 3.2), 256
+
+[State 0]
+Type = RemoveExplod
+Trigger1 = !AnimElemTime(15)
+ID = 3011
+
+[State 0] 
+Type = Explod
+TriggerAll = AnimElemTime(15) < 0
+Trigger1 = Fvar(1) := ((25 - (Random%50)) / 100.0) * 1.0
+Trigger1 = Fvar(2) := ((-100 + (Random%80)) / 100.0) * 1.5
+Trigger1 = var(3) := Random
+Trigger1 = AnimElemTime(8) >= 0
+Trigger1 = TimeMod = 3,0
+Anim = 3555
+ID = 3555
+Pos = (Pos X + CameraPos X) + ((-60 + Random%120) * Facing), (Pos Y) + (10 - Random%5)
+Space = Stage
+Facing = Facing
+Vel = Fvar(1),Fvar(2)
+Accel = ((Fvar(1) / 12.5) * -1),0
+Scale = Cond(var(3) < 500,0.05,.08),Cond(var(3) < 500,0.05,.08)
+SprPriority = 403
+Shadow = 0,0,0
+OwnPal = 1
+RemapPal = 5,2
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+Trans = AddAlpha
+Alpha = 256,256
+
+[State 0, PlaySnd]
+Type = PlaySnd
+Trigger1 = Time = 300
+Value = S5,18
+VolumeScale = 100
+
+[State 0, Excalibur blade]
+Type = Explod
+Trigger1 = !AnimElemTime(13)
+Anim = 3035
+ID = 3035
+Pos = 0*Const(Size.XScale) * Facing,0*Const(Size.YScale)
+Space = Stage
+Facing = Facing
+BindTime = -1
+BindID = ID
+RemoveTime = 82
+Scale = 1*Const(Size.XScale),1*Const(Size.YScale)
+SprPriority = 398
+Shadow = 0,0,0
+OwnPal = 1
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+Trans = AddAlpha
+Alpha = 256,256
+[State 0, Excalibur blade]
+Type = Explod
+Trigger1 = !AnimElemTime(14)
+Anim = 3036
+ID = 3035
+Pos = 0*Const(Size.XScale) * Facing,0*Const(Size.YScale)
+Space = Stage
+Facing = Facing
+BindTime = -1
+BindID = ID
+RemoveTime = 90
+Scale = 1*Const(Size.XScale),1*Const(Size.YScale)
+SprPriority = 398
+Shadow = 0,0,0
+OwnPal = 1
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+Trans = AddAlpha
+Alpha = 256,256
+
+[State 0, PlaySnd]
+Type = PlaySnd
+Trigger1 = Time = 390
+Value = S5,42
+VolumeScale = 100
+
+[State 0, Excalibur Energy]
+Type = Explod
+Trigger1 = Time = 390
+Anim = 3030
+ID = 3030
+Pos = -17*Facing*Const(Size.XScale),-46*Const(Size.YScale)
+Space = Stage
+Facing = Facing
+BindID = ID
+BindTime = -1
+RemoveTime = 85
+Scale = .4*Const(Size.XScale),.4*Const(Size.YScale)
+SprPriority = 399
+OwnPal = 1
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+Angle = 70
+[State 0, Excalibur Energy]
+Type = Explod
+Trigger1 = Time = 390
+Anim = 3030
+ID = 3030
+Pos = -14*Facing*Const(Size.XScale),-45*Const(Size.YScale)
+Space = Stage
+Facing = Facing
+BindID = ID
+BindTime = -1
+RemoveTime = 85
+Scale = .35*Const(Size.XScale),.35*Const(Size.YScale)
+SprPriority = 400
+OwnPal = 1
+RemapPal = 5,3
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+Angle = 70
+
+[State 0, Aura FX]
+Type = Explod
+Trigger1 = Time = 390
+Anim = 3530
+ID = 3530
+Pos = 0*Const(Size.XScale)*Facing,0*Const(Size.YScale)
+Space = Stage
+Facing = Facing
+BindTime = -1
+BindID = ID
+Scale = .2*Const(Size.XScale),.2*Const(Size.YScale)
+SprPriority = 401
+Shadow = 0,0,0
+OwnPal = 1
+RemoveTime = -1
+RemapPal = 5,2
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+Angle = 90
+Trans = AddAlpha
+Alpha = 256,256
+[State 0, Aura FX]
+Type = Explod
+Trigger1 = Time = 400
+Anim = 3530
+ID = 3530
+Pos = 0*Const(Size.XScale)*Facing,-20*Const(Size.YScale)
+Space = Stage
+Facing = Facing
+BindTime = -1
+BindID = ID
+Scale = .2*Const(Size.XScale),.2*Const(Size.YScale)
+SprPriority = 403
+Shadow = 0,0,0
+OwnPal = 1
+RemapPal = 5,2
+RemoveTime = -1
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+Angle = 270
+Trans = AddAlpha
+Alpha = 256,256
+
+[State 0, EnvShake]
+Type = EnvShake
+TriggerAll = Time = [390,475]
+Trigger1 = Time%5 = 0
+Time = 5
+Ampl = -10
+
+[State 0,RemoveExplod]
+Type = RemoveExplod
+Trigger1 = !AnimElemTime(15)
+ID = 3530
+IgnoreHitPause = 1
+
+[State 0, Aura FX]
+Type = Explod
+Trigger1 = !AnimElemTime(15)
+Anim = 3132
+ID = 3132
+Pos = 0*Const(Size.XScale)*Facing,0*Const(Size.YScale)
+Space = Stage
+Facing = Facing
+BindTime = -1
+BindID = ID
+Scale = 1*Const(Size.XScale),1*Const(Size.YScale)
+SprPriority = 403
+Shadow = 0,0,0
+OwnPal = 1
+RemoveTime = -1
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+Trans = AddAlpha
+Alpha = 256,256
+
+[State 0] 
+Type = Explod
+Trigger1 = !AnimElemTime(16)
+Anim = 3140
+ID = 3140
+Pos = 3 * Const(Size.XScale) * Facing,-27 * Const(Size.YScale)
+Space = Stage
+Facing = -Facing
+BindTime = -1
+BindID = ID
+Scale = 0.22 * Const(Size.XScale),0.4 * Const(Size.YScale)
+SprPriority = 404
+Shadow = 0,0,0
+OwnPal = 1
+RemapPal = 5,2
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+Trans = AddAlpha
+Alpha = 256,256
+Angle = 120
+
+[State 0, Aura FX]
+Type = Explod
+Trigger1 = !AnimElemTime(15)
+Anim = 3019
+ID = 3019
+Pos = 120*Const(Size.XScale)*Facing,-30*Const(Size.YScale)
+Space = Stage
+Facing = Facing
+BindTime = -1
+BindID = ID
+Scale = .6*Const(Size.XScale),.6*Const(Size.YScale)
+SprPriority = 405
+Shadow = 0,0,0
+OwnPal = 1
+RemapPal = 5,2
+RemoveTime = -1
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+Trans = AddAlpha
+Alpha = 256,256
+[State 0]
+Type = Explod
+Trigger1 = !AnimElemTime(15)
+Anim = 3020
+ID = 3020
+Pos = 120*Const(Size.XScale)*Facing,-30*Const(Size.YScale)
+Space = Stage
+Facing = Facing
+BindTime = -1
+BindID = ID
+RemoveTime = -1
+Scale = 15*Const(Size.XScale),.6*Const(Size.YScale)
+SprPriority = 405
+Shadow = 0,0,0
+OwnPal = 1
+RemapPal = 5,2
+RemoveTime = -1
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+Trans = AddAlpha
+Alpha = 256,256
+
+[State 0, PlaySnd]
+Type = PlaySnd
+Trigger1 = AnimElemTime(14) = 60
+Value = S3020,0
+VolumeScale = 100
+
+[State 0, EnvShake]
+Type = EnvShake
+Trigger1 = AnimElemTime(15) >= 0
+Trigger1 = TimeMod = 10,0
+Time = 15
+Ampl = -6
+Freq = 40
+IgnoreHitPause = 1
+
+[State 0]
+Type = Explod
+Trigger1 = !AnimElemTime(15)
+Trigger2 = AnimElemTime(15) > 0
+Trigger2 = TimeMod = 8,0
+Anim = 11008
+ID = 11008
+BindID = ID
+BindTime = -1
+Pos = -50*Const(Size.XScale)*Facing,5*Const(Size.YScale)
+Space = Stage
+Facing = Facing
+Scale = .65*Const(Size.XScale),.65*Const(Size.YScale)
+SprPriority = 403
+Shadow = 0,0,0
+OwnPal = 1
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+Trans = AddAlpha
+Alpha = 64,256
+
+[State 0,RemoveExplod]
+Type = RemoveExplod
+Trigger1 = Time = 565
+IgnoreHitPause = 1
+
+[State 200, End]
+Type = ChangeState
+Trigger1 = Time = 565
+Value = 3002
+;-------------------------------------------------------------------------------
+; Excalibur - P1 - Beam
+ [StateDef 3002]
+Type    = S
+MoveType= I
+Physics = S
+Juggle  = 1
+VelSet = 0,0
+Ctrl = 0
+SprPriority = 402
+
+[State 0]
+Type = Explod
+TriggerAll = NumTarget(3000)
+Trigger1 = Time = 30
+Trigger2 = Time > 30
+Trigger2 = TimeMod = 4,0
+Anim = 11005
+ID = 11005
+Pos = (Target(3000),Pos X + CameraPos X) + ((-12 - Random%8) * Target(3000),Facing),(Target(3000),Pos Y) + (0 - Target(3000),Const(Size.Height)/3 - Random%(Target(3000),Const(Size.Height)/5*4))
+Space = Stage
+Facing = Target(3000),Facing
+Scale = .12*1.5,.08*1.5*NumEnemy
+Angle = 90
+SprPriority = 411
+Shadow = 0,0,0
+OwnPal = 1
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+Trans = Sub
+
+[State 0, Luz]
+Type = Helper
+Trigger1 = Time = 140
+HelperType = Normal
+Name = "WHiteScreen"
+ID = 3085
+StateNO = 3085
+Pos = 0,0
+PosType = p1
+Facing = 1
+OwnPal = 1
+Size.XScale = 2*Const(Size.XScale)
+Size.YScale = 2*Const(Size.YScale)
+IgnoreHitPause = 1
+
+[State 0, EnvShake]
+Type = EnvShake
+Trigger1 = !Time
+Time = 0
+Ampl = 0
+
+[State 0, invisible]
+Type = AssertSpecial
+Trigger1 = 1
+Flag = Invisible
+
+[State 0, ScreenBound]
+Type = ScreenBound
+Trigger1 = 1
+Value = 0
+
+[State 0]
+Type = PosSet
+Trigger1 = NumTarget(3000)
+Trigger1 = !Time
+X = (Target(3000),Pos X) * Facing
+Y = Target(3000),Pos Y
+IgnoreHitPause = 1
+
+[State 0]
+Type = Explod
+Trigger1 = Time = 30
+Anim = 3020
+ID = 3020
+Pos = Cond(Facing = 1,0,ScreenWIDth),ScreenHeight/2
+Space = Screen
+Facing = Cond(Facing = 1,1,-1)
+RemoveTime = 160
+Scale = 0 + ((Time - 30) * .5), .8
+SprPriority = 403
+Shadow = 0,0,0
+OwnPal = 1
+RemapPal = 5,2
+IgnoreHitPause = 1
+Trans = AddAlpha
+Alpha = 256,256
+[State 0]
+Type = ModifyExplod
+Trigger1 = NumExplod(3020)
+ID =3020
+IgnoreHitPause = 1
+Scale = 0 + ((Time - 30) * .5), .8
+Trans = AddAlpha
+Alpha = 256,256
+
+[State 0]
+Type = Explod
+Trigger1 = Time = 30
+Anim = 3021
+ID = 3021
+Pos = Cond(Facing = 1,0,ScreenWIDth),ScreenHeight/2
+Space = Screen
+Facing = Cond(Facing = 1,1,-1)
+RemoveTime = -1
+Scale = 1,1
+Vel = 100*Facing,0
+SprPriority = 404
+Shadow = 0,0,0
+OwnPal = 1
+RemapPal = 5,2
+IgnoreHitPause = 1
+Persistent = 0
+Trans = AddAlpha
+Alpha = 256,256
+
+[State 0] 
+Type = Explod
+Trigger1 = !Time
+Anim = 3022
+ID = 3022
+Pos = Cond(Facing = 1,0,ScreenWIDth),0
+Space = Screen
+Facing = Cond(Facing = 1,1,-1)
+RemoveTime = -1
+Scale = .25,.5
+SprPriority = 402
+Shadow = 0,0,0
+OwnPal = 1
+RemapPal = 5,2
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+Trans =  AddAlpha
+Alpha = 0,256
+
+[State 0]
+Type = ModifyExplod
+Trigger1 = NumExplod(3022)
+ID =3022
+IgnoreHitPause = 1
+Trans = AddAlpha
+Alpha = 0 + Ceil(Time * 5),256
+
+[State 0]
+Type = PlaySnd
+Trigger1 = Time = 30
+Value = S2010,0
+VolumeScale = 40
+
+[State 0]
+Type = PlaySnd
+Trigger1 = Time = 30
+Value = S1210,0
+VolumeScale = 70
+IgnoreHitPause = 1
+
+[State 0]
+Type = PlaySnd
+Trigger1 = Time = 30
+Value = S1265,0
+VolumeScale = 70
+IgnoreHitPause = 1
+
+[State 0]
+Type = PlaySnd
+Trigger1 = !Time
+Value = S3020,1
+VolumeScale = 90
+IgnoreHitPause = 1
+
+[State 0]
+Type = PlaySnd
+Trigger1 = Time = 90
+Value = S3020,2
+VolumeScale = 90
+IgnoreHitPause = 1
+
+[State 0]
+Type = EnvShake
+Trigger1 = Time < 30
+Trigger1 = Time%4 = 0
+Time = 4
+Ampl = -2
+IgnoreHitPause = 1
+
+[State 0]
+Type = EnvShake
+Trigger1 = Time >= 30
+Trigger1 = Time%10 = 0
+Time = 15
+Ampl = -8
+Freq = 40
+IgnoreHitPause = 1
+
+[State 0]
+Type = RemoveExplod
+Trigger1 = Time = 150
+IgnoreHitPause = 1
+
+[State 200, End]
+Type = ChangeState
+Trigger1 = Time = 150
+Value = 3003
+;-------------------------------------------------------------------------------
+; Excalibur - P1 - End
+[StateDef 3003]
+Type    = S
+MoveType= I
+Physics = S
+Juggle  = 1
+VelSet = 0,0
+Ctrl = 0
+SprPriority = 2
+
+[State 0]
+Type = PosSet
+Trigger1 = !Time
+X = (Target(3000),Pos X - 200) * Facing
+Y = 0
+IgnoreHitPause = 1
+
+[State 0, PlaySnd]
+Type = PlaySnd
+Trigger1 = !Time
+Value = S5,43
+VolumeScale = 50
+
+[State 0, Ground]
+Type = Helper
+Trigger1 = !Time
+ID = 1460
+StateNO = 1460
+Pos = 100 * Const(Size.XScale),0 * Const(Size.YScale)
+OwnPal = 1
+Size.XScale = .3*Const(Size.XScale)
+Size.YScale = .3*Const(Size.YScale)
+
+[State 0, Ground]
+Type = Helper
+Trigger1 = !Time
+ID = 1460
+StateNO = 1460
+Pos = 200 * Const(Size.XScale),0 * Const(Size.YScale)
+OwnPal = 1
+Size.XScale = .3*Const(Size.XScale)
+Size.YScale = .3*Const(Size.YScale)
+
+[State 0, Ground]
+Type = Helper
+Trigger1 = !Time
+ID = 1460
+StateNO = 1460
+Pos = 300 * Const(Size.XScale),0 * Const(Size.YScale)
+OwnPal = 1
+Size.XScale = .3*Const(Size.XScale)
+Size.YScale = .3*Const(Size.YScale)
+
+[State 0, Ground]
+Type = Helper
+Trigger1 = !Time
+ID = 1460
+StateNO = 1460
+Pos = 400 * Const(Size.XScale),0 * Const(Size.YScale)
+OwnPal = 1
+Size.XScale = .3*Const(Size.XScale)
+Size.YScale = .3*Const(Size.YScale)
+
+[State 0, Estrellas]
+Type = Helper
+Trigger1 = 1
+Name = "Estrellas"
+ID = 3040
+StateNO = 3040
+Pos = -100+Random%400,50
+PosType = p1
+OwnPal = 1
+Size.XScale = .1*Const(Size.XScale)
+Size.YScale = .1*Const(Size.YScale)
+
+[State 200, End]
+Type = ChangeState
+Trigger1 = Time = 75
+Value = 12
+Ctrl = 1
+;-------------------------------------------------------------------------------
+; Stars
+[StateDef 3040]
+Type    = A
+MoveType= I
+Physics = N
+Juggle  = 1
+VelSet = 0,0
+Ctrl = 0
+Anim = 3040
+SprPriority = 6
+
+[State 0, AngleDraw]
+Type = AngleDraw
+Trigger1 = 1
+Value = -1-Time*25
+
+[State 0, VelSet]
+Type = VelSet
+Trigger1 = !Time
+X = -2+Random%5
+Y = -5
+
+[State 0, VarAdd]
+Type = VarAdd
+Trigger1 = Time > 40
+V = 1
+Value = 25
+
+[State 0, Trans]
+Type = Trans
+Trigger1 = 1
+Trans = AddAlpha
+Alpha = 256-var(1),256
+
+[State 0, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = 1
+Flag = NoShadow
+
+[State 200, End]
+Type = DestroySelf
+Trigger1 = var(1) >= 256
+;-------------------------------------------------------------------------------
+; Hyper BG
+[StateDef 3080]
+Type    = A
+MoveType= I
+Physics = N
+Juggle  = 1
+VelSet = 0,0
+Ctrl = 0
+Anim = 9999
+
+[State 0, PlaySnd]
+Type = PlaySnd
+Trigger1 = !Time
+Value = S3080,0
+Channel = 30
+VolumeScale = 50
+
+[State 0, StopSnd]
+Type = StopSnd
+Trigger1 = NumHelper(3085)
+Trigger1 = Helper(3085),Time >= 15
+Trigger2 = Time = 720
+Channel = 30
+
+[State 0]
+Type = Explod
+Trigger1 = !Time
+Anim = 11012
+ID = 11012
+Pos = Cond(TeamSide = 1,0,ScreenWIDth),0
+Space = Screen
+Facing = Cond(TeamSide = 1,1,-1)
+RemoveTime = 720
+Scale = 100,100
+SprPriority = 390
+Shadow = 0,0,0
+OwnPal = 1
+IgnoreHitPause = 1
+Trans = Sub
+
+[State 0, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = 1
+Flag = NoBarDisplay
+Flag2 = NoBG
+Flag3 = NoFG
+
+[State 0, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = 1
+Flag = NoMusic
+
+[State 200, End]
+Type = DestroySelf
+Trigger1 = NumHelper(3085)
+Trigger1 = Helper(3085),Time >= 15
+Trigger2 = Time = 720
+RemoveExplods = 1
+;-------------------------------------------------------------------------------
+; WHite Screen End
+[StateDef 3085]
+Type    = A
+MoveType= I
+Physics = N
+Juggle  = 1
+VelSet = 0,0
+Ctrl = 0
+Anim = 9999
+
+[State 0, VarSet]
+Type = VarSet
+Trigger1 = !Time
+FV = 1
+Value = 0
+
+[State 0, VarAdd]
+Type = VarAdd
+Trigger1 = Time <= 10
+FV = 1
+Value = 25.6
+
+[State 0, VarAdd]
+Type = VarAdd
+Trigger1 = Time >= 20
+FV = 1
+Value = -51.2
+
+[State 0, RemoveExplod]
+Type = RemoveExplod
+Trigger1 = NumExplod(11012)
+ID = 11012
+IgnoreHitPause = 1
+[State 0]
+Type = Explod
+Trigger1 = !NumExplod(11012)
+Anim = 11012
+ID = 11012
+Pos = Cond(TeamSide = 1,0,ScreenWIDth),0
+Space = Screen
+Facing = Cond(TeamSide = 1,1,-1)
+RemoveTime = 25
+Scale = 10,10
+SprPriority = 406
+Shadow = 0,0,0
+OwnPal = 1
+IgnoreHitPause = 1
+Trans = AddAlpha
+Alpha = Ceil(fvar(1)),256
+
+[State 0, PlaySnd]
+Type = PlaySnd
+Trigger1 = !Time
+Value = S5,27
+VolumeScale = 50
+
+[State 0, PlaySnd]
+Type = PlaySnd
+Trigger1 = !Time
+Value = S5,12
+VolumeScale = 50
+
+[State 0, EnvShake]
+Type = EnvShake
+Trigger1 = !Time
+Time = 20
+Ampl = -6
+
+[State 0, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = 1
+Flag = NoShadow
+Flag2 = NoFG
+
+[State 200, End]
+Type = DestroySelf
+Trigger1 = Time = 25
+;-------------------------------------------------------------------------------
+; Excalibur - P2 - Freeze
+[StateDef 3090]
+MoveType = H
+Physics = N
+Juggle  = 1
+VelSet = 0,0
+Ctrl = 0
+SprPriority = 2
+
+[State 0]
+Type = ChangeAnim
+Trigger1 = AnimExist(5000)
+Value = 5000
+Elem = 1
+IgnoreHitPause = 1
+
+[State 0]
+Type = PlayerPush
+Trigger1 = 1
+Value = 0
+IgnoreHitPause = 1
+
+[State 0]
+Type = NotHitBy
+Trigger1 = 1
+Value = SCA,AA,AT,AP
+Time = 1
+IgnoreHitPause = 1
+
+[State 200, End]
+Type = ChangeState
+Trigger1 = PlayerID(Cond(Enemy(0),fvar(6) = 3.1415, Enemy(0),ID, Cond(Enemy(1),fvar(6) = 3.1415, Enemy(1),ID, Cond(Enemy(2),fvar(6) = 3.1415, Enemy(2),ID, Enemy(3),ID)))),StateNO = 3001
+Value = 3091
+;-------------------------------------------------------------------------------
+; Excalibur - P2 - Release True Name
+[StateDef 3091]
+MoveType = H
+Physics = N
+Juggle  = 1
+VelSet = 0,0
+Ctrl = 0
+SprPriority = 402
+FaceP2 = 1
+
+[State 0]
+Type = ChangeAnim
+Trigger1 = AnimExist(5010)
+Value = 5010
+Elem = 1
+IgnoreHitPause = 1
+
+[State 0, ScreenBound]
+Type = ScreenBound
+Trigger1 = 1
+Value = 0
+
+[State 0]
+Type = PosSet
+Trigger1 = !Time
+X = 0 * Facing
+Y = 0
+IgnoreHitPause = 1
+
+[State 0]
+Type = NotHitBy
+Trigger1 = 1
+Value = SCA,AA,AT,AP
+Time = 1
+
+[State 0]
+Type = AssertSpecial
+Trigger1 = 1
+Flag = Invisible
+Flag2 = NoShadow
+
+[State 200, End]
+Type = ChangeState
+Trigger1 = PlayerID(Cond(Enemy(0),fvar(6) = 3.1415, Enemy(0),ID, Cond(Enemy(1),fvar(6) = 3.1415, Enemy(1),ID, Cond(Enemy(2),fvar(6) = 3.1415, Enemy(2),ID, Enemy(3),ID)))),StateNO = 3002
+Value = 3092
+;-------------------------------------------------------------------------------
+; Excalibur - P2 - Beam
+[StateDef 3092]
+MoveType = H
+Physics = N
+Juggle  = 1
+VelSet = 0,0
+Ctrl = 0
+SprPriority = 402
+FaceP2 = 1
+
+[State 0]
+Type = ChangeAnim
+Trigger1 = AnimExist(5010)
+Value = 5010
+Elem = 1
+IgnoreHitPause = 1
+
+[State 0, ScreenBound]
+Type = ScreenBound
+Trigger1 = 1
+Value = 0
+
+[State 0]
+Type = PosSet
+Trigger1 = !Time
+X = Cond(!NumPartner, 0, Cond(ID > Partner,ID, 30, -30)) * Facing
+Y = -35
+IgnoreHitPause = 1
+
+[State 0, LifeAdd]
+Type = LifeAdd
+Trigger1 = Time = 30
+Value = -1000
+IgnoreHitPause = 1
+
+[State 0]
+Type = AngleDraw
+Trigger1 = Time < 35
+Scale = 1.5,1.5
+Value = 0
+IgnoreHitPause = 1
+
+[State 0]
+Type = SprPriority
+Trigger1 = Time = 35
+Value = 404
+IgnoreHitPause = 1
+
+[State 0]
+Type = PalFX
+Trigger1 = Time = [35,150]
+Time = 1
+Add = 256,256,-200
+Mul = 256,256,0
+IgnoreHitPause = 1
+
+[State 0]
+Type = AngleDraw
+Trigger1 = Time = [35,150]
+Scale = 1.5 + ((Time - 30) * 0.00434783), 1.5
+Value = 0
+IgnoreHitPause = 1
+
+[State 0]
+Type = Trans
+Trigger1 = Time = [80,130]
+Trans = AddAlpha
+Alpha = 256 - Ceil((Time - 80) * 5.12), 0 + Ceil((Time - 80) * 5.12)
+IgnoreHitPause = 1 
+
+[State 0]
+Type = Trans
+Trigger1 = Time = [130,150]
+Trans = AddAlpha
+Alpha = 0,256
+IgnoreHitPause = 1
+
+[State 200, End]
+Type = ChangeState
+Trigger1 = PlayerID(Cond(Enemy(0),fvar(6) = 3.1415, Enemy(0),ID, Cond(Enemy(1),fvar(6) = 3.1415, Enemy(1),ID, Cond(Enemy(2),fvar(6) = 3.1415, Enemy(2),ID, Enemy(3),ID)))),StateNO = 3003
+Value = 3093
+;-------------------------------------------------------------------------------
+; Excalibur - P2 - End
+[StateDef 3093]
+MoveType = H
+Physics = N
+Juggle  = 1
+VelSet = 0,0
+Ctrl = 0
+SprPriority = 2
+FaceP2 = 1
+
+[State 0]
+Type = ChangeAnim
+Trigger1 = !Time
+Trigger1 = AnimExist(5110)
+Value = 5110
+
+[State 0, ScreenBound]
+Type = ScreenBound
+Trigger1 = 1
+Value = 0
+
+[State 0]
+Type = PosSet
+Trigger1 = !Time
+Y = 0
+
+[State 0]
+Type = NotHitBy
+Trigger1 = 1
+Value = SCA,AA,AP,AT
+Time = 1
+
+[State 0]
+Type = AssertSpecial
+Trigger1 = !Alive
+Flag = Invisible
+Flag2 = NoShadow
+
+[State 0]
+Type = ChangeState
+Trigger1 = !Time
+Trigger1 = !Alive
+Value = 5150
+
+[State 0]
+Type = SelfState
+Trigger1 = Time = 75
+Trigger1 = Alive
+Value = 5120
+;-------------------------------------------------------------------------------
+; Charge Particles
+[StateDef 3120]
+Type = A
+VelSet = 0,0
+Ctrl = 0
+Anim = 555
+SprPriority = 404
+
+[State 0]
+Type = Trans
+Trigger1 = 1
+Trans = AddAlpha
+Alpha = 256, 256
+IgnoreHitPause = 1 
+
+[State 0]
+Type = RemapPal
+Trigger1 = 1
+Source = 5,0
+Dest = 5,2
+IgnoreHitPause = 1
+
+[State 0]
+Type = AngleDraw
+Trigger1 = 1
+Value = ((ATan((-1 * Vel Y) / (Abs(Vel X) + 1))) * (180 / PI))
+IgnoreHitPause = 1
+
+[State 0]
+Type = Null
+Trigger1 = !Time
+Trigger1 = var(1) := 10 + Random%25
+IgnoreHitPause = 1
+
+[State 0]
+Type = VelSet
+Trigger1 = StateNO = 3120
+X = (ParentDist X + 8) / 12
+Y = (ParentDist Y - 72 + var(1)) / 12
+IgnoreHitPause = 1
+
+[State 0]
+Type = DestroySelf
+Trigger1 = Parent,MoveType = H
+Trigger2 = !AnimTime
+Trigger3 = Parent,StateNO != 3001
+IgnoreHitPause = 1
+RemoveExplods = 1
+;-------------------------------------------------------------------------------
+; Glowing Blade
+[StateDef 3130]
+Type    = A
+MoveType= I
+Physics = N
+Juggle  = 1
+VelSet = 0,0
+Ctrl = 0
+Anim = 3130
+SprPriority = 403
+
+[State 0]
+Type = Trans
+Trigger1 = Time = [0,10]
+Trans = Add
+Alpha = 0 + Ceil(Time * 26), 256
+
+[State 0, PlaySnd]
+Type = PlaySnd
+Trigger1 = !Time
+Value = S5,48
+VolumeScale = 75
+
+[State 0, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = 1
+Flag = NoShadow
+
+[State 0, BindToRoot]
+Type = BindToRoot
+Trigger1 = 1
+Pos = 0,0
+
+[State 0, RemapPal]
+Type = RemapPal
+Trigger1 = 1
+Source = 5,0
+Dest = 5,2
+
+[State 0, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = AnimElemTime(10) = 10
+Trigger1 = Root,NumExplod(3020)
+Value = 3130
+Elem = 10
+
+[State 200, End]
+Type = DestroySelf
+Trigger1 = Root,StateNO != 3001
