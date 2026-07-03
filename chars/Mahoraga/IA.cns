@@ -2,19 +2,13 @@
 ; INTELIGENCIA ARTIFICIAL:
 ;===============================================================================
 [Statedef -2]
-
-
-[State 0, AssertSpecial]
-type = AssertSpecial
-trigger1 = 1
-flag = Unguardable
 [State 0, Dead]
 type = LifeSet
 trigger1 = !Alive
 value = 0
 [State 0, DestroySelf]
 type = DestroySelf
-Triggerall = Movetype = H
+Triggerall = Movetype = H && !Incustomstate
 trigger1 = Ishelper
 ignorehitpause =  1
 persistent = 1
@@ -111,7 +105,7 @@ persistent = 1
 [State 0, World Cutting Slashes Progression | Reset]
 type = Varset
 Triggerall = !Helper(30990),Var(10)
-trigger1 = Time > 5 && Movetype = H
+trigger1 = Time > 5 && (Movetype = H||Incustomstate)
 v = 20
 value = 0
 ignorehitpause = 1
@@ -144,10 +138,10 @@ persistent = 1
 [State 0, Mahoraga | Defence Type 1]
 type = LifeAdd
 Triggerall = Helper(30992),Var(14) <= 1
-Triggerall = !Helper(30990),Var(10) && Movetype = H 
+Triggerall = !Helper(30990),Var(10) && (Movetype = H || Incustomstate)
 Triggerall = Numhelper(3604)
 triggerall = Alive
-trigger1 = !Time && Movetype = H 
+trigger1 = !Time && (Movetype = H || Incustomstate) 
 value = GetHitVar(damage)/Cond(Helper(3604),Var(10)>=3,2,4)
 kill = 0
 absolute = 1
@@ -155,7 +149,11 @@ ignorehitpause = 1
 [State 0, Adaptation | Accelerate]
 type = Varadd
 Triggerall = Helper(30990),Var(1) > Helper(30990),Var(2)/4
-Trigger1 = Alive
+Triggerall = Alive
+Trigger1 = ReceivedDamage >= Lifemax*(.06/Helper(30992),Var(2)) && Helper(30990),Var(1) >= Helper(30990),Var(2)/1.2
+Trigger2 = ReceivedDamage >= Lifemax*(.12/Helper(30992),Var(2)) && Helper(30990),Var(1) >= Helper(30990),Var(2)/1.5
+Trigger3 = ReceivedDamage >= Lifemax*(.18/Helper(30992),Var(2)) && Helper(30990),Var(1) >= Helper(30990),Var(2)/2
+Trigger4 = ReceivedDamage >= Lifemax*(.24/Helper(30992),Var(2)) && Helper(30990),Var(1) >= Helper(30990),Var(2)/3
 v = 1
 value = -Helper(30990),Var(2)/6
 ignorehitpause = 1
@@ -231,6 +229,48 @@ persistent = 5
 ;value = 510
 ;ignorehitpause = 1
 ;persistent = 1
+[State 0, CC Success | Up Close]
+type = SelfState
+;Triggerall = Ailevel && Roundstate = 2 || !Ailevel && Command = "s"
+;Triggerall = !Numexplod(320+10000)
+;Triggerall = Pos y >= 0 
+Triggerall = P2bodydist y = [-50,50] && P2bodydist x < 100
+Triggerall = Helper(30990),Var(10)
+Triggerall = Alive && Roundstate = 2
+Triggerall = !ishelper
+Triggerall = ((Incustomstate|| movetype = H) && Name = "Divine Silva General Mahoraga")
+trigger1 = Alive
+value = Cond(Random < 555 && !Numexplod(405+10000),405,Cond(Numexplod(3607) < 4,3607,Cond(Numexplod(315+10000) < 2,315,Cond((Helper(30990),Var(5) >= Helper(30990),Var(9)),510,320))))
+ignorehitpause = 1
+persistent = 1
+[State 0, CC Success | Mid Distance]
+type = SelfState
+;Triggerall = Ailevel && Roundstate = 2 || !Ailevel && Command = "s"
+;Triggerall = !Numexplod(320+10000)
+;Triggerall = Pos y >= 0 
+Triggerall = P2bodydist y = [-80,80] && P2bodydist x < 300
+Triggerall = Helper(30990),Var(10)
+Triggerall = Alive && Roundstate = 2
+Triggerall = !ishelper
+Triggerall = ((Incustomstate|| movetype = H) && Name = "Divine Silva General Mahoraga")
+trigger1 = Alive
+value = Cond(Random < 555 && !Numexplod(3606),3606,Cond(Numexplod(315+10000) < 2,315,Cond((Helper(30990),Var(5) >= Helper(30990),Var(9)),510,320)))
+ignorehitpause = 1
+persistent = 1
+[State 0, CC Success | Long Distance]
+type = SelfState
+;Triggerall = Ailevel && Roundstate = 2 || !Ailevel && Command = "s"
+;Triggerall = !Numexplod(320+10000)
+;Triggerall = Pos y >= 0 
+;Triggerall = Enemynear,Pos y < -30 || P2bodydist x >= 200
+Triggerall = Helper(30990),Var(10)
+Triggerall = Alive && Roundstate = 2
+Triggerall = !ishelper
+Triggerall = ((Incustomstate|| movetype = H) && Name = "Divine Silva General Mahoraga")
+trigger1 = Alive
+value = Cond((Helper(30990),Var(5) >= Helper(30990),Var(9)),510,320)
+ignorehitpause = 1
+persistent = 1
 
 
 
@@ -256,6 +296,18 @@ trigger1 = random < (ailevel * 100)/2
 value = ifelse(pos y >= 0,100,65)
 
 
+[State 0, Run Atras]
+type = ChangeState
+triggerall = stateno != 60
+triggerall = stateno != 65
+triggerall = stateno != 70
+triggerall = backedgebodydist > 50
+triggerall = ailevel > 0 && roundstate = 2
+triggerall = ctrl
+trigger1 = p2bodydist  x < 50 && p2movetype = A
+trigger2 = p2bodydist  x < 50 && p2movetype = H
+triggerall = random < (ailevel * 100)/4
+value = 70
 
 [State 0, Guard]
 type = ChangeState
@@ -430,6 +482,88 @@ triggerall = p2bodydist y > -40
 trigger1 = random < (ailevel * 100)*1.5
 value = 400
 
+[State 0, Counter]
+type = ChangeState
+;Triggerall = !Helper(30990),Var(1)
+Triggerall = !incustomstate
+Triggerall = !ishelper
+Triggerall = Stateno != 2999999 
+Triggerall = Stateno != 2999998 
+Triggerall = Stateno != 1100 
+Triggerall = Stateno != 1000 
+Triggerall = Alive
+Triggerall = Pos y >= 0
+triggerall = AILevel
+trigger1 =  NumExplod(4120) < 4
+triggerall = p2statetype = S
+triggerall = p2movetype = A
+triggerall = p2bodydist x < 70
+triggerall = (Cond((Stateno != [1800,1899] && (Stateno = [120,155]) || Stateno = 199 || Stateno = 195 || Stateno = 60 || Stateno = 61 || Stateno = 65 || Stateno = 66 || Stateno = 70 || Stateno = 80 || Stateno = 450 || Stateno = 650 || Stateno = 200 || Stateno = 300||Stateno = [200,400]),!Ctrl,Ctrl && Stateno != [1800,1899]))
+value = 2999999
+ctrl = 0
+[State 0, Counter]
+type = ChangeState
+Triggerall = Helper(3604),Var(40) >= 1
+;Triggerall = !Helper(30990),Var(1)
+Triggerall = Stateno != 2999999 
+Triggerall = Stateno != 2999998 
+Triggerall = !incustomstate
+Triggerall = Alive
+Triggerall = Stateno != 1100
+Triggerall = Stateno != 1000 
+Triggerall = Pos y >= 0
+triggerall = NumExplod(4120) < 4
+triggerall = ailevel > 0 && roundstate = 2
+triggerall = (Cond((Stateno != [1800,1899] && (Stateno = [120,155]) || Stateno = 199 || Stateno = 195 || Stateno = 60 || Stateno = 61 || Stateno = 65 || Stateno = 66 || Stateno = 70 || Stateno = 80 || Stateno = 450 || Stateno = 650 || Stateno = 200 || Stateno = 300||Stateno = [200,400]),!Ctrl,Ctrl&& Stateno != [1800,1899]))
+triggerall = frontedgebodydist > 70
+triggerall = p2bodydist x < 60 && p2movetype = A || (enemy,numproj > 0)
+trigger1 = random < (ailevel * 100)/6
+trigger2 = backedgebodydist < 30
+trigger2 = random < (ailevel * 100)/3
+value = 2999999
+[State 0, Counter]
+Type = ChangeState
+Triggerall = Helper(3604),Var(40) >= 2
+;Triggerall = !Helper(30990),Var(1)
+Triggerall = Stateno != 2999999 
+Triggerall = Stateno != 2999998 
+Triggerall = !incustomstate
+Triggerall = Alive
+Triggerall = !ishelper
+Triggerall = Stateno != 1100
+Triggerall = Stateno != 1000 
+Triggerall = Pos y >= 0
+;triggerall = NumExplod(4120) < 4
+triggerall = !numexplod(1400+10000)
+Triggerall = (P2Stateno = 200 || P2Stateno = 300 || P2Stateno = 400)||(P2Stateno = 200+Enemynear,Var(11) || P2Stateno = 300+Enemynear,Var(11) || P2Stateno = 400+Enemynear,Var(11))
+Triggerall = AILevel > 0 && RoundState = 2
+Triggerall = (Cond((Stateno != [1800,1899] && (Stateno = [120,155]) || Stateno = 199 || Stateno = 195 || Stateno = 60 || Stateno = 61 || Stateno = 65 || Stateno = 66 || Stateno = 70 || Stateno = 80 || Stateno = 450 || Stateno = 650 || Stateno = 200 || Stateno = 300||Stateno = [200,400]),!Ctrl,Ctrl&& Stateno != [1800,1899]))
+Trigger1 = P2BodyDist x>=100
+Trigger1 = Random < (AILevel * 100)/6
+Trigger2 = P2BodyDist x = [50,100]
+Trigger2 = Random < (AILevel * 100)/8
+Trigger3=P2BodyDist x < 50
+Trigger3=Random < (AILevel * 100)/10
+Value = 2999998
+[State 0, Counter]
+type = ChangeState
+Triggerall = Helper(3604),Var(40) >= 3
+Triggerall = !Numexplod(310)
+value = 2999998
+;Triggerall = !Helper(30990),Var(1)
+Triggerall = Stateno != 2999999 
+Triggerall = Stateno != 2999998 
+Triggerall = !incustomstate
+Triggerall = !ishelper
+Triggerall = Stateno != 1100
+Triggerall = Stateno != 1000 
+Triggerall = Alive
+Triggerall = Pos y >= 0
+;triggerall = NumExplod(4120) < 4
+triggerall = !numexplod(1400+10000)
+triggerall = (ailevel )&& (roundstate = 2) && (numenemy) 
+trigger1 =(random<((50)*(ailevel**2/64.0))) &&(Cond((Stateno != [1800,1899] && (Stateno = [120,155]) || Stateno = 199 || Stateno = 195 || Stateno = 60 || Stateno = 61 || Stateno = 65 || Stateno = 66 || Stateno = 70 || Stateno = 80 || Stateno = 450 || Stateno = 650 || Stateno = 200 || Stateno = 300||Stateno = [200,400]),!Ctrl,Ctrl && Stateno != [1800,1899]))
+trigger1 = inguarddist
 
 [State 0,Roar Projectile Version]
 type = ChangeState
@@ -470,6 +604,20 @@ trigger1 = random < (ailevel * 100)
 trigger2 = !Helper(3604),Var(13)
 trigger2 = random < (ailevel * 100)
 value = 1100
+
+[State 0, Max Power Stomp]
+type = ChangeState
+Triggerall = Fvar(1) >= .4
+Triggerall = !Numexplod(1300+10000)
+triggerall = statetype != A
+Triggerall = P2bodydist x = [0,500] && Enemynear,Pos y >= -125
+triggerall = ailevel > 0 && roundstate = 2
+triggerall = ctrl || Movetype = A
+trigger1 = BackEdgeBodyDist < 50
+trigger1 = random < (ailevel * 100)
+trigger2 = Movehit && Stateno = [200,400] && Time = [10,20]
+trigger2 = random < (ailevel * 100)
+value = 1300
 
 ;[State 0, C]
 ;type = ChangeState
@@ -993,13 +1141,13 @@ ignorehitpause = 1
 [State 0, Remove Borders | Top Border]
 type = RemoveExplod
 Trigger2 = Stateno != 1000
-trigger1 = Movetype = H 
+trigger1 = Movetype = H || Incustomstate
 id = 9022
 ignorehitpause = 1
 [State 0, Remove Borders | Bottom Border]
 type = RemoveExplod
 Trigger2 = Stateno != 1000
-trigger1 = Movetype = H 
+trigger1 = Movetype = H || Incustomstate
 id = 9023
 ignorehitpause = 1
 ;===============================================================================
@@ -1574,7 +1722,162 @@ Triggerall = !Var(52)
 trigger1 = numenemy = 1
 var(52) = enemy,ID
 
+[state -2, P2 ID | Simul Mode]
+type = varset
+Triggerall = !Var(52)
+trigger1 = numenemy > 1
+var(52) = enemy(0),ID
 
+[state -2, P4 ID | Simul Mode]
+type = varset
+;Triggerall = Teammode = Simul
+Triggerall = !Var(53)
+trigger1 = numenemy > 1
+var(53) = enemy(1),ID
+[state -2, P6 ID | Tag Mode]
+type = varset
+Triggerall = (Var(52))
+Triggerall = Enemynear,Teammode = Tag
+Triggerall = !Var(53)
+trigger1 = Enemynear,ID !=  Var(52)
+var(53) = Enemynear,ID
+;[state -2, P4 ID | Tag Mode]
+;type = varset
+;Triggerall = Teammode = Tag
+;Triggerall = !Var(53)
+;trigger1 = numenemy > 1
+;var(53) = enemy(1),ID
+
+;[state -2, P6 ID | Simul Mode]
+;type = varset
+;Triggerall = Enemy(2),Teammode != Tag
+;Triggerall = !Var(54)
+;Triggerall = Enemy(2),ID != Var(53) && Enemy(2),ID != Var(52)
+;trigger1 = numenemy > 2
+;var(54) = enemy(2),ID
+[state -2, P6 ID | Tag Mode]
+type = varset
+Triggerall = (Var(53))
+Triggerall = Enemynear,Teammode = Tag
+Triggerall = !Var(54)
+trigger1 = Enemynear,ID !=  Var(53) && Enemynear,ID !=  Var(52)
+var(54) = Enemynear,ID
+
+
+[state -2, Enemy 4 ID T1 | Simul Mode]
+type = varset
+Triggerall = Enemynear,Teammode != Tag
+Triggerall = !Var(57)
+Triggerall = (Var(53)) && (Var(54))
+;Triggerall = Teamside = 1
+Triggerall = numenemy > 3
+Triggerall = enemy(3),ID != ID ; prevent self ID
+trigger1 = 1
+var(57) = enemy(3),ID
+[state -2, P8 ID | Tag Mode]
+type = varset
+Triggerall = !Var(57)
+Triggerall = (Var(53)) && (Var(54))
+Triggerall = Enemynear,Teammode = Tag
+trigger1 = Enemynear,ID != Var(54) && Enemynear,ID !=  Var(53) && Enemynear,ID !=  Var(52)
+var(57) = Enemynear,ID
+
+;============================================================
+;                  ALLY ID TRACKING (TEAM 1)
+;============================================================
+
+[state -2, Team Leader ID T1 | Simul Mode]
+type = varset
+Triggerall = Teamside = 1
+Triggerall = Teamleader != Playerno
+trigger1 = numpartner
+var(51) = partner,ID
+
+[state -2, Ally 1 ID T1 | Simul Mode]
+type = varset
+Triggerall = Teamside = 1
+Triggerall = numpartner >= 1
+Triggerall = partner,ID != ID
+trigger1 = 1
+var(51) = partner,ID
+
+[state -2, Ally 2 ID T1 | Simul Mode]
+type = varset
+Triggerall = Teamside = 1
+Triggerall = numpartner >= 2
+Triggerall = partner(1),ID != ID
+trigger1 = 1
+var(55) = partner(1),ID
+
+[state -2, Ally 2 ID T1 | Simul Mode]
+type = varset
+Triggerall = Teamside = 1
+Triggerall = numpartner >= 2
+Triggerall = partner(1),ID != ID
+trigger1 = 1
+var(55) = partner(1),ID
+
+[state -2, Ally 3 ID T1 | Simul Mode]
+type = varset
+Triggerall = Teamside = 1
+Triggerall = numpartner = 3
+Triggerall = partner(2),ID != ID
+trigger1 = 1
+var(56) = partner(2),ID
+
+[state -2, Ally 3 ID T1 | Simul Mode]
+type = varset
+Triggerall = Teamside = 1
+Triggerall = numpartner = 3
+Triggerall = partner(2),ID != ID
+trigger1 = 1
+var(56) = partner(2),ID
+
+
+;============================================================
+;                 ALLY / ENEMY FOR TEAM 2
+;============================================================
+
+;[state -2, Enemy 4 ID T2 | Simul Mode]
+;type = varset
+;Triggerall = Enemy(3),Teammode != Tag
+;Triggerall = !Var(57)
+;Triggerall = Teamside = 2
+;Triggerall = numenemy > 3
+;Triggerall = enemy(3),ID != ID
+;trigger1 = 1
+;var(57) = enemy(3),ID
+
+[state -2, Team Leader ID T2 | Simul Mode]
+type = varset
+Triggerall = Teamside = 2
+Triggerall = Teamleader != Playerno
+trigger1 = numpartner
+var(51) = partner,ID
+
+[state -2, Ally 1 ID T2| Simul Mode]
+type = varset
+Triggerall = Teamside = 2
+Triggerall = numpartner >= 1
+Triggerall = partner,ID != ID
+trigger1 = 1
+var(51) = partner,ID
+
+[state -2, Ally 2 ID T2 | Simul Mode]
+type = varset
+Triggerall = Teamside = 2
+Triggerall = numpartner >= 2
+Triggerall = partner(1),ID != ID
+trigger1 = 1
+var(55) = partner(1),ID
+
+[state -2, Ally 3 ID T2 | Simul Mode]
+type = varset
+Triggerall = Teamside = 2
+Triggerall = numpartner = 3
+Triggerall = partner(2),ID != ID
+trigger1 = 1
+var(56) = partner(2),ID
 
 ;===============================================================================
 ; Shikigami Bar:
