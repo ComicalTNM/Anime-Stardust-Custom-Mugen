@@ -1,0 +1,592 @@
+# == Global States - Stage Intro, Intro-Outro & VNIX Effects Module Combined == #
+
+# ==============================================================================
+# FUNCIONES GLOBALES
+# ==============================================================================
+
+# Función de Flash para el efecto especial de KO (Sintaxis de intervalos corregida)
+[Function flash(i,j,k,l,m,n)]
+ignorehitpause if (map(_addon_disable_intro_outro_zss) = 0) && (time >= $i && time <= $j) {
+	envcolor{value:0,0,0; time:1; under:1;}
+}
+ignorehitpause if (map(_addon_disable_intro_outro_zss) = 0) && (time >= $k && time <= $l) {
+	if time % $m < $n {
+		envcolor{value:255,0,0; time:1; under:1;}
+	} else {
+		envcolor{value:255,255,255; time:1; under:1;}
+	}
+}
+
+# ==============================================================================
+# HELPERS ORIGINALES Y VNIX EFFECTS
+# ==============================================================================
+
+# Helper para mantener la Intro activa durante la cinemática de cámara de Stage
+[Statedef 9000800; type: S; ctrl: 0; velset: 0, 0;] 
+AssertSpecial{flag:invisible}
+notHitBy{value: SCA}
+
+# Meter management helper
+[Statedef 29108180;anim:-2;]
+persistent(0) if playerno < 3 {
+	if teammode != turns {
+		if map(io_pow_wi) != 0 && map(io_wincount) > 0 {poweradd{value :map(io_pow_wi); redirectid:root,ID;}}
+		else if map(io_pow_lo) != 0 && map(io_wincount) = 0 {poweradd{value :map(io_pow_lo); redirectid:root,ID;}}
+	}
+	else if map(io_pow_tm) != 0 && !roundsexisted {poweradd{value :map(io_pow_tm); redirectid:root,ID;}}
+}
+if root,ctrl {destroyself{}}
+
+# KO Seizure flash helper
+[Statedef 29108190;anim:-2;]
+ignorehitpause if (map(_addon_disable_intro_outro_zss) = 0) && ( roundstate = 3)  {
+	if root,map(io_ko_slo) {call flash(0,11,12,59,15,7);}
+	else {call flash(0,2,3,14,3,1);}
+} else {
+	destroyself{}
+}
+	
+# Pre-fight movement helper (allows movement durante intros)
+[Statedef 29108191;anim:-2;]
+if roundstate > 0 && (root,ctrl || enemy,ctrl) {destroyself{}}
+
+
+# ===============================================================================
+# HELPER: VNIX Tokon Effects
+# ===============================================================================
+[StateDef 220201950; type: U; physics: N; anim: -2;]
+
+if time = 1 {
+	playsnd{value: VP 100, 52; volumescale: 200; freqmul: 1.0; channel: 5;}
+	playsnd{value: VP 100, 52; volumescale: 200; freqmul: 1.0; channel: 5;}
+	explod{
+		anim: VP 20091;
+		ID: 20091;
+		postype: left;
+		pos: const240p(160), const240p(0);
+		scale: 1,1;
+		angle: 0;
+		facing: 1;
+		under: 1;
+		layerno: 0;
+		sprpriority: -99;
+		removetime: 80;
+		pausemovetime: -1;
+		supermovetime: -1;
+		window: -160,0,160,240;
+	}
+	explod{
+		anim: VP 20110;
+		ID: 20110;
+		postype: left;
+		pos: const240p(160), const240p(120);
+		scale: 1,1;
+		angle: 0;
+		facing: 1;
+		under: 1;
+		layerno: 0;
+		sprpriority: -99;
+		removetime: -2;
+		pausemovetime: -1;
+		supermovetime: -1;
+	}
+	explod{
+		anim: VP 20111;
+		ID: 20111;
+		postype: left;
+		pos: const240p(160), const240p(120);
+		scale: 1,1;
+		angle: 0;
+		facing: 1;
+		under: 1;
+		layerno: 0;
+		sprpriority: -99;
+		removetime: -2;
+		pausemovetime: -1;
+		supermovetime: -1;
+		interpolation.time: 90;
+		interpolation.scale: 1.2,1.2;
+	}
+	explod{
+		anim: VP 20111;
+		ID: 20112;
+		postype: left;
+		pos: const240p(160), const240p(120);
+		scale: 1,1;
+		angle: 0;
+		facing: 1;
+		under: 1;
+		layerno: 0;
+		sprpriority: -99;
+		removetime: -2;
+		pausemovetime: -1;
+		supermovetime: -1;
+	}
+	explod{
+		anim: VP 20112;
+		ID: 20113;
+		postype: left;
+		pos: const240p(160), const240p(120);
+		scale: 1,1;
+		angle: 0;
+		facing: 1;
+		under: 1;
+		layerno: 0;
+		sprpriority: -99;
+		removetime: -2;
+		pausemovetime: -1;
+		supermovetime: -1;
+		interpolation.time: 90;
+		interpolation.scale: 1.2,1.2;
+	}
+}
+
+if time = 110 {
+	stopSnd{channel: 5;}
+	root, map(_vnix_announcer) := random;
+	root, map(_vnix_announcer_soul) := random%5;
+}
+if time = [0, 30] { allpalfx{ time: 1; color: 0; } }
+if time = [30,89] { allpalfx{ time: 1; color: (time - 30) * 4.2; } }
+
+assertspecial{flag: nomusic;}
+
+if root, map(_vnix_strive_cfg_enable) {
+	if time > 120 { assertspecial{flag: roundFreeze;} }
+	if time < 80 { assertspecial{flag: globalnoshadow;} }
+
+	if time = 300 {
+		playsnd{value: VP 7, 33; volumescale: 200; freqmul: 1.0}
+		playsnd{value: VP 7, 33; volumescale: 200; freqmul: 1.0}
+	}
+	
+	if root, map(_vnix_strive_cfg_random) != 0 {
+		if root, map(_vnix_announcer) < 301 { 
+			if time = 300 { 
+				playsnd{value: VP 7, 31; volumescale: 200; freqmul: 1.0}
+				playsnd{value: VP 7, 31; volumescale: 100; freqmul: 1.0} 
+			}
+			if time = 500 { 
+				playsnd{value: VP 7, 32; volumescale: 200; freqmul: 1.0}
+				playsnd{value: VP 7, 32; volumescale: 100; freqmul: 1.0} 
+			}
+			if time = 730 { destroySelf{} }
+		} else if root, map(_vnix_announcer) = [301, 660] { 
+			if time = 300 { 
+				playsnd{value: VP 7, 34; volumescale: 200; freqmul: 1.0}
+				playsnd{value: VP 7, 34; volumescale: 200; freqmul: 1.0} 
+			}
+			if time = 500 { 
+				playsnd{value: VP 7, 35; volumescale: 200; freqmul: 1.0}
+				playsnd{value: VP 7, 35; volumescale: 200; freqmul: 1.0} 
+			}	
+			if time = 580 { destroySelf{} }
+		} else if root, map(_vnix_announcer) > 660 { 
+			if time = 300 { playsnd{value: VP 7, 36; volumescale: 200; freqmul: 1.0} }
+			if time = 500 { playsnd{value: VP 7, 37 + root, map(_vnix_announcer_soul); volumescale: 200; freqmul: 1.0} }	
+			if time = 750 { destroySelf{} }
+		}
+	} else { 
+		if root, map(_vnix_strive_cfg_choice) = 1 { 
+			if time = 300 { 
+				playsnd{value: VP 7, 34; volumescale: 200; freqmul: 1.0}
+				playsnd{value: VP 7, 34; volumescale: 200; freqmul: 1.0} 
+			}
+			if time = 500 { 
+				playsnd{value: VP 7, 35; volumescale: 200; freqmul: 1.0}
+				playsnd{value: VP 7, 35; volumescale: 200; freqmul: 1.0} 
+			}	
+			if time = 580 { destroySelf{} }
+		} else if root, map(_vnix_strive_cfg_choice) = 2 { 
+			if time = 300 { playsnd{value: VP 7, 36; volumescale: 200; freqmul: 1.0} }
+			if time = 500 { playsnd{value: VP 7, 37 + root, map(_vnix_announcer_soul); volumescale: 200; freqmul: 1.0} }	
+			if time = 750 { destroySelf{} }
+		} else { 
+			if time = 300 { 
+				playsnd{value: VP 7, 31; volumescale: 200; freqmul: 1.0}
+				playsnd{value: VP 7, 31; volumescale: 100; freqmul: 1.0} 
+			}
+			if time = 500 { 
+				playsnd{value: VP 7, 32; volumescale: 200; freqmul: 1.0}
+				playsnd{value: VP 7, 32; volumescale: 100; freqmul: 1.0} 
+			}
+			if time = 730 { destroySelf{} }
+		}
+	} 	
+} else {
+	if time = 300 { destroySelf{} }
+}
+
+
+# ==============================================================================
+# ESTADOS NEGATIVOS (CONFIGURACIÓN Y LÓGICA BASE)
+# ==============================================================================
+
+[Statedef -2]
+
+if !map(ignore_io) && stateno = 5900 && playerno < 9 {
+	
+	# --- SISTEMA DE INTROS ---
+	# 1 = Permite mover a los personajes libremente antes de que empiece el round (Pre-fight). 0 = Estáticos
+	map(io_pre_fight) := 0;
+	
+	# 1 = Bloquea el salto de intro con cualquier botón. 0 = Permite saltarlo. (Bloqueado por defecto porque usamos la regla de la tecla "A")
+	map(io_intro_skip) := 1;
+	
+	# --- SISTEMA DE ENERGÍA (POWER) ---
+	# Configura la cantidad de barra de poder que se regala a los personajes: [cite: 32]
+	map(io_pow_r1) := 0; # Al inicio del round 1.
+	map(io_pow_wi) := 0; # Después de ganar un combate.
+	map(io_pow_lo) := 0; # Después de perder un combate.
+	map(io_pow_tm) := 0; # Después de perder a un compañero (En modo Turns).
+
+	# --- MÚSICA EN INTROS ---
+	# 1 = Silencia la música de fondo mientras se reproducen las animaciones de Intro. 0 = La música suena normal. 
+	map(io_intro_bgm_r1) := 1; # Durante el Round 1.
+	map(io_intro_bgm_tm) := 1; # Durante el relevo en modo Turns.
+
+	# --- HUD (BARRAS DE VIDA) EN INTROS ---
+	# 1 = Oculta las barras de vida de la pantalla mientras suena la intro. 0 = Las barras siempre están visibles.
+	map(io_intro_hud_r1) := 1; # Durante el Round 1.
+	map(io_intro_hud_rx) := 1; # Durante los Rounds siguientes.
+	map(io_intro_hud_tm) := 1; # Durante el relevo en modo Turns.
+
+	# --- SISTEMA DE K.O. ---
+	# 1 = Elimina el efecto de "Cámara Lenta" nativo de MUGEN/Ikemen al hacer K.O. 0 = Mantiene la cámara lenta. 
+	map(io_ko_slo) := 0;
+	
+	# 1 = Activa un destello de luz intenso en la pantalla cuando el K.O. es por Especial (spc) o Súper (sup). 0 = Desactivado. [Precaución: Puede causar fotosensibilidad] 
+	map(io_ko_spc) := 0;
+	map(io_ko_sup) := 0;
+	
+	# 1 = Silencia inmediatamente la música de fondo en el instante que alguien hace K.O. 0 = La música sigue sonando. 
+	map(io_ko_bgm) := 0;
+	
+	# 1 = Oculta las barras de vida en el instante que hay un K.O. 0 = Las mantiene visibles. 
+	map(io_ko_hud) := 1;
+
+	# --- SISTEMA DE WINPOSES (VICTORIA) ---
+	# 1 = Silencia la música de fondo durante las animaciones de victoria. 0 = Normal. 
+	map(io_win_bgm) := 0;
+	
+	# 1 = Oculta las barras de vida durante las animaciones de victoria. 0 = Visibles. 
+	map(io_win_hud) := 1;
+	
+	# Control de cámara en la victoria: 1 = Enfoca al ganador. 2 = Enfoca al perdedor. 0 = Se queda estática en el centro. 
+	map(io_win_cam) := 1;
+	
+	# Qué tanto se acerca el zoom de la cámara en la victoria (Ejemplo: 1.0 es normal, 1.50 es bastante cerca). 
+	map(io_win_zoo) := 1.50;
+	
+	# 1 = Impide saltar las animaciones de victoria. 0 = Permite saltarlas.
+	map(io_win_skip) := 0;
+
+	# --- EFECTOS VNIX ---
+	# 1 = Activa el filtro visual Tokon Fade-in al arrancar el combate. 0 = Lo desactiva.
+	map(_vnix_whiteout_cfg_enable) := 1;
+	
+	# 1 = Activa los efectos adicionales de round (impactos, zoom, sonidos). 0 = Lo desactiva.
+	map(_vnix_roundfx_cfg_enable) := 1;
+}
+
+# Lógica principal del State -2 (Manual turning)
+ignorehitpause if (map(_addon_disable_intro_outro_zss) = 0) && ( playerno < 9)  {
+	let x0 = ceil(enemynear((numenemy=2)*(enemynear,stateno=5150)),pos x-pos x)*facing;
+	if stateno = [29109000,29109106] && ($x0 < -5) && (anim = 0 || anim = 11 || anim = 20) {
+		changeanim{value:5+(anim = 11)}
+		turn{}
+	}
+}
+
+[Statedef -3]
+# Centers camera on the winner or loser during winposes
+if playerno < 9 {
+	ignorehitpause if (map(_addon_disable_intro_outro_zss) = 0) && ( roundstate = 4 && !ishelper && playerno < 3)  {
+		if authorname = "Phantom.of.the.Server" && map(cfg_winzoom) {map(cfg_winzoom):= 0;}
+		
+		if ((map(io_win_cam) = 1 && (winko||wintime)) || (map(io_win_cam) = 2 && (loseko||losetime))) && map(io_win_zoo) > 1 {
+			let z = gamewidth/const240p(320/map(io_win_zoo));
+			zoom{scale:$z;lag:0.97; pos:(pos x/$z)*camerazoom, pos y; stagebound:1; camerabound:0;}
+		}
+	}
+}
+
+[StateDef -4]
+
+# --- LÓGICA DE INICIALIZACIÓN STAGE INTRO Y VNIX ---
+ignorehitpause if playerno = 1 && roundstate = 0 && !isHelper {
+	if numhelper(9000800) = 0 {
+		Helper {
+			name: "Intro AssertSpecial";
+			ID: 9000800;
+			stateno: 9000800;
+			pos: 0,0,0;
+			postype: p1;
+			keyctrl:0;
+			supermovetime:-1;
+			pausemovetime:-1;
+		}
+	}
+
+	# --- CONFIGURACIÓN DEL MOVIMIENTO DE CÁMARA (STAGE INTRO) ---
+	# 1 = Activa el movimiento cinemático de cámara por el escenario al iniciar. 0 = Desactivado.
+	map(bbtag_stageIntro) := 1;
+	
+	# Dirección en la que viaja la cámara: 1 = Hacia el centro directamente, 2 = Desde abajo hacia el centro, 3 = Desde arriba hacia el centro.
+	map(bbtag_stageIntroScrollOrder) := 2;   
+	
+	# Duración total del recorrido de cámara (en Frames). (120 = aprox 2 segundos).
+	map(bbtag_stageIntroTime) := 120;         
+	
+	# Qué tan alejado/acercado comienza el escenario en el primer frame de la intro (2.0 = Muy alejado).
+	map(bbtag_stageIntroZoom) := 2.0;         
+	
+	# Tiempo de espera (en frames) en el que los personajes están quietos ANTES de que comience el paneo de cámara.
+	map(bbtag_IntroDelay) := 60;              
+	
+	# Valor de suavizado (Smooth) de la cámara al regresar a la normalidad (Valores bajos = suave, valores altos = rígido).
+	map(bbtag_cameraLag) := 0.9;
+
+	# Inicialización Variables VNIX (No editar)
+	if time = 0 {
+		map(_vnix_fightsound) := 0;
+		map(_vnix_fightsound_2) := 0;
+		map(_vnix_fightport) := 0;
+		map(_vnix_tokon) := 0;
+		zoom{ scale: 1.0; time: 10; pos: 0, 0; lag: 0.5; stagebound: 0; camerabound: 0;}
+	}
+}
+
+ignorehitpause if roundstate = 2 && !isHelper && (teamside = 1 || teamside = 2) {
+	map(_vnix_ypos_detector) := 0;
+}
+
+# --- LÓGICA DE MOVIMIENTO DE CÁMARA (STAGE INTRO) ---
+ignorehitpause if roundState = [0,1] && !isHelper && teamSide != 0
+{
+	if playerno = 1 && roundNo = 1 && map(bbtag_stageIntro) = 1 {
+		if !map(bbtag_stageIntroFinished) {
+			AssertSpecial{flag: Intro; redirectid: helper(9000800), id}
+		}
+
+		if !map(bbtag_stageIntroFinished) && !map(stageIntroBegun) {
+			map(stageIntroBegun) := 1;
+			map(stageIntroTime) := map(bbtag_stageIntroTime);
+		}
+
+		if map(stageIntroTime) >= 0 {
+			let c = (256 - (256 * (map(stageIntroTime) / map(bbtag_stageIntroTime))));
+			AllPalFX{mul: $c, $c, $c; time: 2}
+
+			if stagetime > 0 {
+				switch(map(bbtag_stageIntroScrollOrder)) {
+					case 1:
+						let siz = gamewidth/const240p(320/1.0 + (map(bbtag_stageIntroZoom)*(map(stageIntroTime)/map(bbtag_stageIntroTime))));
+						zoom{scale:$siz; pos:$siz*camerazoom, 0; lag:cond(map(stageIntroTime) = map(bbtag_stageIntroTime), 0, map(bbtag_cameraLag)); stagebound:1; camerabound:0}
+					case 2:
+						let pos = stageVar(camera.boundlow)*(map(stageIntroTime)/map(bbtag_stageIntroTime));
+						zoom{scale:stagevar(camera.startzoom); pos:0, $pos; lag:cond(map(stageIntroTime) = map(bbtag_stageIntroTime), 0, map(bbtag_cameraLag)); stagebound:1; camerabound:0}
+					case 3:
+						let pos = stageVar(camera.boundhigh)*(map(stageIntroTime)/map(bbtag_stageIntroTime));
+						zoom{scale:stagevar(camera.startzoom); pos:0, $pos; lag:cond(map(stageIntroTime) = map(bbtag_stageIntroTime), 0, map(bbtag_cameraLag)); stagebound:1; camerabound:0}
+				}
+			}
+		}
+
+		if map(stageIntroTime) > (map(bbtag_IntroDelay) * -1) && map(stageIntroBegun) {
+			if map(stageIntroTime) < 0 {
+				zoom{scale:stagevar(camera.startzoom); lag:map(bbtag_cameraLag); pos:0, 0; stagebound:1; camerabound:0}
+			}
+			map(stageIntroTime) := map(stageIntroTime) - 1;
+		}
+
+		if map(stageIntroTime) = (map(bbtag_IntroDelay) * -1) && !map(bbtag_stageIntroFinished) {
+			map(bbtag_stageIntroFinished) := 1;
+		}
+	}
+
+	# LÓGICA DE ESPERA DE INTROS (Evita que caminen solos)
+	if stateno = 0 {
+		if enemy, stateno = [190,199] || enemy, stateno = [2190,2199] || enemy, stateno = 5900 || (roundNo = 1 && player(1), map(bbtag_stageIntro) = 1 && !player(1), map(bbtag_stageIntroFinished)) {
+			if ctrl { ctrlSet{value: 0} }
+			velSet{x: 0; y: 0}
+		}
+	}
+}
+
+# --- LÓGICA DEL SISTEMA DE INTRO/OUTRO (Ocultar HUD, Silenciar BGM, etc) ---
+if playerno < 9 {
+
+	if stateno = 5900 && !map(ignore_io) {map(foobs_intro_system):= 1;}
+
+	if !ishelper && Roundsexisted > 0 && map(io_pre_fight){
+		if roundstate = [0,1] && !isasserted(intro) && !numhelper(29108191) {
+			helper{stateno:29108191; ID:29108191; name:"Pre-fight helper"}
+		}
+		if numhelper(29108191) {
+			assertspecial{flag:nointroreset;flag2:nohardcodedkeys;}
+		}
+	}
+
+	if roundstate = [0,1] && playerno < 3 {	
+		if map(io_intro_bgm_r1) && roundno = 1 {assertspecial{flag:nomusic;}}
+		if map(io_intro_bgm_tm) && roundno > 1 && teammode = turns && !roundsexisted {assertspecial{flag:nomusic;}}
+		if map(io_intro_hud_r1) && roundno = 1 {assertspecial{flag:nobardisplay;}}
+		if map(io_intro_hud_rx) && roundno > 1 {assertspecial{flag:nobardisplay;}}
+		if map(io_intro_hud_tm) && roundno > 1 && teammode = turns && !roundsexisted {assertspecial{flag:nobardisplay;}}
+	}
+
+	if roundstate = 4 {
+		if alive {map(io_wincount):= 1;} else {map(io_wincount):= 0;}
+	}
+
+	if roundstate = 1 && playerno < 3 && map(io_pow_r1) != 0 && roundno = 1 && power = 0 {powerset{value :map(io_pow_r1);}}
+
+	if roundstate = 1 && playerno < 3 && !numhelper(29108180) && roundno != 1 {
+		helper{stateno:29108180; ID:29108180; extendsmap:1; name:"Meter management helper";}
+	}
+
+	ignorehitpause if (map(_addon_disable_intro_outro_zss) = 0) && ( roundstate = 3 && playerno < 3 && !ishelper && alive)  {
+		if !numhelper(29108190) && ((map(io_ko_spc) && winspecial) || (map(io_ko_sup) && winhyper)) {
+			helper{stateno:29108190; ID:29108190;}
+		}
+		ignorehitpause if (map(_addon_disable_intro_outro_zss) = 0) && ( map(io_ko_slo))  {assertspecial{flag:nokoslow;}}
+		ignorehitpause if (map(_addon_disable_intro_outro_zss) = 0) && ( map(io_ko_bgm))  {assertspecial{flag:nomusic;}}
+		ignorehitpause if (map(_addon_disable_intro_outro_zss) = 0) && ( map(io_ko_hud))  {assertspecial{flag:nobardisplay;}}
+	}
+
+	# Hace que las intros no se puedan saltar
+	# SOLO el Jugador 1 controla este candado
+	ignorehitpause if (map(_addon_disable_intro_outro_zss) = 0) && ( roundstate < 2 && playerno = 1 && map(io_intro_skip)) {
+		if command = "a"  {
+			mapset{map: "intro_unlocked"; value: 1}
+		}
+		if map(intro_unlocked) = 0 {
+			assertspecial{flag:roundnotskip;}
+		}
+	}
+	
+	ignorehitpause if roundstate >= 2 {
+		mapset{map: "intro_unlocked"; value: 0}
+	}
+	
+	ignorehitpause if (map(_addon_disable_intro_outro_zss) = 0) && ( roundstate = 4 && playerno < 3 && !ishelper && alive)  {
+		if map(io_win_skip) {assertspecial{flag:roundnotskip;}}
+		ignorehitpause if (map(_addon_disable_intro_outro_zss) = 0) && ( map(io_win_bgm))  {assertspecial{flag:nomusic;}}
+		ignorehitpause if (map(_addon_disable_intro_outro_zss) = 0) && ( map(io_win_hud))  {assertspecial{flag:nobardisplay;}}
+	}
+}
+
+# ==============================================================================
+# VNIX EFFECTS LOGIC (Manejador General de Efectos Visuales)
+# ==============================================================================
+[StateDef +1]
+
+# --- VNIX: Tokon Fade-In Effect ---
+ignoreHitPause if map(_vnix_whiteout_cfg_enable) != 0 && !ishelper && gameMode != "Training" && roundNo = 1 {
+	if ID = player(1), ID { 
+		if roundState = 0 && stageconst(intro_startup) <= fighttime {
+			mapadd{map: "_vnix_tokon"; value: 1}
+			if map(_vnix_tokon) = 1 {
+				helper{
+					stateno: 220201950;
+					ID: 220201950;
+					name: "Tokon Effects";
+					pausemovetime: 5184000;
+					supermovetime: 5184000;
+				}			
+			}
+		}
+	}
+}
+
+
+# --- VNIX: Round FX ---
+ignorehitpause if !ishelper && map(_vnix_roundfx_cfg_enable) != 0 && ID > p2, ID {
+	if roundState = [0,1] && gameMode != "training" {
+		assertSpecial{flag: nobardisplay}
+	}
+	
+	if roundState = 1 && gameMode != "training" {
+		if RoundNo = 1 && stageconst(intro_startup) <= fighttime {
+
+			if map(_vnix_whiteout_cfg_enable) && map(_vnix_strive_cfg_enable) {
+				if roundtime > 250 { zoom{ scale: 1.00; time: 1; pos: 0, 0; lag: 0.998; stagebound: 1; camerabound: 1; } }			
+			}
+		}
+		
+		if fightScreenState(RoundDisplay) {
+			mapadd{map:"_vnix_fightsound"; value: 1}
+			if map(_vnix_fightsound) = 1 {
+				if RoundNo = 1 && map(_vnix_special_intro) != 0 {
+					explod{ anim: VP 20551; postype: left; pos: const240p(160), const240p(0); scale: 1,1; ontop: 1; removetime: 120; pausemovetime: -1; supermovetime: -1; }
+					explod{ anim: VP 20550; postype: left; pos: const240p(160), const240p(175); scale: 1.5,1.5; ontop: 1; removetime: 120; trans: addalpha; alpha: 0,256; pausemovetime: -1; supermovetime: -1; interpolation.time: 20; interpolation.scale: 1,1; interpolation.alpha: 256,0; }
+					explod{ anim: VP 20552; postype: left; pos: const240p(160), const240p(175); scale: 1,1; ontop: 1; removetime: 60; pausemovetime: -1; supermovetime: -1; palfx.time: -1; palfx.add: 255,255,255; }
+				}
+				playsnd{value: VP 100, 38; volumescale: 200; freqmul: 1.0}	
+			}
+			if map(_vnix_fightsound) = 20 {
+				if RoundNo = 1 && map(_vnix_special_intro) != 0 { playsnd{value: VP 100, 42; volumescale: 100; freqmul: 1.0} }
+			}
+			if map(_vnix_fightsound) = [9,70] {
+				allpalfx{time:1; color:0}
+				pause{time: 1}
+				assertSpecial{flag:nomusic}
+			}
+			if map(_vnix_fightsound) = 900 {
+				playsnd{value: VP 100, 36; volumescale:200; freqmul: 1.0}
+				playsnd{value: VP 100, 36; volumescale:200; freqmul: 1.0}
+				envshake{ time: 10; freq: 90; ampl: 4 }
+			}
+			if map(_vnix_fightsound) > 9 {
+				zoom{ scale: 1.00; time: 1; pos: 0, 0; lag: 0.945; stagebound: 1; camerabound: 1; }
+			}
+		}
+		
+		if fightscreenstate(FightDisplay) {
+			mapadd{map:"_vnix_fightsound_2"; value: 1}
+			if map(_vnix_fightsound_2) = 101 {
+				playsnd{value: VP 100, 37; volumescale:200; freqmul: 1.0}
+				playsnd{value: VP 100, 36; volumescale:200; freqmul: 1.0}
+				pause{time: 10}
+			}
+			if map(_vnix_fightsound_2) < 3 {
+				palfx{time:1; color:0}
+				palfx{time:1; color:0; redirectID: p2, ID}				
+			}
+			if map(_vnix_fightsound_2) < 13 {
+				bgpalfx{time:1; color:0}
+			}
+			if map(_vnix_fightsound_2) = 90 {
+				zoom{ scale: 1.1; time: 5; pos: 0, 0; lag: 0; stagebound: 1; camerabound: 1; }
+			}
+			if map(_vnix_fightsound_2) < 109 || map(_vnix_fightsound_2) > 115 {
+				zoom{ scale: 1.0; time: 10; pos: 0, 0; lag: 0; stagebound: 1; camerabound: 1; }
+			}
+		}
+	}
+}
+
+# ==============================================================================
+# 1. FINAL CONGELADO (Trigger exacto al dar el golpe de K.O.)
+# ==============================================================================
+ignorehitpause if roundstate = 3 && playerno = 1 && !ishelper {
+
+	# Si detectamos que el oponente acaba de ser derrotado y no hemos activado el efecto
+	if map(freeze_frame_active) = 0 {
+		
+		# Congela el frame exacto del impacto por casi 1 segundo (45 frames)
+		# 'pausebg: 1' asegura que el fondo también se detenga para la "foto"
+		Pause { 
+			time: 55; movetime: 0; pausebg: 1; 
+		}
+		
+		# Marcamos que el efecto ya se ejecutó para este round
+		mapset{map: "freeze_frame_active"; value: 1}
+	}
+}
+
+# Reiniciamos la memoria al volver a pelear o en la intro
+ignorehitpause if roundstate != 3 && playerno = 1 && !ishelper {
+	mapset{map: "freeze_frame_active"; value: 0}
+}

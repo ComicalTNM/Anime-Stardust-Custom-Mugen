@@ -1,0 +1,1348 @@
+;---------------------------------------------------------------------------
+; 5ABC
+[StateDef 3000]
+Type = S
+MoveType = A
+Physics = S
+Ctrl = 0
+Anim = 3000
+SprPriority = 2
+PowerAdd = -1000
+FaceP2 = 1
+
+[State 3000, VarSet]
+Type = VarSet
+Trigger1 = !AnimElemTime(1)
+var(32) = 2
+IgnoreHitPause = 1
+
+[State 3000, VelSet]
+Type = VelSet
+Trigger1 = PrevStateNO != 100
+Trigger1 = !AnimElemTime(1)
+X = 0
+Y = 0
+IgnoreHitPause = 1
+
+[State 3000, PalFX]
+Type = PalFX
+Trigger1 = !AnimElemTime(1)
+Time = 12
+Add = 192,192,192
+SinAdd = -192,-192,-192,48
+IgnoreHitPause = 1
+
+[State 3000, BGPalFX]
+Type = BGPalFX
+Trigger1 = Time < 45
+Time = 1
+Add = -128,-128, -128
+Color = 256
+IgnoreHitPause = 1
+
+[State 3000, BGPalFX]
+Type = BGPalFX
+Trigger1 = Time = 45
+Time = 10
+Add = -128,-128, -128
+SinAdd = 128, 128, 128, 40
+Color = 256
+IgnoreHitPause = 1
+
+[State 3000, Pause]
+Type = Pause
+Trigger1 = !AnimElemTime(1)
+Time = 50
+MoveTime = 50
+PauseBG = 1
+IgnoreHitPause = 1
+
+[State 3000 Helper]
+Type = Helper
+Trigger1 = !AnimElemTime(1)
+Name = "Super Charge Effect"
+ID = 11300
+StateNO = 11300 
+Pos = 0, 0
+OwnPal = 1
+PauseMoveTime = 99999
+Size.Mid.Pos = -30,-96
+IgnoreHitPause = 1
+
+[State 3000, PlaySnd]
+Type = PlaySnd
+Trigger1 = MoveHit
+Value = S11300,0
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3000, PlaySnd]
+Type = PlaySnd
+Trigger1 = MoveHit
+Value = S11300,2
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3000, VelSet]
+Type = VelSet
+Trigger1 = !AnimElemTime(4)
+X = 8
+IgnoreHitPause = 1
+
+[State 3000, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(1)
+Value = S3000, 0
+VolumeScale = 80
+IgnoreHitPause = 1
+
+[State 3000, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(4)
+Value = S6000, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 3000, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(4)
+Value = S6001, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 3000, Explod]
+Type = Explod
+Trigger1 = !AnimElemTime(4)
+Anim = 11001
+ID = 11001
+Pos = (Pos X + CameraPos X) + (0 * Facing), (Pos Y)
+Space = Stage 
+Facing = Facing
+PauseMoveTime = 99999
+Scale = .65,.65
+SprPrioritY = 3
+Shadow = 0, 0, 0
+OwnPal = 1
+IgnoreHitPause = 1
+
+[State 3000, Helper]
+Type = Helper
+Trigger1 = !AnimElemTime(4)
+Name = "Slash Effect"
+ID = 3001
+StateNO = 251
+OwnPal = 1
+PauseMoveTime = 99999
+Size.XScale = .5
+Size.YScale = .5
+Size.Mid.Pos = 20,-105
+IgnoreHitPause = 1
+
+[State 3000, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = ((Pos X - EnemyNear,Pos X) * EnemyNear,Facing) < 0
+Flag = UnGuardable
+IgnoreHitPause = 1
+
+[State 3000, HitDef]
+Type = HitDef
+hitflag = mafd
+triggerall = !movecontact
+trigger1 = 1
+Attr = S,HA        
+;hitflag = MAFD     
+;GuardFlag = MA              
+AnimType = Hard       
+Priority = 7,Hit
+Damage = 0,Ceil(20/4)
+PauseTime = 75,0
+Guard.PauseTime = 10,10
+Sparkno = -1 + (0 * (Var(25) := -1))
+HitSound = -1
+GuardSound = S12100,0
+Ground.Type = High
+Air.Type = High
+Ground.SlideTime = 0
+Ground.HitTime = 0
+Air.HitTime = 0
+Guard.SlideTime = 15
+Guard.HitTime = 20
+Ground.Velocity = 0
+Air.Velocity = 0,0
+Guard.Velocity = -15
+AirGuard.Velocity = -15,-4
+Ground.Cornerpush.VelOff = 0
+Air.Cornerpush.VelOff = 0
+Down.Cornerpush.VelOff = 0
+Guard.Cornerpush.VelOff = 0
+AirGuard.Cornerpush.VelOff = 0
+P1SprPriority = 2
+P2SprPriority = 1
+Fall = 0
+Fall.YVelocity = 0
+Fall.Recover = 0
+Fall.RecoverTime = 0
+Fall.Damage = 10
+ID = StateNO
+HitOnce = 1
+Kill = 0
+Getpower = 0,0
+Givepower = 20,10
+
+Fall.EnvShake.Time = 10 ;exclusive
+Fall.EnvShake.Freq = 55 ;exclusive
+Fall.EnvShake.Ampl = -8 ;exclusive
+
+Persistent = 0
+
+[State 3000, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = AnimElemTime(5) >= 0
+MoveType = I
+IgnoreHitPause = 1
+
+[State 3000, Null]
+Type = Null
+Trigger1 = NumTarget(StateNO)
+Trigger1 = Var(26) :=  Ceil((Target(StateNO),Pos X - Pos X)  * Facing)
+Trigger1 = Var(27) :=  Ceil((Pos Y * -1) + (Target(StateNO),Pos Y + (Target(StateNO),Const(Size.Mid.Pos.Y))))
+Trigger2 = !NumTarget(StateNO)
+Trigger2 = Var(26) :=  Ceil((EnemyNear,Pos X - Pos X)  * Facing)
+Trigger2 = Var(27) :=  Ceil((Pos Y * -1) + (EnemyNear,Pos Y + (EnemyNear,Const(Size.Mid.Pos.Y))))
+IgnoreHitPause = 1
+
+[State 3000, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = MoveHit
+Trigger1 = NumTarget(StateNO)
+Trigger1 = !(Target(StateNO),IsHelper)
+Flag = NoMusic
+IgnoreHitPause = 1
+
+[State 3000, Helper]
+Type = Helper
+Trigger1 = MoveHit
+Name = "Black or White FadeIn/FadeOut Effect"
+ID = 11020
+StateNO = 11020
+OwnPal = 1
+PauseMoveTime = 99999
+Size.XScale = 50 ;StandBy Time
+Size.YScale = 25 ;Fade Time
+Size.Ground.Back = 0 ;0 - FadeIn / 1 - FadeOut
+Size.Ground.Front = 0 ;SprPriority
+Size.Air.Back = 1 ;OnTop
+Size.Air.Front = 256 ;Transparecy
+Size.Height = 0 ;0 - White Fade / 1 - Black Fade 
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3000, TargetState]
+Type = TargetState
+Trigger1 = MoveHit
+Trigger1 = NumTarget(StateNO)
+Trigger1 = !(Target(StateNO),IsHelper)
+Value = 3080
+ID = 3000
+
+[State 3000, SuperPause]
+Type = Pause
+Trigger1 = MoveHit
+Time = 75
+MoveTime = 75
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3000, NotHitBy]
+Type = NotHitBy
+Trigger1 =  MoveHit
+Value = SCA
+Time = 75
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3000, ChangeState]
+Type = ChangeState
+Trigger1 = MoveHit
+Trigger1 = NumTarget(StateNO)
+Trigger1 = !(Target(StateNO),IsHelper)
+Value = 3001
+
+[State 3000, ChangeState]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = 0
+Ctrl = 1
+;---------------------------------------------------------------------------
+; 5ABC
+[StateDef 3001]
+Type = S
+MoveType = I
+Physics = N
+VelSet = 0,0
+Ctrl = 0
+Anim = 3001
+SprPriority = 1002
+PowerAdd = -3000
+
+[State 3001, ChangeState]
+Type = ChangeState
+Trigger1 = Time = 200
+Value = StateNO + 1
+
+[State 3001, AngleDraw]
+Type = AngleDraw
+Trigger1 = StateNO = StateNO ; 3001
+Value = 0
+Scale = 1.0  * Fvar(0), 1.0  * Fvar(0)
+IgnoreHitPause = 1
+
+[State 3001, Null]
+Type = Null
+Trigger1 = !Time
+Trigger1 = Var(33) := 0 + Random%2
+IgnoreHitPause = 1
+
+[State 3001, Null]
+Type = Null
+Trigger1 = !Time
+Trigger1 = Var(58) := 200 + 73 + 110
+IgnoreHitPause = 1
+
+[State 3001, Null]
+Type = Null
+Trigger1 = !Time
+Trigger1 = Fvar(0) := 1.20 / CameraZoom
+IgnoreHitPause = 1
+
+[State 3001, Null]
+Type = Null
+Trigger1 = !Time
+Trigger1 = Fvar(1) := 0
+IgnoreHitPause = 1
+
+[State 3001, ScreenBound]
+Type = ScreenBound
+Trigger1 = StateNO = StateNO ; 3001
+Value = 1
+MoveCamera = 0, 0
+IgnoreHitPause = 1
+
+[State 3001, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = StateNO = StateNO ; 3001
+Flag = NoBarDisplay
+Flag2 = NoMusic
+Flag3 = NoBG
+IgnoreHitPause = 1
+
+[State 3001, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = StateNO = StateNO ; 3001
+Flag = NoFG
+Flag2 = NoShadow
+Flag3 = TimerFreeze
+IgnoreHitPause = 1
+
+[State 3001 Helper]
+Type = Helper
+Trigger1 = !Time
+Name = "BG"
+ID = 3200
+StateNO = 3200
+OwnPal = 1
+PauseMoveTime = 99999
+IgnoreHitPause = 1
+
+[State 3001, NotHitBy]
+Type = NotHitBy
+Trigger1 = !Time
+Value = SCA, NA, SA, HA, NP, SP, HP, NT, ST, HT
+Time = Var(58)
+IgnoreHitPause = 1
+
+[State 3001, PosSet]
+Type = PosSet
+Trigger1 = StateNO = StateNO
+X = (-320 * Facing) / CameraZoom
+Y = 0
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3001, Helper]
+Type = Helper
+Trigger1 = !Time
+Name = "Black or White FadeIn/FadeOut Effect"
+ID = 11020
+StateNO = 11020
+OwnPal = 1
+PauseMoveTime = 99999
+Size.XScale = 10 ;StandBy Time
+Size.YScale = 10 ;Fade Time
+Size.Ground.Back = 1 ;0 - FadeIn / 1 - FadeOut
+Size.Ground.Front = 0 ;SprPriority
+Size.Air.Back = 1 ;OnTop
+Size.Air.Front = 256 ;Transparecy
+Size.Height = 0 ;0 - White Fade / 1 - Black Fade 
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3001, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = Time = [0,136]
+Trigger1 = AnimElemTime(6) = 3
+Value = Anim
+Elem = 1
+IgnoreHitPause = 1
+
+[State 3001, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = Time = 136
+Value = Anim
+Elem = 7
+IgnoreHitPause = 1
+
+[State 3001, PlaySnd]
+Type = PlaySnd
+Trigger1 = Var(33) = 1
+Trigger1 = Time = 120
+Value = S3000, 2 +  Random%2
+VolumeScale = 80
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3001, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(1)
+Value = S3000, 500
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3001, Null]
+Type = Null
+Trigger1 = Fvar(2) := ((-100 + (Random%40)) / 100.0) * 50
+IgnoreHitPause = 1
+[State 3001, Null]
+Type = Null
+Trigger1 = Fvar(3) := ((100 - (Random%50)) / 100.0) * 15
+IgnoreHitPause = 1
+[State 3001, Null]
+Type = Null
+Trigger1 = Fvar(4) := ((100 - (Random%50)) / 100.0) * 2.5
+IgnoreHitPause = 1
+
+[State 3001, Explod]
+Type = Explod
+Trigger1 = Time%Cond(Time < 20,2,4) = 0
+Trigger1 = Time = [0,140]
+Anim = 3020 + Random%4
+ID = 3020
+Pos = Cond(Facing = 1,((ScreenWidth * 2.0) -  Random%Ceil(ScreenWidth * 2.0)),((0 - ScreenWidth) +  Random%Ceil(ScreenWidth * 2.0))),0
+Space = Screen
+Facing = Facing
+RemoveTime = -1
+Vel = Fvar(2) * Facing, Fvar(3)
+Accel = Cond(Time > 100,Abs(Fvar(2) / Cond(Time > 125,75,100)),0) * Facing, 0
+PauseMoveTime = 99999
+Scale = Fvar(4),Fvar(4)
+SprPriority = 1004
+Shadow = 0, 0, 0
+OwnPal = 1
+Trans = AddAlpha
+Alpha = 256, 0
+Angle = Random%360
+IgnoreHitPause = 1
+
+[State 3001, Explod]
+Type = Explod
+Trigger1 = Time%Cond(Time < 20,2,4) = 0
+Trigger1 = Time = [0,140]
+Anim = 3020 + Random%4
+ID = 3020
+Pos = Cond(Facing = 1,ScreenWidth,0),(0 - (ScreenHeight * 0.5)) + Random%Ceil(ScreenHeight * 1.5)
+Space = Screen
+Facing = Facing
+RemoveTime = -1
+Vel = Fvar(2) * Facing, Fvar(3)
+Accel = Cond(Time > 100,Abs(Fvar(2) / Cond(Time > 125,75,100)),0) * Facing, 0
+PauseMoveTime = 99999
+Scale = Fvar(4),Fvar(4)
+SprPriority = 1004
+Shadow = 0, 0, 0
+OwnPal = 1
+Trans = AddAlpha
+Alpha = 256, 0
+Angle = Random%360
+IgnoreHitPause = 1
+
+;[State 3001, ModifyExplod]
+;Type = ModifyExplod
+;Trigger1 = Time = 100
+;Trigger1 = NumExplod(3020)
+;ID = 3020
+;Accel = 0.50, 0
+;Trans = AddAlpha
+;Alpha = 256, 0
+;IgnoreHitPause = 1
+;Persistent = 0
+
+;---------------------------------------------------------------------------
+; 5ABC
+[StateDef 3002]
+Type = S
+MoveType = I
+Physics = N
+VelSet = 0,0
+Ctrl = 0
+Anim = 3002
+SprPriority = 1002
+
+[State 3002, ChangeState]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = StateNO + 1
+
+[State 3002, AngleDraw]
+Type = AngleDraw
+Trigger1 = StateNO = StateNO ; 3002
+Value = 0
+Scale = 1.0  * Fvar(0), 1.0  * Fvar(0)
+IgnoreHitPause = 1
+
+[State 3002, Null]
+Type = Null
+Trigger1 = !Time
+Trigger1 = Fvar(0) := 1.20 / CameraZoom
+IgnoreHitPause = 1
+
+[State 3002, Null]
+Type = Null
+Trigger1 = !Time
+Trigger1 = Fvar(1) := 0
+IgnoreHitPause = 1
+
+[State 3002, ScreenBound]
+Type = ScreenBound
+Trigger1 = StateNO = StateNO ; 3002
+Value = 1
+MoveCamera = 0, 0
+IgnoreHitPause = 1
+
+[State 3002, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = StateNO = StateNO ; 3002
+Flag = NoBarDisplay
+Flag2 = NoMusic
+Flag3 = NoBG
+IgnoreHitPause = 1
+
+[State 3002, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = StateNO = StateNO ; 3002
+Flag = NoFG
+Flag2 = NoShadow
+Flag3 = TimerFreeze
+IgnoreHitPause = 1
+
+[State 3002, PosAdd]
+Type = PosAdd
+Trigger1 = AnimElemTime(13) >= 0
+X = 53.3333 / CameraZoom
+IgnoreHitPause = 1
+
+[State 3002, PlayerPush]
+Type = PlayerPush
+Trigger1 = AnimElemTime(13) >= 0
+Value = 0
+IgnoreHitPause = 1
+
+[State 3002, ModifyExplod]
+Type = ModifyExplod
+Trigger1 = Time = [0,20]
+Trigger1 = NumExplod(3020)
+ID = 3020
+Trans = AddAlpha
+Alpha = 256 - Ceil(Time * (256/20)), 0 + Ceil(Time * (256/20))
+IgnoreHitPause = 1
+
+[State 3002, RemoveExplod]
+Type = RemoveExplod
+Trigger1 = Time =20
+Trigger1 = NumExplod(3020)
+ID = 3020
+IgnoreHitPause = 1
+
+[State 3002, Explod]
+Type = Explod
+Trigger1 = NumHelper(11020)
+;Trigger1 = !AnimElemTime(14)
+Anim = 3050
+ID = 3050
+Pos = ScreenWidth / 2,ScreenHeight / 2
+Space = Screen
+Facing = Facing
+RemoveTime = -2
+PauseMoveTime = 99999
+Scale = (ScreenHeight / 200),(ScreenHeight / 200)
+OnTop = 1
+Shadow = 0, 0, 0
+OwnPal = 1
+Trans = Sub
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3002, Helper]
+Type = Helper
+Trigger1 = !AnimElemTime(14)
+Name = "Black or White FadeIn/FadeOut Effect"
+ID = 11020
+StateNO = 11020
+OwnPal = 1
+PauseMoveTime = 99999
+Size.XScale = 10 ;StandBy Time
+Size.YScale = 10 ;Fade Time
+Size.Ground.Back = 1 ;0 - FadeIn / 1 - FadeOut
+Size.Ground.Front = 0 ;SprPriority
+Size.Air.Back = 1 ;OnTop
+Size.Air.Front = 256 ;Transparecy
+Size.Height = 0 ;0 - White Fade / 1 - Black Fade 
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3002, PlaySnd]
+Type = PlaySnd
+Trigger1 = Var(33) = 0
+Trigger1 = !AnimElemTime(1) 
+Value = S3000, 1
+VolumeScale = 80
+IgnoreHitPause = 1
+
+[State 3002, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(1)
+Value = S3000, 501
+IgnoreHitPause = 1
+Persistent = 0
+[State 3002, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(1)
+Value = S3000, 501
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3002, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(14)
+Value = S3000, 502
+IgnoreHitPause = 1
+Persistent = 0
+
+;---------------------------------------------------------------------------
+; 5ABC
+[StateDef 3003]
+Type = S
+MoveType = I
+Physics = N
+VelSet = 0,0
+Ctrl = 0
+Anim = 3003
+SprPriority = 1002
+
+[State 3003, ChangeState]
+Type = ChangeState
+Trigger1 = Time = 110
+Value = StateNO + 1
+
+[State 3003, AngleDraw]
+Type = AngleDraw
+Trigger1 = StateNO = StateNO ; 3002
+Value = 0
+Scale = 1.0  * Fvar(0), 1.0  * Fvar(0)
+IgnoreHitPause = 1
+
+[State 3003, Null]
+Type = Null
+Trigger1 = !Time
+Trigger1 = Fvar(0) := 1.20 / CameraZoom
+IgnoreHitPause = 1
+
+[State 3003, Null]
+Type = Null
+Trigger1 = !Time
+Trigger1 = Fvar(1) := 0
+IgnoreHitPause = 1
+
+[State 3003, ScreenBound]
+Type = ScreenBound
+Trigger1 = StateNO = StateNO ; 3002
+Value = 1
+MoveCamera = 0, 0
+IgnoreHitPause = 1
+
+[State 3003, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = StateNO = StateNO ; 3002
+Flag = NoBarDisplay
+Flag2 = NoMusic
+Flag3 = NoBG
+IgnoreHitPause = 1
+
+[State 3003, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = StateNO = StateNO ; 3002
+Flag = NoFG
+Flag2 = NoShadow
+Flag3 = TimerFreeze
+IgnoreHitPause = 1
+
+[State 3002, Explod]
+Type = Explod
+Trigger1 = !AnimElemTime(20)
+Anim = 3060
+ID = 3060
+Pos = Cond(Facing = 1,0,ScreenWidth),0
+Space = Screen
+Facing = Facing
+RemoveTime = -2
+PauseMoveTime = 99999
+Scale = (ScreenWidth / 320),(ScreenHeight / 240)
+OnTop = 1
+Shadow = 0, 0, 0
+OwnPal = 1
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3002, Helper]
+Type = Helper
+Trigger1 = Time = 90
+Name = "Black or White FadeIn/FadeOut Effect"
+ID = 11020
+StateNO = 11020
+OwnPal = 1
+PauseMoveTime = 99999
+Size.XScale = 0 ;StandBy Time
+Size.YScale = 20 ;Fade Time
+Size.Ground.Back = 0 ;0 - FadeIn / 1 - FadeOut
+Size.Ground.Front = 99999 ;SprPriority
+Size.Air.Back = 0 ;OnTop
+Size.Air.Front = 256 ;Transparecy
+Size.Height = 0 ;0 - White Fade / 1 - Black Fade 
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3003, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(5)
+Value = S3000, (Var(33) + 4)
+VolumeScale = 80
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3003, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(20)
+Value = S3000, 503
+IgnoreHitPause = 1
+Persistent = 0
+;---------------------------------------------------------------------------
+; 5ABC
+[StateDef 3004]
+Type = S
+MoveType = I
+Physics = N
+VelSet = 0,0
+Ctrl = 0
+Anim = 3004
+SprPriority = 2
+
+[State 3004, TargetLifeAdd]
+Type = TargetLifeAdd
+Trigger1 = !Time
+Trigger1 = NumTarget(3000)
+Value = -800
+ID = 3000
+Kill = 1
+IgnoreHitPause = 1
+
+[State 3004, ScreenBound]
+Type = ScreenBound
+Trigger1 = StateNO = StateNO ; 3001
+Value = 0
+MoveCamera = 0,0
+IgnoreHitPause = 1
+
+[State 3004, PosSet]
+Type = PosSet
+Trigger1 = !Time
+X = (250 * Facing) / CameraZoom
+Y = 0
+IgnoreHitPause = 1
+
+[State 3004, Helper]
+Type = Helper
+Trigger1 = !AnimElemTime(1)
+Name = "Black or White FadeIn/FadeOut Effect"
+ID = 11020
+StateNO = 11020
+OwnPal = 1
+PauseMoveTime = 99999
+Size.XScale = 0 ;StandBy Time
+Size.YScale = 20 ;Fade Time
+Size.Ground.Back = 1 ;0 - FadeIn / 1 - FadeOut
+Size.Ground.Front = 99999 ;SprPriority
+Size.Air.Back = 0 ;OnTop
+Size.Air.Front = 256 ;Transparecy
+Size.Height = 0 ;0 - White Fade / 1 - Black Fade 
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3004, Turn]
+Type = Turn
+Trigger1 = !AnimElemTime(1)
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3004, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(1)
+Trigger1 =  Random%2 = 0
+Value = S3000, 6
+VolumeScale = 80
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3004, SuperPause]
+Type = SuperPause
+Trigger1 = AnimElemTime(1) < 20
+Time = 2
+MoveTime = 0
+Anim = -1
+Sound = -1
+Pos = 0, 0
+Darken = 0
+P2DefMul = 0
+PowerAdd = 0
+Unhittable = 0
+IgnoreHitPause = 1
+
+[State 3004, ChangeState]
+Type = ChangeState
+Trigger1 = time = 30
+Value = 0
+Ctrl = 1
+
+;---------------------------------------------------------------------------
+; 5ABC
+[StateDef 3500]
+Type = S
+MoveType = H
+Physics = S
+Ctrl = 0
+Anim = 3500
+SprPriority = 2
+PowerAdd = -1000
+FaceP2 = 1
+
+[State 3500, Projectile]
+Type = Projectile
+Trigger1 = !AnimElemTime(1)
+Trigger1 = PlayerIDExist(Var(16))
+ProjID = 3500
+ProjAnim = 3510
+ProjHitAnim = -1
+ProjRemAnim = -1
+ProjCancelAnim = -1
+ProjScale = 0,0
+ProjRemove = 1
+ProjRemoveTime = 10
+Velocity = 0, 0
+RemVelocity = 0, 0
+Accel = 0, 0
+VelMul = 1.0, 1.0
+ProjHits = 1
+ProjPriority = 0
+ProjSprPriority = 0
+ProjEdgeBound = 999999
+ProjStageBound = 999999
+projHeightBound = 999999, 999999
+OffSet = (PlayerID(Var(16)),Pos X - Pos X) * Facing, (PlayerID(Var(16)),Pos Y - Pos Y)
+PosType = P1
+ProjShadow = 0, 0, 0
+SuperMoveTime = 99999
+PauseMoveTime = 99999
+Attr = S,HA    
+;hitflag = MAFD              
+AnimType = Hard       
+Priority = 7,Hit
+Damage = (20 / Cond(Var(22),(1+(Var(21) - Var(22))),1)),Ceil(20/4)
+PauseTime = 0,0
+Guard.PauseTime = 0,0
+Sparkno = -1 + (0 * (Var(25) := -1))
+HitSound = -1
+GuardSound = -1
+Ground.Type = High
+Air.Type = High
+Ground.SlideTime = 0
+Ground.HitTime = 0
+Air.HitTime = 0
+Ground.Velocity = 0
+Air.Velocity = 0,0
+Ground.Cornerpush.VelOff = 0
+Air.Cornerpush.VelOff = 0
+Down.Cornerpush.VelOff = 0
+Guard.Cornerpush.VelOff = 0
+AirGuard.Cornerpush.VelOff = 0
+P1SprPriority = 2
+P2SprPriority = 1
+Fall = 0
+Fall.YVelocity = 0
+Fall.Recover = 0
+Fall.RecoverTime = 0
+Fall.Damage = 10
+ID = StateNO - 500
+HitOnce = 1
+Kill = 0
+Getpower = 0,0
+Givepower = 10,5
+
+Fall.EnvShake.Time = 10 ;exclusive
+Fall.EnvShake.Freq = 55 ;exclusive
+Fall.EnvShake.Ampl = -8 ;exclusive
+
+Persistent = 0
+
+[State 3500, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = !AnimElemTime(1)
+MoveType = A
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3500, NotHitBy]
+Type = NotHitBy
+Trigger1 =  !AnimElemTime(1)
+Value = SCA
+Time = 75
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3500, PalFX]
+Type = PalFX
+Trigger1 = !AnimElemTime(1)
+Time = 8
+Add = 192,192,192
+SinAdd = -192,-192,-192,32
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3500, BGPalFX]
+Type = BGPalFX
+Trigger1 = Time < 75
+Time = 1
+Add = -128,-128, -128
+Color = 256
+IgnoreHitPause = 1
+
+[State 3500, BGPalFX]
+Type = BGPalFX
+Trigger1 = Time = 75
+Time = 10
+Add = -128,-128, -128
+SinAdd = 128,128, 128, 40
+Color = 256
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3500, Pause]
+Type = Pause
+Trigger1 = !AnimElemTime(1)
+Time = 75
+MoveTime = 75
+PauseBG = 1
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3500 Helper]
+Type = Helper
+Trigger1 = !AnimElemTime(1)
+Name = "Super Charge Effect"
+ID = 11300
+StateNO = 11300 
+Pos = 0, 0
+OwnPal = 1
+PauseMoveTime = 99999
+Size.Mid.Pos = -20,-110
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3500, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(1)
+Value = S11300,0
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3500, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(1)
+Value = S11300,2
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3500, Helper]
+Type = Helper
+Trigger1 = ProjHit3500 = 1
+Name = "Black or White FadeIn/FadeOut Effect"
+ID = 11020
+StateNO = 11020
+OwnPal = 1
+PauseMoveTime = 99999
+Size.XScale = 50 ;StandBy Time
+Size.YScale = 25 ;Fade Time
+Size.Ground.Back = 0 ;0 - FadeIn / 1 - FadeOut
+Size.Ground.Front = 0 ;SprPriority
+Size.Air.Back = 1 ;OnTop
+Size.Air.Front = 256 ;Transparecy
+Size.Height = 0 ;0 - White Fade / 1 - Black Fade 
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3500, TargetState]
+Type = TargetState
+Trigger1 = Time = 75
+Trigger1 = NumTarget(3000)
+Value = 3080
+ID = 3000
+
+[State 3500, ChangeState]
+Type = ChangeState
+Trigger1 = Time = 75
+Trigger1 = NumTarget(3000)
+Value = 3001
+
+[State 3500, ChangeState]
+Type = ChangeState
+Trigger1 = Time = 5
+Trigger1 = !NumTarget(3000)
+Value = 3501
+
+;---------------------------------------------------------------------------
+; 5ABC 
+[StateDef 3501]
+Type = S
+MoveType = I
+Physics = S
+Ctrl = 0
+Anim = Anim
+SprPriority = 2
+
+[State 3501, BGPalFX]
+Type = BGPalFX
+Trigger1 = !AnimElemTime(1)
+Time = 10
+Add = -100,-100, -100
+SinAdd = 100, 100, 100, 40
+Color = 256
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3501, Pause]
+Type = Pause
+Trigger1 = !AnimElemTime(1)
+Time = 0
+MoveTime = 0
+PauseBG = 0
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3501, ChangeState]
+Type = ChangeState
+Trigger1 = Time = 10
+Value = 0
+Ctrl = 1
+
+;---------------------------------------------------------------------------
+; 5ABC
+[StateDef 3080, TargetState]
+Type = S
+MoveType = H
+Physics = N
+VelSet = 0,0
+Ctrl = 0
+SprPriority = 1002
+
+[State 3080, ChangeState]
+Type = ChangeState
+
+Trigger1 = NumEnemy 
+Trigger1 = Enemy(0),NumTarget(3000)
+Trigger1 = Enemy(0),Cond(1,Target(3000),Cond(1,ID = ID,0),0)
+Trigger1 = PlayerIDExist(Enemy(0),ID)
+Trigger1 = PlayerID(Enemy(0),ID),StateNO != [3000,3002]
+
+Trigger2 = NumEnemy = 2
+Trigger2 = Enemy(1),NumTarget(3000)
+Trigger2 = Enemy(1),Cond(1,Target(3000),Cond(1,ID = ID,0),0)
+Trigger2 = PlayerIDExist(Enemy(1),ID)
+Trigger2 = PlayerID(Enemy(1),ID),StateNO != [3000,3002]
+
+Value = 3082
+
+[State 3080, AngleDraw]
+Type = AngleDraw
+Trigger1 = NumEnemy 
+Trigger1 = Enemy(0),NumTarget(3000)
+Trigger1 = Enemy(0),Cond(1,Target(3000),Cond(1,ID = ID,0),0)
+Trigger1 = PlayerIDExist(Enemy(0),ID)
+Value = 0
+Scale = 1.0 * PlayerID(Enemy(0),ID),Fvar(0),1.0 * PlayerID(Enemy(0),ID),Fvar(0)
+IgnoreHitPause = 1
+
+[State 3080, AngleDraw]
+Type = AngleDraw
+Trigger1 = NumEnemy = 2
+Trigger1 = Enemy(1),NumTarget(3000)
+Trigger1 = Enemy(1),Cond(1,Target(3000),Cond(1,ID = ID,0),0)
+Trigger1 = PlayerIDExist(Enemy(1),ID)
+Value = 0
+Scale = 1.0 * PlayerID(Enemy(1),ID),Fvar(0),1.0 * PlayerID(Enemy(1),ID),Fvar(0)
+IgnoreHitPause = 1
+
+[State 3080, ScreenBound]
+Type = ScreenBound
+Trigger1 = StateNO = StateNO ; 3080
+Value = 1
+MoveCamera = 0, 0
+IgnoreHitPause = 1
+
+[State 3080, PlayerPush]
+Type = PlayerPush
+Trigger1 = StateNO = StateNO
+Value = 0
+IgnoreHitPause = 1
+
+[State 3080, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = StateNO = StateNO ; 3080
+Flag = NoShadow
+IgnoreHitPause = 1
+
+[State 3080, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = StateNO = StateNO
+Value = 0
+IgnoreHitPause = 1
+
+[State 3080, NotHitBy]
+Type = NotHitBy
+Trigger1 = StateNO = StateNO
+Value = SCA, NA, SA, HA, NP, SP, HP, NT, ST, HT
+Time = 2
+IgnoreHitPause = 1
+
+[State 3080, Turn]
+Type = Turn
+Trigger1 = NumEnemy
+Trigger1 = Enemy(0),NumTarget(3000)
+Trigger1 = Enemy(0),Cond(1,Target(3000),Cond(1,ID = ID,0),0)
+Trigger1 = PlayerIDExist(Enemy(0),ID)
+Trigger1 = Facing = PlayerID(Enemy(0),ID),Facing 
+
+Trigger2 = NumEnemy = 2
+Trigger2 = Enemy(1),NumTarget(3000)
+Trigger2 = Enemy(1),Cond(1,Target(3000),Cond(1,ID = ID,0),0)
+Trigger2 = PlayerIDExist(Enemy(1),ID)
+Trigger2 = Facing = PlayerID(Enemy(1),ID),Facing 
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3080, PosSet]
+Type = PosSet
+Trigger1 = !Time
+X = 0
+Y = 0
+IgnoreHitPause = 1
+
+;---------------------------------------------------------------------------
+; 5ABC
+[StateDef 3082, TargetState]
+Type = S
+MoveType = H
+Physics = N
+VelSet = 0,0
+Ctrl = 0
+SprPriority = 1002
+
+[State 3082, ChangeState]
+Type = ChangeState
+
+Trigger1 = NumEnemy 
+Trigger1 = Enemy(0),NumTarget(3000)
+Trigger1 = Enemy(0),Cond(1,Target(3000),Cond(1,ID = ID,0),0)
+Trigger1 = PlayerIDExist(Enemy(0),ID)
+Trigger1 = PlayerID(Enemy(0),ID),StateNO != 3003
+
+Trigger2 = NumEnemy = 2
+Trigger2 = Enemy(1),NumTarget(3000)
+Trigger2 = Enemy(1),Cond(1,Target(3000),Cond(1,ID = ID,0),0)
+Trigger2 = PlayerIDExist(Enemy(1),ID)
+Trigger2 = PlayerID(Enemy(1),ID),StateNO != 3003
+
+Value = 3084
+
+[State 3082, AngleDraw]
+Type = AngleDraw
+Trigger1 = NumEnemy 
+Trigger1 = Enemy(0),NumTarget(3000)
+Trigger1 = Enemy(0),Cond(1,Target(3000),Cond(1,ID = ID,0),0)
+Trigger1 = PlayerIDExist(Enemy(0),ID)
+Value = 0
+Scale = 1.0 * PlayerID(Enemy(0),ID),Fvar(0),1.0 * PlayerID(Enemy(0),ID),Fvar(0)
+IgnoreHitPause = 1
+
+[State 3082, AngleDraw]
+Type = AngleDraw
+Trigger1 = NumEnemy = 2
+Trigger1 = Enemy(1),NumTarget(3000)
+Trigger1 = Enemy(1),Cond(1,Target(3000),Cond(1,ID = ID,0),0)
+Trigger1 = PlayerIDExist(Enemy(1),ID)
+Value = 0
+Scale = 1.0 * PlayerID(Enemy(1),ID),Fvar(0),1.0 * PlayerID(Enemy(1),ID),Fvar(0)
+IgnoreHitPause = 1
+
+[State 3082, ScreenBound]
+Type = ScreenBound
+Trigger1 = StateNO = StateNO ; 3080
+Value = 1
+MoveCamera = 0, 0
+IgnoreHitPause = 1
+
+[State 3082, PlayerPush]
+Type = PlayerPush
+Trigger1 = StateNO = StateNO
+Value = 0
+IgnoreHitPause = 1
+
+[State 3082, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = StateNO = StateNO ; 3080
+Flag = NoShadow
+IgnoreHitPause = 1
+
+[State 3082, ChangeAnim]
+Type = ChangeAnim2
+Trigger1 = StateNO = StateNO
+Value = 3082
+IgnoreHitPause = 1
+
+;---------------------------------------------------------------------------
+; 5ABC
+[StateDef 3084, TargetState]
+Type = A
+MoveType = H
+Physics = N
+VelSet = 0,0
+Ctrl = 0
+SprPriority = 2
+
+[State 3084, ScreenBound]
+Type = ScreenBound
+Trigger1 = StateNO = StateNO ; 3080
+Value = 0
+MoveCamera = 0, 0
+IgnoreHitPause = 1
+
+[State 3084, PlayerPush]
+Type = PlayerPush
+Trigger1 = StateNO = StateNO
+Value = 0
+IgnoreHitPause = 1
+
+[State 3084, Turn]
+Type = Turn
+Trigger1 = !Time
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3084, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = !Time
+Value = 5050
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3084, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = Vel Y >= -8
+Value = 5060
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3084, PosSet]
+Type = PosSet
+Trigger1 = !Time
+X = 0
+Y = 0
+IgnoreHitPause = 1
+
+[State 3084, VelSet]
+Type = VelSet
+Trigger1 = !Time
+X = 0
+Y = -30
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3084, VelAdd]
+Type = VelAdd
+Trigger1 = StateNO = StateNO
+Y = Const(Movement.YAccel)
+IgnoreHitPause = 1
+
+[State 3084, SelfState]
+Type = SelfState
+Trigger1 = Pos Y > 0
+Value = 5100
+IgnoreHitPause = 1
+
+;---------------------------------------------------------------------------
+;5ABC - BG
+[StateDef 3200]
+Type = A
+MoveType = I
+Physics = N
+VelSet = 0,0
+Ctrl = 0
+Anim = 99999
+
+[State 3200, BindToParent]
+Type = BindToParent
+Trigger1 = StateNO = StateNO
+IgnoreHitPause = 1
+
+[State 3200, RemoveExplod]
+Type = RemoveExplod
+Trigger1 = NumExplod(3200)
+ID = 3200
+IgnoreHitPause = 1
+
+[State 3200, Explod]
+Type = Explod
+Trigger1 = !NumExplod(3200)
+Anim = 3200
+ID = 3200
+Pos = Cond(Facing = 1,0,ScreenWidth),0
+Space = Screen
+Facing = Facing
+RemoveTime = -1
+PauseMoveTime = 99999
+Scale = (ScreenWidth/640),(ScreenHeight/480)
+SprPriority = 998
+Shadow = 0, 0, 0
+OwnPal = 1
+IgnoreHitPause = 1
+
+[State 3200, DestroySelf]
+Type = DestroySelf
+Trigger1 = Parent,StateNO != [3001,3003]
+Trigger2 = Parent,MoveType = H
+IgnoreHitPause = 1
+RemoveExplods = 1

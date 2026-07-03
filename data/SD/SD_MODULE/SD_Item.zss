@@ -1,0 +1,336 @@
+#===============================================================================
+# Configuration & Optimized Item System (Blue Marble, Bomb, Feather Shoes)
+#===============================================================================
+
+[Function F_Vnix_Item_Config()]
+
+# Enable Items
+mapset{map: "_vnix_potion_cfg_enable"; value: 1}
+mapset{map: "_vnix_potion_cfg_random"; value: 0}
+mapset{map: "_vnix_potion_cfg_cpu"; value: 0}
+mapset{map: "_vnix_potion_cfg_random_round"; value: 0}
+
+#===============================================================================
+# Global Item State
+#===============================================================================
+[StateDef -4]
+
+ignoreHitPause if (teamside = 1 || teamside = 2) {
+
+	# INIT & ACUMULACIÓN DE ÍTEMS (CANDADO DE RONDA)
+	if roundstate = 0 && !ishelper {
+		call F_Vnix_Item_Config();
+		
+		# Este candado asegura que la suma matemática ocurra EXACTAMENTE UNA VEZ por ronda.
+		if map(_vnix_round_init) != roundno {
+			mapset{map: "_vnix_round_init"; value: roundno}
+			
+			if teamMode = Single || teamMode = Turns {
+				if roundno = 1 {
+					mapset{map: "_vnix_item_slot1"; value: 1}
+					mapset{map: "_vnix_item_slot2"; value: 1}
+				} else {
+					mapadd{map: "_vnix_item_slot1"; value: 1}
+					mapadd{map: "_vnix_item_slot2"; value: 1}
+				}
+			}
+
+			if gameMode = "Training" {
+				mapset{map: "_vnix_slot1_itemtype"; value: 1;} # Blue Marble
+				mapset{map: "_vnix_slot2_itemtype"; value: 3;} # Feather Shoes
+			} else {
+				if (AILevel && map(_vnix_potion_cfg_cpu)) || (!AILevel && map(_vnix_potion_cfg_random)) {
+					
+					# Randomizer para 3 ítems
+					mapset{map: "_vnix_slot1_itemtype"; value: (random%3) + 1;}
+					mapset{map: "_vnix_slot2_itemtype"; value: (random%3) + 1;}
+					
+					if map(_vnix_slot1_itemtype) = map(_vnix_slot2_itemtype) {
+					    mapadd{map: "_vnix_slot2_itemtype"; value: 1;}
+					    if map(_vnix_slot2_itemtype) > 3 { mapset{map: "_vnix_slot2_itemtype"; value: 1;} }
+					}
+					
+					if map(_vnix_potion_cfg_random_round) = 0 {
+						if RoundNo = 1 {
+							mapset{map: "_vnix_slot1_itemstatic"; value: map(_vnix_slot1_itemtype);}
+							mapset{map: "_vnix_slot2_itemstatic"; value: map(_vnix_slot2_itemtype);}
+						}
+						mapset{map: "_vnix_slot1_itemtype"; value: map(_vnix_slot1_itemstatic);}
+						mapset{map: "_vnix_slot2_itemtype"; value: map(_vnix_slot2_itemstatic);}
+					}
+				} else {
+					mapset{map: "_vnix_slot1_itemtype"; value: const(Vnix_Item_Slot1);}
+					mapset{map: "_vnix_slot2_itemtype"; value: const(Vnix_Item_Slot2);}
+				}
+			}
+		}
+	}
+	
+	# Support Items Execution
+	if (teamMode = Single || teamMode = Turns) && map(_vnix_potion_cfg_enable) {
+	
+		# Input handling
+		if map(_vnix_slot1_input) > 0 { mapadd{map: "_vnix_slot1_input"; value: -1} }
+		if map(_vnix_slot2_input) > 0 { mapadd{map: "_vnix_slot2_input"; value: -1} }
+		let buffertime = 1;
+
+		# AI Logic (OPTIMIZADA Y ALEATORIA)
+		if AIlevel > 0 && enemy, gethitvar(isbound) = 0 && pausetime = 0 {
+			
+			# IA: Blue Marble (Power)
+			if (map(_vnix_slot1_itemtype) = 1 && map(_vnix_item_slot1) > 0) || (map(_vnix_slot2_itemtype) = 1 && map(_vnix_item_slot2) > 0) {
+				if power < powerMax && random < (AIlevel * 10) && movetype != H {
+					mapset{map: "_vnix_slot1_input"; value: $buffertime}
+					mapset{map: "_vnix_slot2_input"; value: $buffertime}
+				}
+			}
+			
+			# IA: Bomb (Ataque Drenador de Energia)
+			if (map(_vnix_slot1_itemtype) = 2 && map(_vnix_item_slot1) > 0) || (map(_vnix_slot2_itemtype) = 2 && map(_vnix_item_slot2) > 0) {
+				if enemy, power >= 1000 && random < (AIlevel * 15) && movetype != H {
+					mapset{map: "_vnix_slot1_input"; value: $buffertime}
+					mapset{map: "_vnix_slot2_input"; value: $buffertime}
+				}
+			}
+
+			# IA: FEATHER SHOES (MODO ALEATORIO)
+			if (map(_vnix_slot1_itemtype) = 3 && map(_vnix_item_slot1) > 0) || (map(_vnix_slot2_itemtype) = 3 && map(_vnix_item_slot2) > 0) {
+				if time > 200 && random < (2 + AIlevel) && life <= lifeMax * 0.9 && movetype != H {
+					mapset{map: "_vnix_slot1_input"; value: $buffertime}
+					mapset{map: "_vnix_slot2_input"; value: $buffertime}
+				}
+			}
+
+		} else {
+			# Player Input
+			if inputtime(d) = 1 { mapset{map: "_vnix_slot1_input"; value: $buffertime} }
+			if inputtime(w) = 1 { mapset{map: "_vnix_slot2_input"; value: $buffertime} }
+		}
+		
+		if roundState = 2 && !isHelper {
+		
+			# ACTIVE EFFECTS (Feather Shoes)
+			if map(_vnix_feather_shoes_timer) > 0 {
+				mapadd{map: "_vnix_feather_shoes_timer"; value: -1}
+
+				if (gametime % 6) = 0 {
+					explod{
+						anim: VP 40109; postype: p1;
+						pos: const(size.mid.pos.x) + 10, -1.0 * random%40;
+						scale: .25  + (random%50/100), .25 + (random%50/100);
+						angle: 10 - random%20; random: 24, 0;
+						facing: cond(random <= 500, 1, -1);
+						trans: Addalpha; alpha: 256,256; ontop: 0;
+						vel: 0, -1; bindtime: 2; sprpriority: 3;
+						pausemovetime: -1; supermovetime: -1; ownpal: 1;
+						palfx.time: -1; palfx.add: 0,255,0;
+						interpolation.time: 40; interpolation.alpha: 0,256; interpolation.scale: .5,.75;
+					}
+				}
+
+				if stateno = 20 || stateno = 21 || stateno = 50 || stateno = 100 || stateno = 105 {
+				    PosAdd{x: vel x * 0.8}
+				}
+
+				if map(_vnix_feather_shoes_timer) = 0 {
+					lifebarAction{text: "Speed Normal"; top: 1;}
+					playsnd{value: VP 110, 10; volumescale: 200; freqmul: 1.0; channel: 5}
+					mapset{map: "_pots_rainbow_turboskip"; value: 0}
+				}
+			}
+			
+			# UI RENDERING
+			if map(_vnix_life_hidegauge) = 0 {
+				if map(_vnix_slot1_itemtype) = 0 {
+					explod{
+						anim: VP 40010; postype: left;
+						pos: const240p(cond(teamside = 1, 1.5, 318.5)), const240p(30.5);
+						scale: 1,1; angle: 0; facing: cond(teamside = 1, 1, -1);
+						ontop: 0;
+						vel: 0, 0; bindtime: -1; sprpriority: -5; removetime: 1;
+						pausemovetime: -1; supermovetime: -1; ownpal: 1;
+						palfx.time: -1;
+						palfx.color: cond(map(_vnix_item_slot1) > 0, 255, 0);
+					}
+				} else {
+					explod{
+						anim: VP 40010 + map(_vnix_slot1_itemtype) + 1; postype: left;
+						pos: const240p(cond(teamside = 1, 1.5, 318.5)), const240p(30.5);
+						scale: 1,1; angle: 0; facing: cond(teamside = 1, 1, -1);
+						ontop: 0;
+						vel: 0, 0; bindtime: -1; sprpriority: -5; removetime: 1;
+						pausemovetime: -1; supermovetime: -1; ownpal: 1;
+						palfx.time: -1;
+						palfx.color: cond(map(_vnix_item_slot1) > 0, 255, 0);
+					}			
+				}
+				if map(_vnix_slot2_itemtype) = 0 {
+					explod{
+						anim: VP 40011; postype: left;
+						pos: const240p(cond(teamside = 1, 11.5, 308.5)), const240p(30.5);
+						scale: 1,1; angle: 0; facing: cond(teamside = 1, 1, -1);
+						ontop: 0;
+						vel: 0, 0; bindtime: -1; sprpriority: -5; removetime: 1;
+						pausemovetime: -1; supermovetime: -1; ownpal: 1;
+						palfx.time: -1;
+						palfx.color: cond(map(_vnix_item_slot2) > 0, 255, 0);
+					}
+				} else if map(_vnix_slot2_itemtype) > 0 && (map(_vnix_slot1_itemtype) != map(_vnix_slot2_itemtype)) {
+					explod{
+						anim: VP 40011 + map(_vnix_slot2_itemtype);
+						postype: left;
+						pos: const240p(cond(teamside = 1, 11.5, 308.5)), const240p(30.5);
+						scale: 1,1; angle: 0; facing: cond(teamside = 1, 1, -1);
+						ontop: 0; vel: 0, 0; bindtime: -1; sprpriority: -5; removetime: 1;
+						pausemovetime: -1; supermovetime: -1; ownpal: 1;
+						palfx.time: -1;
+						palfx.color: cond(map(_vnix_item_slot2) > 0, 255, 0);
+					}
+				}
+				explod{
+					anim: VP 40110; postype: left;
+					pos: const240p(cond(teamside = 1, 0, 320)), const240p(32);
+					scale: 1, 1; angle: 0; facing: cond(teamside = 1, 1, -1);
+					ontop: 0; removetime: 1; sprpriority: -5;
+					pausemovetime: -1;
+					supermovetime: -1; ownpal: 1;
+					trans: addalpha; alpha: 128,256;
+				}
+			}
+			
+			# ACTIVATION
+			if alive && statetype != L && !incustomstate {
+				if movetype != H {
+					# ACTIVATION: Feather Shoes
+					if map(_vnix_slot1_itemtype) = 3 && map(_vnix_slot1_input) > 0 && map(_vnix_item_slot1) > 0 {
+						mapset{map: "_vnix_feather_shoes_timer"; value: 600;} 
+						playsnd{value: VP 100, 56; volumescale:200}
+						lifebarAction{text: "Speed Buff"; top: 1;}
+						explod{
+							anim: VP 40100; postype: left;
+							pos: const240p(cond(teamside = 1, 6, 314.5)), const240p(35);
+							scale: .125,.125; angle: 0; facing: 1; sprpriority: 5; removetime: -2;
+							pausemovetime: -1;
+							supermovetime: -1; ownpal: 1;
+						}
+						explod{
+							postype: p1; id: 694210; pos: -20, 0; vel: 2, 0;
+							facing: 1; anim: anim; animfreeze: 1;
+							animelem: animelemno(0);
+							sprpriority: sprpriority + 1; removetime: 10;
+							pausemovetime: -1; supermovetime: -1; trans: addalpha; alpha: 256,256;
+							scale: 1.0 * const(size.xscale), 1.0 * const(size.yscale);
+							palfx.time: 11; palfx.color: 0; palfx.mul: 0,255,0;
+							interpolation.time: 10; interpolation.alpha: 0,256;
+							interpolation.scale: 1.15 * const(size.xscale), 1.15 * const(size.yscale);
+						}
+						explod{
+							anim: VP 10100; postype: p1;
+							pos: const(size.mid.pos.x), const240p(0);
+							scale: .33,.33; trans: add;
+							sprpriority: -5; removetime: -2;
+						}
+						palfx{time: 30; add: 0,255,0; sinadd: 0,-255,0,120}
+						mapadd{map: "_vnix_item_slot1"; value: -1}
+					} else if map(_vnix_slot2_itemtype) = 3 && map(_vnix_slot2_input) > 0 && map(_vnix_item_slot2) > 0 {
+					    mapset{map: "_vnix_feather_shoes_timer"; value: 600;} 
+						playsnd{value: VP 100, 56; volumescale:200}
+						lifebarAction{text: "Speed Buff"; top: 1;}
+						explod{
+							anim: VP 40100; postype: left;
+							pos: const240p(cond(teamside = 1, 16, 304)), const240p(35);
+							scale: .125,.125; angle: 0; facing: 1; sprpriority: 5; removetime: -2;
+						}
+						explod{
+							postype: p1;
+							id: 694210; pos: -20, 0; vel: 2, 0;
+							facing: 1; anim: anim; animfreeze: 1; animelem: animelemno(0);
+							sprpriority: sprpriority + 1;
+							removetime: 10;
+							pausemovetime: -1; supermovetime: -1; trans: addalpha; alpha: 256,256;
+							scale: 1.0 * const(size.xscale), 1.0 * const(size.yscale);
+							palfx.time: 11;
+							palfx.color: 0; palfx.mul: 0,255,0;
+							interpolation.time: 10; interpolation.alpha: 0,256; interpolation.scale: 1.15 * const(size.xscale), 1.15 * const(size.yscale);
+						}
+						explod{
+							anim: VP 10100; postype: p1;
+							pos: const(size.mid.pos.x), const240p(0);
+							scale: .33,.33; trans: add; sprpriority: -5; removetime: -2;
+						}
+						palfx{time: 30; add: 0,255,0; sinadd: 0,-255,0,120}
+						mapadd{map: "_vnix_item_slot2"; value: -1}
+					}
+					
+					# ACTIVATION: Blue Marble
+				    if map(_vnix_slot1_itemtype) = 1 && map(_vnix_slot1_input) > 0 && map(_vnix_item_slot1) > 0 {
+				        if power < powerMax {
+    					    poweradd{value: 1000;}
+    					    playsnd{value: VP 100, 56; volumescale:200}
+    					    lifebarAction{text: "Blue Marble"; top: 1;}
+    						explod{
+    						    anim: VP 40100; postype: left;
+    						    pos: const240p(cond(teamside = 1, 6, 314.5)), const240p(35);
+    						    scale: .125,.125; sprpriority: 5; removetime: -2;
+    						}
+    					    palfx{time: 30; add: 255,0,0; sinadd: -255,0,0,120}
+    					    mapadd{map: "_vnix_item_slot1"; value: -1}
+				        }
+				    } else if map(_vnix_slot2_itemtype) = 1 && map(_vnix_slot2_input) > 0 && map(_vnix_item_slot2) > 0 {
+				        if power < powerMax {
+    					    poweradd{value: 1000;}
+    					    playsnd{value: VP 100, 56; volumescale:200}
+    					    lifebarAction{text: "Blue Marble"; top: 1;}
+    						explod{
+    						    anim: VP 40100; postype: left;
+    						    pos: const240p(cond(teamside = 1, 16, 304)), const240p(35);
+    						    scale: .125,.125; sprpriority: 5; removetime: -2;
+    						}
+    					    palfx{time: 30; add: 255,0,0; sinadd: -255,0,0,120}
+    					    mapadd{map: "_vnix_item_slot2"; value: -1}
+				        }
+				    }
+					
+					# ACTIVATION: Bomb (Drenador de Energía)
+					if map(_vnix_slot1_itemtype) = 2 && map(_vnix_slot1_input) > 0 && map(_vnix_item_slot1) > 0 {
+					    if enemy, power >= 1000 {
+    						playsnd{value: VP 100, 56; volumescale: 200}
+    						lifebarAction{text: "Energy Drain"; top: 1;}
+    						explod{
+    							anim: VP 40100; postype: left;
+    							pos: const240p(cond(teamside = 1, 6, 314.5)), const240p(35);
+    							scale: .125,.125; sprpriority: 5; removetime: -2;
+    						}
+    						palfx{time: 30; add: 255,255,0; sinadd: -255,-255,0,120}
+    						mapadd{map: "_vnix_item_slot1"; value: -1}
+    						PowerAdd{value: -1000; redirectid: enemynear, id}
+					    }
+					} else if map(_vnix_slot2_itemtype) = 2 && map(_vnix_slot2_input) > 0 && map(_vnix_item_slot2) > 0 {
+					    if enemy, power >= 1000 {
+    						playsnd{value: VP 100, 56; volumescale: 200}
+    						lifebarAction{text: "Energy Drain"; top: 1;}
+    						explod{
+    							anim: VP 40100; postype: left;
+    							pos: const240p(cond(teamside = 1, 16, 304)), const240p(35);
+    							scale: .125,.125; sprpriority: 5; removetime: -2;
+    						}
+    						palfx{time: 30; add: 255,255,0; sinadd: -255,-255,0,120}
+    						mapadd{map: "_vnix_item_slot2"; value: -1}
+    						PowerAdd{value: -1000; redirectid: enemynear, id}
+					    }
+					}
+                }
+			}
+			
+			if gameMode = "Training" {
+				mapset{map: "_vnix_item_slot1"; value: 1}
+				mapset{map: "_vnix_item_slot2"; value: 1}
+			}
+		}
+		
+		if roundState = [3,4] {
+			mapset{map: "_vnix_feather_shoes_timer"; value: 0;}
+			mapset{map: "_pots_rainbow_turboskip"; value: 0;}
+		}
+	}
+}

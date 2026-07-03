@@ -1,0 +1,233 @@
+
+#===============================================================================
+# Configuration
+#===============================================================================
+
+[Function F_Vnix_Comeback_Config()]
+
+# Comeback Super Effects
+mapset{map: "_vnix_comebacksuper_cfg_enable"; value: 1} 		# Enable Super Effects, 0 to disable
+mapset{map: "_vnix_comebacksuper_cfg_life"; value: 0.25} 		# Configure life threshold, 0.25 = 25%
+mapset{map: "_vnix_comebacksuper_cfg_zoom"; value: 1} 			# Enable Zoom Effect, 0 to disable
+mapset{map: "_vnix_comebacksuper_cfg_zoomscale"; value: 1.2} 	# Configure zoom scale
+mapset{map: "_vnix_comebacksuper_cfg_pause"; value: 60}		 	# Configure first hit pausetime
+
+
+#===============================================================================
+
+[StateDef -4]
+
+ignoreHitPause if (teamside = 1 || teamside = 2) && gamemode = "fightchallenge"  || gamemode = "fightchallengevs"   {
+
+	# Initialize
+	if roundstate = 0 && time = 0 && !ishelper  {
+		# Run config
+		call F_Vnix_Comeback_Config();
+	}
+	
+	# ===========================================================================
+	# Empowered Supers
+	if roundState = 2 && map(_vnix_comebacksuper_cfg_enable) {
+		if alive = 1
+		&& float(life) / lifeMax <= float(map(_vnix_comebacksuper_cfg_life))
+		&& !ishelper
+		&& p2, getHitVar(attr) = SCA, HA, HP, HT
+		&& playerNo = teamLeader
+		&& p2, moveType = H
+		&& p2, stateno != 5110 && p2, stateno != 5150
+		&& p2, stateNo != [120,155]
+		&& p2, getHitVar(guarded) = 0 {
+			mapadd{map: "_vnix_critical_art"; value: 1}
+			if map(_vnix_critical_art) = 1 {
+				lifebarAction{text: "Critical Art"; top: 1;}
+				playSnd{value: VP 100, 55; volumescale: 200;}
+				playSnd{value: VP 100, 55; volumescale: 100;}
+				pause{time: ceil(map(_vnix_comebacksuper_cfg_pause));}
+				explod{
+					anim: VP 20107;
+					ID: 20107;
+					postype: left;
+					pos: 0, 0;
+					scale: 3, 3;
+					angle: 0;
+					facing: 1;
+					ontop: 0;
+					sprpriority: -99;
+					removetime: -2;
+					pausemovetime: -1;
+					supermovetime: -1
+				}
+			}
+			assertSpecial{flag: nomusic;}
+			bgpalfx{
+				time: 1;
+				add: -100,-100,-100;
+				color: 0;
+			}
+			palfx{time: 1; color: 0;}
+			palfx{time: 1; color: 0; redirectID: enemy, ID;}
+			if map(_vnix_comebacksuper_cfg_zoom) {
+				if p2, getHitVar(attr) = SCA, HA, HP
+				{
+					if moveType = A {
+						zoom{
+							scale: map(_vnix_comebacksuper_cfg_zoomscale);
+							time: 60;
+							pos: const240p(cond(p2, getHitVar(attr) = SCA, HP, p2, pos x, pos x)), 0;
+							lag: 0.92;
+							stagebound: 1;
+							camerabound: 1;
+						}
+					} else {
+						zoom{
+							scale: 1.0;
+							time: 60;
+							pos: const240p(cond(p2, getHitVar(attr) = SCA, HP, p2, pos x, pos x)), 0;
+							lag: 0.92;
+							stagebound: 1;
+							camerabound: 1;
+						}			
+					}
+				} else if p2, getHitVar(attr) = SCA, HT {
+					if p2, getHitVar(isbound) = 1 {
+						zoom{
+							scale: map(_vnix_comebacksuper_cfg_zoomscale);
+							time: 60;
+							pos: const240p(cond(p2, getHitVar(attr) = SCA, HP, p2, pos x, pos x)), 0;
+							lag: 0.92;
+							stagebound: 1;
+							camerabound: 1;
+						}
+					} else {
+						zoom{
+							scale: 1.0;
+							time: 60;
+							pos: const240p(cond(p2, getHitVar(attr) = SCA, HP, p2, pos x, pos x)), 0;
+							lag: 0.92;
+							stagebound: 1;
+							camerabound: 1;
+						}			
+					}
+				}
+			}
+			explod{
+				anim: VP 40000;
+				postype: left;
+				pos: const240p(0), const240p(0);
+				scale: 1,1;
+				angle: 0;
+				facing: 1;
+				under: 1;
+				sprpriority: -99;
+				removetime: 1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				palfx.time: -1;
+			}	
+			# Increase Damage
+			if p2, getHitVar(frame) && pauseTime = 0 && playerNo = teamSide {
+				targetlifeadd{value: p2, getHitVar(damage) * -0.33; absolute: 1; kill: 0;}
+				if p2, getHitVar(attr) = SCA, HP {
+					lifeadd{value: p2, getHitVar(damage) * -0.33; absolute: 1; kill: 0; redirectID: p2, ID;}
+				}
+				envshake {
+					time: 20;
+					freq: 90;
+					ampl: 2
+				}
+				# Hard Hitspark
+				if p2, getHitVar(attr) = SCA, HT, HP || (moveHitVar(SparkX) = 0 && moveHitVar(SparkY) = 0) || localCoord X > 320 {
+					explod{
+						anim: VP 333;
+						postype: p2;
+						pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+						scale: 1.25, 1.25;
+						angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+						facing: (ifelse(Random <= 500, 1, -1));
+						ontop: 0;
+						sprpriority: -5;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						palfx.time: -1;
+					}
+					explod{
+						anim: VP 20082;
+						postype: p2;
+						pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+						scale: .33, .33;
+						angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+						facing: (ifelse(Random <= 500, 1, -1));
+						ontop: 0;
+						sprpriority: 5;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						palfx.time: -1;
+					}
+				} else if p2, getHitVar(attr) = SCA, HA && localCoord X <= 320 && moveHitVar(SparkX) != 0 && moveHitVar(SparkY) != 0  {
+					explod{
+						anim: VP 333;
+						postype: p1;
+						pos: const240p(MoveHitVar(SparkX)), const240p(MoveHitVar(SparkY));
+						scale: 1.25, 1.25;
+						angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+						facing: (ifelse(Random <= 500, 1, -1));
+						ontop: 0;
+						sprpriority: -5;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						palfx.time: -1;
+					}
+					explod{
+						anim: VP 20082;
+						postype: p1;
+						pos: const240p(MoveHitVar(SparkX)), const240p(MoveHitVar(SparkY));
+						scale: .33, .33;
+						angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+						facing: (ifelse(Random <= 500, 1, -1));
+						ontop: 0;
+						sprpriority: 5;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						palfx.time: -1;
+					}						
+				}
+			}
+			# Aura
+			if p2, receivedHits && numExplod(694200) = 0 {
+				explod{
+					postype: p1;
+					id: 694200;
+					pos: 0, 0;
+					vel: 0, 0;
+					facing: 1;
+					anim: anim;
+					animfreeze: 1;
+					animelem: animelemno(0);
+					sprpriority: sprpriority + 1;
+					removetime: 20;
+					pausemovetime: -1;
+					supermovetime: -1;
+					trans: addalpha;
+					alpha: 256,256;
+					scale: 1.0 * const(size.xscale), 1.0 * const(size.yscale);
+					palfx.time: 21;
+					palfx.color: 0;
+					palfx.mul: cond(teamside = 1, 255, 52), cond(teamside = 1, 165, 204), cond(teamside = 1, 0, 255);
+					interpolation.time: 20;
+					interpolation.alpha: 0,256;
+					interpolation.scale: 1.15 * const(size.xscale), 1.15 * const(size.yscale);
+					ownpal: 1;
+				}
+			}
+		} else {
+			if animTime = 0 {
+				mapset{map: "_vnix_critical_art"; value: 0}
+			}
+		}
+	}
+}

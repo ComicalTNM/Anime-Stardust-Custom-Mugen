@@ -1,0 +1,683 @@
+
+#===============================================================================
+# Configuration
+#===============================================================================
+
+[Function F_Vnix_CBreaker_Config()]
+
+# Combo Breaker
+mapset{map: "_vnix_cbreaker_cfg_enable"; value: 1} 		# Enable Combo Breaker, 0 to disable
+mapset{map: "_vnix_ccounter_cfg_enable"; value: 0} 		# Enable Counter Breaker, 0 to disable
+
+mapset{map: "_vnix_cbreaker_cfg_power"; value: 600}		# Amount of Dash Gauge needed to activate
+mapset{map: "_vnix_cbreaker_cfg_combo"; value: 6} 		# Hit by Combo string Threshold before being able to activate Combo Breaker
+mapset{map: "_vnix_cbreaker_cfg_sound"; value: 1} 		# Enable Combo Breaker Sound, 0 to disable
+
+
+# ========================================================================================================================================
+# V-Nix - Custom Combo Breaker State
+# ========================================================================================================================================
+
+[StateDef 1915201910; type: U; movetype: A; physics: N; ctrl: 0; anim: -2; sprpriority: 1;]
+
+velset{x: 0; y: 0}
+velset{x: 0; y: 0; redirectID: enemy, ID;}
+
+#notHitBy{value: SCA, AP, AT; time: 1}
+
+mapset{map: "_vnix_combobreaker_input"; value: 0}
+
+assertSpecial{flag: unguardable; flag2: noinput; flag3: nohardcodedKeys}
+
+ignoreHitPause if animElemVar(NumClsn1) > 0 {
+	overrideClsn{group: Clsn1; index: 0; rect: -120, -120, 120, 30}
+}
+
+if enemy, stateno != 1915201920 {
+	notHitBy{value: SCA; time: 1}
+}
+
+# Decide Animation
+if time = 0 {
+	mapset{map: "_vnix_break"; value: 1}
+	if stateType = A || pos Y < 0 {
+		if const(Vnix_Breaker_Air) = 0 {
+			if random <= 500 {
+				if selfAnimExist(610) {
+					changeAnim {value: 610}
+				} else if selfAnimExist(600) {
+					changeAnim {value: 600}
+				} else {
+					changeAnim {value: 1915201911}
+				}
+			} else {
+				if selfAnimExist(640) {
+					changeAnim {value: 640}
+				} else if selfAnimExist(630) {
+					changeAnim {value: 630}
+				} else {
+					changeAnim {value: 1915201911}
+				}	
+			}
+		} else {
+			changeAnim{value: const(Vnix_Breaker_Air)}
+		}
+	} else {
+		if const(Vnix_Breaker) = 0 {
+			if Random <= 500 {
+				if selfAnimExist(220) {
+					changeAnim{value: 220}
+				} else if selfAnimExist(210) {
+					changeAnim{value: 210}
+				} else if selfAnimExist(200) {
+					changeAnim{value: 200}
+				} else {
+					changeAnim{value: 1915201910}
+				}
+			} else {
+				if selfAnimExist(250) {
+					changeAnim{value: 250}
+				} else if selfAnimExist(240) {
+					changeAnim{value: 240}
+				} else if selfAnimExist(230) {
+					changeAnim{value: 230}
+				} else if selfAnimExist(200) {
+					changeAnim{value: 200}
+				} else {
+					changeAnim{value: 1915201910}
+				}
+			}
+		} else {
+			changeAnim{value: const(Vnix_Breaker)}
+		}
+	}
+}
+
+# Effects
+if time = 1 {
+	playsnd{value: VP 7, 7; volumescale: 200; freqmul: 1.0}
+	playsnd{value: VP 7, 7; volumescale: 100; freqmul: 1.0}
+	posset{y: p2, pos Y;}
+	bgpalfx{
+		time: 30;
+		mul: 100,100,100;
+		add: 32, 32, 32;
+	}
+	palfx{
+		time: 20;
+		add: 132, 132, 132;
+	}
+	explod{
+		anim: VP 10050;
+		id: 10050;
+		postype: p1;
+		pos: const(size.mid.pos.x), const(size.mid.pos.y);
+		sprpriority: 4;
+		scale: .75,.75;
+		pausemovetime: -1;
+		supermovetime: -1;
+		ownpal: 1;
+	}
+	explod{
+		anim: VP 20003;
+		id: 20003;
+		postype: p1;
+		pos: const(size.mid.pos.x), const(size.mid.pos.y);
+		sprpriority: 5;
+		scale: .5,.5;
+		pausemovetime: -1;
+		supermovetime: -1;
+		ownpal: 1;
+	}
+	if facing = p2, facing {
+		turn{}
+	}
+	stopsnd{channel: 2}
+	pause{time: 20;}
+}
+
+if time = 2 {
+	pause{time: 10; movetime: 10;}
+}
+
+# Hitdef always on before hit happens
+if movehit = 0 {
+	hitDef{
+		attr: S, SA;
+		animtype: Hard;
+		damage: 90, 4;
+		sparkxy: -10, -60;
+		hitsound: -1,0;
+		guardsound: 6, 0;
+		ground.type: Low;
+		ground.slidetime: 12;
+		ground.hittime: 17;
+		kill: 0;
+		pausetime: 20,40;
+		ground.velocity: -8, -3.5;
+		air.velocity: -3, -3;
+		fall: 1;
+		fall.recover: 0;
+		hitflag: MAFD;
+		priority: 7, hit;
+	}
+}
+
+# Effect which happen only once
+ignoreHitPause if movehitvar(frame) {
+	lifebaraction{text: "Combo Breaker"; top: 1}
+	mapset{map: "_vnix_break"; value: 0; redirectID: enemy, ID;}
+	if p2StateType = S {
+		selfstate{value: 1915201930; ctrl: 0; redirectID: enemy, ID;}
+	}
+	envshake{
+		time: 30;
+		freq: 160;
+		ampl: 2;
+	}
+	bgpalfx{
+		time: 30;
+		mul: 0,0,100;
+		add: 30, 0, 32;
+	}
+	# Combo Breaker Announcer
+	if map(_vnix_cbreaker_cfg_sound) != 0 {
+		playsnd{value: VP 110, 1; volumescale: 200; freqmul: 1.0;}
+		playsnd{value: VP 110, 1; volumescale: 200; freqmul: 1.0;}
+	}
+	playsnd{value: VP 110, 36; volumescale: 200; freqmul: 1.0}
+	playsnd{value: VP 110, 36; volumescale: 100; freqmul: 1.0}
+	playSnd{value: GO 5400, 0; volume: 200}
+	explod{
+		anim: VP 40105;
+		postype: p2;
+		pos: p2, const(size.mid.pos.x) - 10, p2, const(size.mid.pos.y);
+		scale: .25,.25;
+		angle: -90;
+		random: 0,0;
+		facing: 1;
+		bindtime: 0;
+		vel: 1,0;
+		sprpriority: 3;
+		removetime: -2;
+		pausemovetime: -1;
+		supermovetime: -1;
+		trans: Addalpha;
+		alpha: 256,256;
+		ownpal: 1;
+		layerno: 1;
+		interpolation.time: 50;
+		interpolation.alpha: 0,256;
+		interpolation.scale: .667,.667;
+	}
+	# Speed Effect
+	explod{
+		anim: VP 20085;
+		postype: p2;
+		pos: p2, const(size.mid.pos.x), p2, const(size.mid.pos.y);
+		scale: 1,.75;
+		angle: 90;
+		facing: 1;
+		vfacing: -1;
+		trans: Addalpha;
+		alpha: 256,0;
+		ontop: 0;
+		vel: -.5, 0;
+		bindtime: 0;
+		sprpriority: -5;
+		pausemovetime: -1;
+		supermovetime: -1;
+		ownpal: 1;
+		palFx.time: -1;
+		palFx.mul: 255, 255, 255;
+		palFx.add: 200, 200, 200;
+		palfx.color: 0;
+		interpolation.time: 40;
+		interpolation.alpha: 0,256;
+	}
+	# Break Effect
+	explod{
+		anim: VP 120;
+		postype: left;
+		pos: 0,0;
+		scale: 2,2;
+		angle: 0;
+		facing: 1;
+		ontop: 0;
+		under: 1;
+		removetime: -2;
+		pausemovetime: -1;
+		supermovetime: -1;
+		trans: Addalpha;
+		alpha: 256,256;
+		ownpal: 1;
+		interpolation.time: 30;
+		interpolation.alpha: 0,256;
+	}
+}
+
+# Zoom Effect
+ignoreHitPause if moveType = A && stateType != A {
+	if movehit = 1 {
+		zoom{
+			scale: 1.2;
+			time: 60;
+			pos: const240p((pos x + p2, pos x) / 2.0), 0;
+			lag: 0.85;
+			stagebound: 1;
+			camerabound: 1;
+		}
+	} else {
+		zoom{
+			scale: 1.0;
+			time: 60;
+			pos: const240p((pos x + p2, pos x) / 2.0), 0;
+			lag: 0.9;
+			stagebound: 1;
+			camerabound: 1;
+		}
+	}
+}
+
+if animtime = 0 || time >= 20 {
+	mapset{map: "_vnix_break"; value: 0}
+	if stateType = A || pos Y < 0 {
+		selfstate{value: 50; ctrl: 1}
+	} else {
+		selfstate{value: 0; ctrl: 1}
+	}
+}
+
+
+# ========================================================================================================================================
+# V-Nix - Custom Counter Breaker State
+# ========================================================================================================================================
+
+[StateDef 1915201920; type: U; movetype: A; physics: N; ctrl: 0; anim: -2; sprpriority: 1;]
+
+velset{x: 0; y: 0}
+velset{x: 0; y: 0; redirectID: enemy, ID;}
+
+#notHitBy{value: SCA, AP, AT; time: 1}
+
+assertSpecial{flag: unguardable; flag2: noinput; flag3: nohardcodedKeys}
+
+ignoreHitPause if animElemVar(NumClsn1) > 0 {
+	overrideClsn{group: Clsn1; index: 0; rect: -120, -120, 120, 30}
+}
+
+notHitBy{value: SCA; time: 1}
+
+# Decide Animation
+if time = 0 {
+	mapset{map: "_vnix_break"; value: 1}
+	if stateType = A {
+		if random <= 500 {
+			if selfAnimExist(610) {
+				changeAnim {value: 610}
+			} else if selfAnimExist(600) {
+				changeAnim {value: 600}
+			} else {
+				changeAnim {value: 1915201911}
+			}
+		} else {
+			if selfAnimExist(640) {
+				changeAnim {value: 640}
+			} else if selfAnimExist(630) {
+				changeAnim {value: 630}
+			} else {
+				changeAnim {value: 1915201911}
+			}	
+		}
+	} else {
+		if Random <= 500 {
+			if selfAnimExist(220) {
+				changeAnim{value: 220}
+			} else if selfAnimExist(210) {
+				changeAnim{value: 210}
+			} else if selfAnimExist(200) {
+				changeAnim{value: 200}
+			} else {
+				changeAnim{value: 1915201910}
+			}
+		} else {
+			if selfAnimExist(250) {
+				changeAnim{value: 250}
+			} else if selfAnimExist(240) {
+				changeAnim{value: 240}
+			} else if selfAnimExist(230) {
+				changeAnim{value: 230}
+			} else if selfAnimExist(200) {
+				changeAnim{value: 200}
+			} else {
+				changeAnim{value: 1915201910}
+			}
+		}
+	}
+}
+
+# Effects
+if time = 1 {
+	playsnd{value: VP 7, 8; volumescale: 200; freqmul: 1.0}
+	playsnd{value: VP 7, 8; volumescale: 100; freqmul: 1.0}
+	posset{y: p2, pos Y;}
+	bgpalfx{
+		time: 30;
+		mul: 100,100,100;
+		add: 32, 32, 32;
+	}
+	palfx{
+		time: 20;
+		add: 132, 132, 132;
+	}
+	explod{
+		anim: VP 10050;
+		id: 10050;
+		postype: p1;
+		pos: const(size.mid.pos.x), const(size.mid.pos.y);
+		sprpriority: 4;
+		scale: .75,.75;
+		pausemovetime: -1;
+		supermovetime: -1;
+		ownpal: 1;
+	}
+	explod{
+		anim: VP 20003;
+		id: 20003;
+		postype: p1;
+		pos: const(size.mid.pos.x), const(size.mid.pos.y);
+		sprpriority: 5;
+		scale: .5,.5;
+		pausemovetime: -1;
+		supermovetime: -1;
+		ownpal: 1;
+	}
+	if facing = p2, facing {
+		turn{}
+	}
+	stopsnd{channel: 2}
+	pause{time: 20;}
+}
+
+if time = 2 {
+	pause{time: 10; movetime: 10;}
+}
+
+# Hitdef always on before hit happens
+if movehit = 0 {
+	hitDef{
+		attr: S, SA;
+		animtype: Hard;
+		damage: 90, 4;
+		sparkxy: -10, -60;
+		hitsound: -1,0;
+		guardsound: 6, 0;
+		ground.type: Low;
+		ground.slidetime: 12;
+		ground.hittime: 17;
+		kill: 0;
+		pausetime: 20,40;
+		ground.velocity: -8, 10;
+		air.velocity: -8, 10;
+		fall: 1;
+		fall.recover: 0;
+		hitflag: MAFD;
+		priority: 7, hit;
+	}
+}
+
+# Effect which happen only once
+ignoreHitPause if movehitvar(frame) {
+	lifebaraction{text: "Counter Breaker"; top: 1}
+	mapset{map: "_vnix_break"; value: 0; redirectID: enemy, ID;}
+	if p2StateType = S {
+		selfstate{value: 1915201930; ctrl: 0; redirectID: enemy, ID;}
+	}
+	envshake{
+		time: 30;
+		freq: 160;
+		ampl: 2;
+	}
+	bgpalfx{
+		time: 30;
+		mul: 100,0,100;
+		add: 30, 0, 32;
+	}
+	# Counter Breaker Announcer
+	if map(_vnix_cbreaker_cfg_sound) != 0 {
+		playsnd{value: VP 110, 42; volumescale: 200; freqmul: 1.0}
+		playsnd{value: VP 110, 42; volumescale: 200; freqmul: 1.0}
+	}
+	playsnd{value: VP 110, 41; volumescale: 200; freqmul: 1.0}
+	playsnd{value: VP 110, 41; volumescale: 100; freqmul: 1.0}
+	playSnd{value: GO 5400, 0; volume: 200}
+	explod{
+		anim: VP 40105;
+		postype: p2;
+		pos: p2, const(size.mid.pos.x) - 10, p2, const(size.mid.pos.y);
+		scale: .25,.25;
+		angle: -90;
+		random: 0,0;
+		facing: 1;
+		bindtime: 0;
+		vel: 1,0;
+		sprpriority: 3;
+		removetime: -2;
+		pausemovetime: -1;
+		supermovetime: -1;
+		trans: Addalpha;
+		alpha: 256,256;
+		ownpal: 1;
+		layerno: 1;
+		interpolation.time: 50;
+		interpolation.alpha: 0,256;
+		interpolation.scale: .667,.667;
+	}
+	# Speed Effect
+	explod{
+		anim: VP 20085;
+		postype: p2;
+		pos: p2, const(size.mid.pos.x), p2, const(size.mid.pos.y);
+		scale: 1,.75;
+		angle: 90;
+		facing: 1;
+		vfacing: -1;
+		trans: Addalpha;
+		alpha: 256,0;
+		ontop: 0;
+		vel: -.5, 0;
+		bindtime: 0;
+		sprpriority: -5;
+		pausemovetime: -1;
+		supermovetime: -1;
+		ownpal: 1;
+		palFx.time: -1;
+		palFx.mul: 255, 0, 255;
+		palFx.add: 200, 0, 200;
+		palfx.color: 0;
+		interpolation.time: 40;
+		interpolation.alpha: 0,256;
+	}
+	# Break Effect
+	explod{
+		anim: VP 120;
+		postype: left;
+		pos: 0,0;
+		scale: 2,2;
+		angle: 0;
+		facing: 1;
+		ontop: 0;
+		under: 1;
+		removetime: -2;
+		pausemovetime: -1;
+		supermovetime: -1;
+		trans: Addalpha;
+		alpha: 256,256;
+		ownpal: 1;
+		interpolation.time: 30;
+		interpolation.alpha: 0,256;
+	}
+}
+
+# Zoom Effect
+ignoreHitPause if moveType = A && stateType != A  {
+	if movehit = 1 {
+		zoom{
+			scale: 1.2;
+			time: 60;
+			pos: const240p((pos x + p2, pos x) / 2.0), 0;
+			lag: 0.85;
+			stagebound: 1;
+			camerabound: 1;
+		}
+	} else {
+		zoom{
+			scale: 1.0;
+			time: 60;
+			pos: const240p((pos x + p2, pos x) / 2.0), 0;
+			lag: 0.9;
+			stagebound: 1;
+			camerabound: 1;
+		}
+	}
+}
+
+if animtime = 0 || time >= 20 {
+	mapset{map: "_vnix_break"; value: 0}
+	if stateType = A || pos Y < 0 {
+		selfstate{value: 50; ctrl: 1}
+	} else {
+		selfstate{value: 0; ctrl: 1}
+	}
+}
+
+# ===================================================================================
+# Combo Breaker - Crumble
+# ===================================================================================
+
+[StateDef 1915201930; 
+	type: S;
+	moveType: I;
+	physics: S;
+	ctrl: 0;
+	anim: -2;
+]
+
+mapset{map: "_vnix_break"; value: 0;}
+
+assertSpecial{flag: noinput; flag2: nohardcodedKeys; flag3: noAILevel}
+
+if time = 0 {
+	mapadd{map: "_pots_dash_gauge_cooldown"; value: 120;}
+	changeanim{value: 420710}
+}
+
+if animTime = 0 {
+	changeState{value: 5110;}
+}
+
+
+[StateDef -4]
+
+ignorehitpause if !ishelper && (teamside = 1 || teamside = 2) {
+
+	# Initialize
+	if roundstate = 0 && time = 0 {
+		# Run config
+		call F_Vnix_CBreaker_Config();
+	}
+}
+
+	
+[StateDef +1]
+
+# ========================================================================================================================================
+# V-Nix - Combo Breaker
+# ========================================================================================================================================
+
+ignoreHitPause if !ishelper && teamside > 0 && map(_vnix_cbreaker_cfg_enable) != 0 && playerNo < 9  && gamemode = "fightchallenge" || gamemode = "fightchallengevs"  {
+	# Input handling
+	if map(_vnix_combobreaker_input) > 0 {
+		mapadd{map: "_vnix_combobreaker_input"; value: -1}
+	}
+	
+	# Precaution to reset flag
+	if map(_vnix_break) > 0 && gametime%30 {
+		mapset{map: "_vnix_break"; value: 0}
+	}
+	
+	let buffertime = 1;
+	if AIlevel {
+		if (movetype = H && stateno != 1915201930 && random < ((250 + 500) * AIlevel / 8.0) && (statetype != L || stateno = 5120))
+		|| (stateno = 1915201930 && enemy, moveType = A)
+		{
+			mapset{map: "_vnix_combobreaker_input"; value: $buffertime}
+		}
+	} else {
+		# Hold any button
+		if inputtime(s) > 0 ||
+		   inputtime(a) > 0 || inputtime(b) > 0 || inputtime(c) > 0 ||
+		   inputtime(x) > 0 || inputtime(y) > 0 || inputtime(z) > 0 {
+			mapset{map: "_vnix_combobreaker_input"; value: $buffertime}
+		}
+	}
+	
+	# Initiate Combo Breaker
+	if !ishelper && roundstate = 2 {
+
+		# Combo Breaker
+		if !incustomstate
+		&& !pausetime
+		#&& !time
+		&& map(_pots_dash_gauge) >= map(_vnix_cbreaker_cfg_power)
+		&& map(_vnix_combobreaker_input) > 0
+		&& map(_pots_dash_burnout) = 0
+		&& map(_vnix_break) = 0
+		&& enemy, map(ikarmor_assertarmor) = 0
+		&& enemy, map(ikarmor_assertarmor2) = 0
+		&& alive
+		&& p2BodyDist X < 60
+		&& p2BodyDist Y = [-40,40]
+		&& movetype = H
+		&& enemy, movetype = A
+		&& enemy, stateno != 1915201910
+		&& statetype != L
+		&& getHitVar(playerNo)
+		&& getHitVar(attr) != SCA, AT #HA, HP, AT
+		&& enemy, combocount >= map(_vnix_cbreaker_cfg_combo) {
+			mapadd{map: "_pots_dash_gauge"; value: -abs(map(_vnix_cbreaker_cfg_power))}
+			mapadd{map: "_vnix_break_out"; value: 1}
+			mapset{map: "_pots_dash_gauge_cooldown"; value: 120}
+			#poweradd{value: -1.0 * map(_vnix_cbreaker_cfg_power)}
+			selfstate{value: 1915201910; ctrl: 0;}
+		}
+		
+		# Counter Breaker
+		if map(_vnix_ccounter_cfg_enable)
+		&& !incustomstate
+		&& !pausetime
+		#&& !time
+		&& map(_pots_dash_gauge) >= map(_vnix_cbreaker_cfg_power)
+		&& map(_vnix_combobreaker_input) > 0
+		&& map(_pots_dash_burnout) = 0
+		&& map(_vnix_break) = 0
+		&& alive
+		&& p2BodyDist X < 60
+		&& p2BodyDist Y = [-40,40]
+		#&& movetype = H
+		&& (stateno = 1915201930 || moveType = H)
+		&& enemy, movetype = A
+		&& enemy, stateno = 1915201910
+		&& statetype != L
+		&& getHitVar(playerNo)
+		&& getHitVar(attr) != SCA, HA, HP, AT
+		{
+			mapadd{map: "_pots_dash_gauge"; value: -abs(map(_vnix_cbreaker_cfg_power))}
+			mapadd{map: "_vnix_break_out"; value: 1}
+			mapset{map: "_pots_dash_gauge_cooldown"; value: 120}
+			#poweradd{value: -1.0 * map(_vnix_cbreaker_cfg_power)}
+			selfstate{value: 1915201920; ctrl: 0;}
+		}
+		
+	}
+}

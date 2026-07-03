@@ -1,0 +1,634 @@
+
+# ========================================================================================================================================
+# Stage Config
+# ========================================================================================================================================
+
+[Function F_Vnix_Stage_Config()]
+
+# Damage Threshold 
+mapset{map: "_vnix_destruction_cfg_dmg"; value: 100} 	# Set number of hits before stage transition
+
+# ========================================================================================================================================
+# Stage States
+# ========================================================================================================================================
+
+[StateDef 0; anim: -2;]
+
+# Crowd Win Helper
+persistent(0) if numHelper(1) = 0 && stagevar(info.name) = "Foundation" {
+	helper{id: 1; stateno: 1;}
+}
+
+# Crowd Parry Helper
+persistent(0) if numHelper(5) = 0 && stagevar(info.name) = "Foundation" {
+	helper{id: 5; stateno: 5;}
+}
+
+# Crowd Super Helper
+persistent(0) if numHelper(10) = 0 && stagevar(info.name) = "Foundation" {
+	helper{id: 10; stateno: 10;}
+}
+
+# Crowd Counter Helper
+persistent(0) if numHelper(15) = 0 && stagevar(info.name) = "Foundation" {
+	helper{id: 15; stateno: 15;}
+}
+
+# Crowd Danger Helper
+persistent(0) if numHelper(20) = 0 && stagevar(info.name) = "Foundation" {
+	helper{id: 20; stateno: 20;}
+}
+
+# Crowd Big Damage Helper
+persistent(0) if numHelper(25) = 0 && stagevar(info.name) = "Foundation" {
+	helper{id: 25; stateno: 25;}
+}
+
+# Wall Helper Right
+persistent(0) if numHelper(100) = 0 && stagevar(info.name) = "Foundation" {
+	helper{id: 100; stateno: 100; pos: 430,0;}
+}
+
+# Wall Helper Left
+persistent(0) if numHelper(110) = 0 && stagevar(info.name) = "Foundation" {
+	helper{id: 110; stateno: 110; pos: -430,0;}
+}
+
+# Meta World Helper
+persistent(0) if numHelper(150) = 0 && stagevar(info.name) = "Foundation" {
+	helper{id: 150; stateno: 150;}
+}
+
+# Crowd Sound
+if timeMod = 600,0 && !matchOver {
+	playsnd{value: 0, 1; volumescale: 50; freqmul: 1.0; channel: 5}
+}
+
+# Crowd Sound Stop
+if roundState = 4 && matchOver {
+	stopsnd{channel: 5}
+}
+
+for i = 1; 8; 1{
+	if player($i), authorname = "Stardust Style" {
+		map(_vnix_stardust) := 1;
+	}
+}
+
+if map(_vnix_wall_hp) = 110 {
+	for s = 1; 8; 2 {
+		if player($s), roundState = 4 && player($s), win && map(_vnix_secret_factor) = 0 {
+			explod{
+				anim: 20;
+				postype: left;
+				pos: 160,0;
+				scale: .5,.5;
+				angle: 0;
+				facing: 1;
+				ontop: 1;
+				random: 0,0;
+				bindtime: 1;
+				removetime: -1;
+				sprpriority: 5;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				palfx.time: -1;
+				palfx.add: 255,255,255;
+				interpolation.time: 60;
+				interpolation.palfx.add: 0,0,0;
+			}
+			playsnd{value: 1, 2; volumescale: 200; freqmul: 1.0}
+			mapset{map: "_vnix_secret_factor"; value: 1;}
+		}
+	}
+	for t = 2; 8; 2 {
+		if player($t), roundState = 4 && player($t), win && map(_vnix_secret_factor) = 0 {
+			explod{
+				anim: 21;
+				postype: left;
+				pos: 160,0;
+				scale: .5,.5;
+				angle: 0;
+				facing: 1;
+				ontop: 1;
+				random: 0,0;
+				bindtime: 1;
+				removetime: -1;
+				sprpriority: 5;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				palfx.time: -1;
+				palfx.add: 255,255,255;
+				interpolation.time: 60;
+				interpolation.palfx.add: 0,0,0;
+			}
+			playsnd{value: 1, 2; volumescale: 200; freqmul: 1.0}
+			mapset{map: "_vnix_secret_factor"; value: 1;}
+		}
+	}
+}
+
+
+# ========================================================================================================================================
+# Crowd Win Helper 1
+[StateDef 1; anim: -2;]
+
+if roundstate = 3
+{
+	changestate{value: 2}
+}
+
+# ========================================================================================================================================
+# Crowd Win Helper 2
+[StateDef 2; anim: -2;]
+
+if time = 0 {
+	playsnd{value: 0, 2; volumescale: 200; freqmul: 1.0; channel: 70}
+	playsnd{value: 0, 2; volumescale: 100; freqmul: 1.0; channel: 70}
+}
+
+if roundstate != 3 {
+	changestate{value: 1}
+}
+
+# ========================================================================================================================================
+# Crowd Parry Helper 1
+[StateDef 5; anim: -2;]
+
+for i = 1; numPlayer; 1 {
+	if player($i), moveReversed {
+		changestate{value: 6}
+	}
+}
+
+# ========================================================================================================================================
+# Crowd Parry Helper 2
+[StateDef 6; anim: -2;]
+
+if time = 0 {
+	playsnd{value: 0, 3; volumescale: 100; freqmul: 1.0; channel: 71}
+}
+
+if time = 180 {
+	changestate{value: 5}
+}
+
+# ========================================================================================================================================
+# Crowd Super Helper 1
+[StateDef 10; anim: -2;]
+
+for i = 1; numPlayer; 1 {
+	if player($i), getHitVar(frame) && player($i), getHitVar(attr) = SCA, HA, HP, HT {
+		changestate{value: 11}
+	}
+}
+
+# ========================================================================================================================================
+# Crowd Super Helper 2
+[StateDef 11; anim: -2;]
+
+if time = 0 {
+	playsnd{value: 0, 0; volumescale: 200; freqmul: 1.0;}
+}
+
+if time = 180 {
+	changestate{value: 10}
+}
+
+# ========================================================================================================================================
+# Crowd Counter Helper 1
+[StateDef 15; anim: -2;]
+
+for i = 1; numPlayer; 1 {
+	if player($i), moveCountered && player($i), map(ikarmor_assertarmor) = 0
+	&& player($i), map(ikarmor_assertarmor2) = 0 && player($i), map(_vnix_rush_armor) = 0
+	{
+		changestate{value: 16}
+	}
+}
+
+# ========================================================================================================================================
+# Crowd Counter Helper 2
+[StateDef 16; anim: -2;]
+
+if time = 0 {
+	playsnd{value: 0, 4; volumescale: 200; freqmul: 1.0; channel: 72}
+}
+
+if time = 120 {
+	changestate{value: 15}
+}
+
+# ========================================================================================================================================
+# Crowd Danger Helper 1
+[StateDef 20; anim: -2;]
+
+for i = 1; numPlayer; 1 {
+	if player($i), ishelper = 0 && player($i), life > 0 && float(player($i), life) / player($i), lifeMax <= 0.25 {
+	#if player($i), life <= player($i), lifeMax * 0.25 {
+		changestate{value: 21}
+	}
+}
+
+# ========================================================================================================================================
+# Crowd Danger Helper 2
+[StateDef 21; anim: -2;]
+
+if time = 0 {
+	playsnd{value: 0, 5; volumescale: 200; freqmul: 1.0; channel: 72}
+}
+
+if time = 1 {
+	destroySelf{}
+}
+
+# ========================================================================================================================================
+# Crowd Big Damage Helper 1
+[StateDef 25; anim: -2;]
+
+for i = 1; numPlayer; 1 {
+	if player($i), getHitVar(frame) && player($i), receiveddamage >= player($i), lifeMax * 0.33 {
+		changestate{value: 26}
+	}
+}
+
+# ========================================================================================================================================
+# Crowd Big Damage Helper 2
+[StateDef 26; anim: -2;]
+
+if time = 0 {
+	playsnd{value: 0, 6; volumescale: 200; freqmul: 1.0; channel: 72}
+	playsnd{value: 0, 6; volumescale: 200; freqmul: 1.0; channel: 72}
+}
+
+if time = 300 {
+	changestate{value: 25}
+}
+
+# ========================================================================================================================================
+# Wall Helper Right
+[StateDef 100; anim: -2;]
+
+for i = 1; 8; 1 {
+	if ((player($i), pos X + player($i), cameraPos X) = [425,440]) && player($i), moveType = H && player($i), inCustomState = 0 && player($i), alive = 1
+	&& ((player($i), stateType = S || player($i), stateType = C) && player($i), stateno != [120,155]
+	|| player($i), stateType = A && player($i), pos Y >= -30 && player($i), vel y < 6)
+	{
+		changestate{value: 101}
+	}
+}
+
+if time = 1 {
+	selfstate{value: 100;}
+}
+
+# ========================================================================================================================================
+# Wall Helper Right 2
+[StateDef 101; anim: -2; type: S; movetype: A; physics: S;]
+
+if time = 0 {
+	changeAnim{value: 100}
+}
+
+if time = 0 {
+	hitDef{
+		attr: S, NT;          #Attributes: Standing, Normal Throw
+		hitflag: MAF+;          #Affect only ground people who are not being hit
+		priority: 1, Miss;    #Throw has low priority, must be miss or dodge type.
+		sparkno: -1;          #No spark
+		p1sprpriority: 1;     #Draw p1's sprite in front of p2
+							  #p2's sprite priority is set to 0 by default
+		p1facing: 1;
+		p2facing: 1;          #Force p2 to face KFM
+		p1stateno: 102;       #On success, KFM changes to state 810
+		p2stateno: 1234505;       #If hit, p2 changes to state 820 in KFM's ZSS
+		guard.dist: 0;        #This prevents p2 from going into a guard state if close
+		fall: 1;              #Force p2 into falling down
+	}
+}
+
+if time = 60 {
+	selfstate{value: 100}
+}
+
+# ========================================================================================================================================
+# Grabbing Target
+[StateDef 102; type: S; movetype: A; physics: N; anim: -2;]
+
+targetBind{pos: 47, 0}
+
+if time = 0 {
+	if root, map(_vnix_stardust) {
+		explod{
+			anim: 130 + random%5;
+			id: 110;
+			postype: p1;
+			pos: 30,0;
+			scale: 1,1;
+			angle: 0;
+			facing: -1;
+			ontop: 1;
+			random: 0,0;
+			bindtime: 1;
+			removetime: -1;
+			sprpriority: 5;
+			pausemovetime: -1;
+			supermovetime: -1;
+			ownpal: 1;
+		}		
+	} else {
+		explod{
+			anim: 120 + random%6; #110 + random%5;
+			id: 110;
+			postype: p1;
+			pos: 30,0;
+			scale: 1,1;
+			angle: 0;
+			facing: -1;
+			ontop: 1;
+			random: 0,0;
+			bindtime: 1;
+			removetime: -1;
+			sprpriority: 5;
+			pausemovetime: -1;
+			supermovetime: -1;
+			ownpal: 1;
+		}
+	}
+	explod{
+		anim: 150;
+		id: 150;
+		postype: p1;
+		pos: 0, const(size.mid.pos.y) * cond(root, map(_vnix_stardust), 0.5, 1.0);
+		scale: .5,.5;
+		angle: 0;
+		facing: -1;
+		ontop: 1;
+		random: 0,0;
+		bindtime: 1;
+		removetime: -2;
+		sprpriority: 5;
+		pausemovetime: -1;
+		supermovetime: -1;
+		ownpal: 1;
+		trans: Add;
+	}
+	playsnd{value: 1, 1; volumescale: 200; freqmul: 1.0;}
+	
+	playsnd{value: 2, random%7; volumescale: 100; freqmul: 1.0;}
+}
+
+for i = 1; 8; 1 {
+	if time >= 90 || (player($i), getHitVar(frame) && player($i), getHitVar(attr) = SCA, AA, AP, ST, HT)  {
+		removeExplod{id: 110;}
+		selfstate{value: 103}
+	}
+}
+
+# ========================================================================================================================================
+
+# Let Go of Target
+[StateDef 103; type: S; movetype: I; physics: N; anim: -2;]
+
+if time = 120 {
+	selfstate{value: 100}
+}
+
+# ========================================================================================================================================
+# Wall Helper Left
+[StateDef 110; anim: -2;]
+
+for i = 1; 8; 1 {
+	if ((player($i), pos X + player($i), cameraPos X) = [-440,-425]) && player($i), moveType = H && player($i), inCustomState = 0 && player($i), alive = 1
+	&& ((player($i), stateType = S || player($i), stateType = C) && player($i), stateno != [120,155]
+	|| player($i), stateType = A && player($i), pos Y >= -30 && player($i), vel y < 6)
+	{
+		changestate{value: 111}
+	}
+}
+
+if time = 1 {
+	selfstate{value: 110;}
+}
+
+# ========================================================================================================================================
+# Wall Helper Left 2
+[StateDef 111; anim: -2; type: S; movetype: A; physics: S;]
+
+if time = 0 {
+	changeAnim{value: 100}
+}
+
+if time = 0 {
+	hitDef{
+		attr: S, NT;          #Attributes: Standing, Normal Throw
+		hitflag: MAF+;          #Affect only ground people who are not being hit
+		priority: 1, Miss;    #Throw has low priority, must be miss or dodge type.
+		sparkno: -1;          #No spark
+		p1sprpriority: 1;     #Draw p1's sprite in front of p2
+							  #p2's sprite priority is set to 0 by default
+		p1facing: 1;
+		p2facing: -1;          #Force p2 to face KFM
+		p1stateno: 112;       #On success, KFM changes to state 810
+		p2stateno: 1234505;       #If hit, p2 changes to state 820 in KFM's ZSS
+		guard.dist: 0;        #This prevents p2 from going into a guard state if close
+		fall: 1;              #Force p2 into falling down
+	}
+}
+
+if time = 60 {
+	selfstate{value: 110}
+}
+
+# ========================================================================================================================================
+# Grabbing Target
+[StateDef 112; type: S; movetype: A; physics: N; anim: -2;]
+
+targetBind{pos: -47, 0}
+
+if time = 0 {
+	if root, map(_vnix_stardust) {
+		explod{
+			anim: 130 + random%5;
+			id: 110;
+			postype: p1;
+			pos: -30,0;
+			scale: 1,1;
+			angle: 0;
+			facing: 1;
+			ontop: 1;
+			random: 0,0;
+			bindtime: 1;
+			removetime: -1;
+			sprpriority: 5;
+			pausemovetime: -1;
+			supermovetime: -1;
+			ownpal: 1;
+		}		
+	} else {
+		explod{
+			anim: 120 + random%6; #110 + random%5;
+			id: 110;
+			postype: p1;
+			pos: -30,0;
+			scale: 1,1;
+			angle: 0;
+			facing: 1;
+			ontop: 1;
+			random: 0,0;
+			bindtime: 1;
+			removetime: -1;
+			sprpriority: 5;
+			pausemovetime: -1;
+			supermovetime: -1;
+			ownpal: 1;
+		}
+	}
+	explod{
+		anim: 150;
+		id: 150;
+		postype: p1;
+		pos: 0, const(size.mid.pos.y) * cond(root, map(_vnix_stardust), 0.5, 1.0);
+		scale: .5,.5;
+		angle: 0;
+		facing: -1;
+		ontop: 1;
+		random: 0,0;
+		bindtime: 1;
+		removetime: -2;
+		sprpriority: 5;
+		pausemovetime: -1;
+		supermovetime: -1;
+		ownpal: 1;
+		trans: Add;
+	}
+	playsnd{value: 1, 1; volumescale: 200; freqmul: 1.0;}
+	
+	playsnd{value: 2, random%7; volumescale: 100; freqmul: 1.0;}
+}
+
+for i = 1; 8; 1 {
+	if time >= 90 || (player($i), getHitVar(frame) && player($i), getHitVar(attr) = SCA, AA, AP, ST, HT) {
+		removeExplod{id: 110;}
+		selfstate{value: 113}
+	}
+}
+
+# ========================================================================================================================================
+# Let Go of Target
+[StateDef 113; type: S; movetype: I; physics: N; anim: -2;]
+
+if time = 120 {
+	selfstate{value: 110}
+}
+
+# ========================================================================================================================================
+# Meta World Helper
+[StateDef 150; anim: -2;]
+
+if time = 0 {
+	
+	playBGM{bgm: "foundation.mp3"; volume: 200; loop: 1;}
+
+
+}
+
+# Meta World Activate
+if player(1), map(_vnix_meta_invert) = 1 || player(2), map(_vnix_meta_invert) = 1 {
+	changestate{value: 151}
+}
+
+# Meta World Deactivate
+if player(1), map(_vnix_meta_invert) = 0 && player(2), map(_vnix_meta_invert) = 0 {
+}
+
+# ========================================================================================================================================
+# Meta World Helper 1
+[StateDef 151; anim: -2;]
+
+if time = 0 {
+	
+	if random = [0, 250] {
+		playBGM{bgm: "Blazin1.mp3"; volume: 100; loop: 1;}
+	} else if random = [251,500] {
+		playBGM{bgm: "Blazin4.mp3"; volume: 100; loop: 1;}
+	} else if random = [501,750] {
+		playBGM{bgm: "Blazin3.mp3"; volume: 100; loop: 1;}
+	} else {
+		playBGM{bgm: "Blazin2.mp3"; volume: 100; loop: 1;}
+	}
+}
+
+# Meta World Activate
+if player(1), map(_vnix_meta_invert) = 1 || player(2), map(_vnix_meta_invert) = 1 {
+}
+
+# Meta World Deactivate
+if player(1), map(_vnix_meta_invert) = 0 && player(2), map(_vnix_meta_invert) = 0 {
+	changestate{value: 150}
+}
+
+# ========================================================================================================================================
+# Grabbed Target
+[StateDef 1234505; type: S; movetype: H; physics: S; velset: 0, 0; ctrl: 0;]
+
+assertSpecial{flag: noinput; flag2: noHardcodedKeys}
+
+#notHitBy{value: SCA, NT;}
+
+for i = 1; 8; 1 {
+	persistent(0) if player($i), moveType = H {
+		changeAnim{value: 5000; redirectID: player($i), ID;}
+	}
+}
+
+if time >= 3 {
+	assertSpecial{flag: animfreeze;}
+}
+
+#In case attacker loses binding on player for any reason, this controller
+#guarantees that the player will never get stuck in this thrown state.
+if !getHitVar(IsBound) {
+	if selfStatenoExist(100) {
+		selfState{value: 100}
+	} else {
+		selfState{value: 5050}
+	}
+}
+
+# ========================================================================================================================================
+
+
+
+[StateDef 175; anim: -2;]
+
+[StateDef 5900; anim:-2;]
+changestate{value:0;}
+
+[StateDef -4]
+
+ignorehitpause {
+	screenBound{value: 0; movecamera: 0,0}
+	assertSpecial{flag: invisible; flag2: noturntarget; flag3: noinput}
+	notHitBy{value: SCA}
+	width{value: 0,0}
+	
+	# Initialize
+	if roundstate = 0 && time = 0 {
+		# Run config
+		call F_Vnix_Stage_Config();
+		stopSnd{channel: 70;}
+		mapset{map: "_vnix_secret_factor"; value: 0}
+		if roundNo = 1 {
+			mapset{map: "_vnix_destruction"; value: 0}
+			mapset{map: "_vnix_destroyed_stage"; value: 0}
+		}
+		if map(_vnix_destroyed_stage) = 1 {
+			playBGM{bgm: "sound/Theme of Hidden Character.mp3"; volume: 100; loop: 1;}
+		}
+	}
+}
+
+

@@ -1,0 +1,165 @@
+
+#===============================================================================
+# Configuration
+#===============================================================================
+
+[Function F_Vnix_Win_Config()]
+
+# Win KO FX
+mapset{map: "_vnix_winmusic_cfg_enable"; value: 1} 		# Enable Win FX, 0 to disable
+mapset{map: "_vnix_winmusic"; value: 0} 				# Enable Win Music, 0 to disable
+
+
+# ========================================================================================================================================
+# V-Nix - Call Win FX 
+# ========================================================================================================================================
+
+[Function F_Vnix_WinFX()]
+
+# Char Fade Out
+explod{
+	anim: VP 20102;
+	ID: 20102;
+	postype: left;
+	pos: 0, 0;
+	scale: 3, 3;
+	angle: 0;
+	facing: 1;
+	ontop: 1;
+	layerno: 1;
+	sprpriority: 99;
+	removetime: -2;
+	pausemovetime: -1;
+	supermovetime: -1
+}
+# Black BG
+explod{
+	anim: VP 20105;
+	ID: 20105;
+	postype: left;
+	pos: 0, 0;
+	scale: 3, 3;
+	angle: 0;
+	facing: 1;
+	ontop: 0;
+	sprpriority: -99;
+	removetime: -2;
+	pausemovetime: -1;
+	supermovetime: -1
+}
+# White BG
+explod{
+	anim: VP 20104;
+	ID: 20104;
+	postype: left;
+	pos: 0, 0;
+	scale: 3, 3;
+	angle: 0;
+	facing: 1;
+	ontop: 0;
+	sprpriority: -98;
+	removetime: -2;
+	pausemovetime: -1;
+	supermovetime: -1
+}
+# White Fade In
+explod{
+	anim: VP 20103;
+	ID: 20103;
+	postype: left;
+	pos: 0, 0;
+	scale: 3, 3;
+	angle: 0;
+	facing: 1;
+	ontop: 1;
+	sprpriority: 5;
+	removetime: -2;
+	pausemovetime: -1;
+	supermovetime: -1
+}
+
+[StateDef -4]
+
+ignorehitpause if !ishelper && (teamside = 1 || teamside = 2) {
+
+	# Initialize
+	if roundstate = 0 {
+		if time = 0 {
+		}
+	}
+	
+	if fightScreenState(RoundDisplay) {
+		# Run config
+		call F_Vnix_Win_Config();
+		# Reset Maps
+		mapset{map: "_vnix_ko_flag"; value: 0}
+		mapset{map: "_vnix_winfx"; value: 0}
+	}
+}
+
+[StateDef +1]
+
+# ========================================================================================================================================
+# V-Nix - Win Music
+# ========================================================================================================================================
+
+ignorehitpause if !ishelper && (teamside = 1 || teamside = 2) {
+
+	# Tokon KO Pause for non Special or Hyper KO 
+	if winKo & !winSpecial && !winHyper {
+		mapadd{map: "_vnix_ko_flag"; value: 1}
+		if map(_vnix_ko_flag) = 1 {
+			pause{time: 40}
+			if pos Y > ((gameHeight * -1.0) + stageVar(camera.boundhigh)) * 0.5 {
+				zoom{
+					scale: 1.2;
+					time: 10;
+					pos: cond(p2bodydist x > 120, (p2, pos x),((pos x + p2, pos x) / 2.0)),
+						 cond(p2bodydist x > 120, (p2, pos y), (max(stagevar(camera.boundhigh), (pos y + p2, pos y) / 4.0)));
+					lag: 0.5;
+					stagebound: 1;
+					camerabound: 1;
+				}
+			}
+		}
+		if map(_vnix_ko_flag) = 11 && pos Y > ((gameHeight * -1.0) + stageVar(camera.boundhigh)) * 0.5 {
+			zoom{
+				scale: 1.0;
+				time: 60;
+				pos: cond(p2bodydist x > 120, (p2, pos x),((pos x + p2, pos x) / 2.0)),
+					 cond(p2bodydist x > 120, (p2, pos y), (max(stagevar(camera.boundhigh), (pos y + p2, pos y) / 4.0)));
+				lag: 0.992;
+				stagebound: 1;
+				camerabound: 1;
+			}
+		}
+	}
+
+	#;-------------------------------------------------------------------------------------
+	# Single, Tag & Turns
+	if matchOver && win && map(_vnix_winmusic_cfg_enable) != 0 {
+		assertSpecial{flag: nobardisplay}
+		if time = [1,800] {
+			AssertSpecial{flag: roundnotover}
+		}
+		
+		# Winner Music
+		if RoundState = 3 && playerNo = teamLeader && map(_vnix_winmusic) != 0 {
+			playSnd{value: VP 110, 0; channel: 200}
+			mapset{map: "_vnix_winmusic"; value: 0}
+		}
+
+		# Character Specific Effects
+		if RoundState = 4 {
+			mapadd{map: "_vnix_winfx"; value: 1}
+			screenBound{value: 0}
+			if map(_vnix_winfx) = 10 && playerNo = teamLeader {
+				# Winner Position
+				if teamMode != Tag {
+					posset{x: 0}
+				}
+				call F_Vnix_WinFX();
+			}
+		}
+	}
+}

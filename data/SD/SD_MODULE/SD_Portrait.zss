@@ -1,0 +1,187 @@
+
+[StateDef +1]
+
+for i = 1; 8; 1 { # Ikemen supports up to 8 players
+	if playerIDexist(player($i), ID) {
+		if player($i), isasserted(nobardisplay) {
+			mapset{map: "_vnix_port_hidegauge"; value: 1; redirectID: player(teamleader), ID}
+			mapset{map: "_vnix_port_hidegauge"; value: 1; redirectID: player(enemy, teamleader), ID}
+			break;
+		}
+	}
+}
+
+# Reactive Portraits Test
+ignorehitpause if Roundstate = 2
+&& !isHelper
+&& (teamside = 1 || teamside = 2)
+&& map(_vnix_port_hidegauge) = 0 
+&& standBy = 0
+&& playerNo = teamLeader
+&& alive {
+
+	if movetype = H && stateno != [120,155] {
+		removeExplod{id: 2999102}
+		if gethitvar(hitshaketime) >= 1 {
+			explod{
+				anim: 2999102; 
+				id: 2999105; 
+				postype: left;          
+				bindtime: 1;
+				facing: cond(teamside = 1, 1, -1);		
+				sprpriority: -200; 
+				random: 2,2;
+				pos: cond(teamside = 1, const240p(0), const240p(320)), const240p(4);
+				removetime: 1;          # refresh loop
+				pausemovetime: -1;
+				supermovetime: -1;
+				scale: .7,.7;#1 * const(size.xscale) * (scale x), .7* const(size.yscale) * (scale y);
+				ownpal: 1;
+				# window: -12.5,-10,12.5,15;
+				palfx.time: -1;
+				palfx.mul: 200,50,50;
+				palfx.add: 100,50,50;
+				ignorehitpause: 1;
+			}
+			# Experimental
+			explod{
+				anim: -1; #2999101; 
+				id: 2999101; 
+				postype: left;          
+				bindtime: 1;
+				facing: cond(teamside = 1, 1, -1);		
+				sprpriority: -200; 
+				random: 2,2;
+				pos: cond(teamside = 1, const240p(13), const240p(307)), const240p(14);
+				removetime: 1;          # refresh loop
+				pausemovetime: 0;
+				supermovetime: 0;
+				scale: .7 * const(size.xscale) * (scale x), .7 * const(size.yscale) * (scale y);
+				ownpal: 1;
+				window: const240p(-12.5/const(size.xscale)),const240p(-10/const(size.yscale)),
+						const240p(12.5/const(size.xscale)),const240p(15/const(size.yscale));
+				ignorehitpause: 1;
+			}
+		} else {
+			explod{
+				anim: 2999102; 
+				id: 2999105; 
+				postype: left;          
+				bindtime: 1;
+				facing: cond(teamside = 1, 1, -1);		
+				sprpriority: -200; 
+				pos: cond(teamside = 1, const240p(0), const240p(320)), const240p(4);
+				removetime: 1;          # refresh loop
+				pausemovetime: -1;
+				supermovetime: -1;
+				scale: .7,.7;#1 * const(size.xscale) * (scale x), .7 * const(size.yscale) * (scale y);
+				ownpal: 1;
+				ignorehitpause: 1;
+			}
+			# Experimental
+			explod{
+				anim: -1; #2999101; 
+				id: 2999101; 
+				postype: left;          
+				bindtime: 1;
+				facing: cond(teamside = 1, 1, -1);
+				sprpriority: -200; 
+				pos: cond(teamside = 1, const240p(13), const240p(307)), const240p(14);
+				removetime: 1;          # refresh loop
+				pausemovetime: 0;
+				supermovetime: 0;
+				scale: .7 * const(size.xscale) * (scale x), .7* const(size.yscale) * (scale y);
+				ownpal: 1;
+				window: const240p(-12.5/const(size.xscale)),const240p(-10/const(size.yscale)),
+						const240p(12.5/const(size.xscale)),const240p(15/const(size.yscale));
+				ignorehitpause: 1;
+			}
+		}
+	} else {
+		explod{
+			anim: 2999102; 
+			id: 2999102; 
+			postype: left;          
+			bindtime: 1;
+			facing: cond(teamside = 1, 1, -1);		
+			sprpriority: -1000; 
+			pos: cond(teamside = 1, const240p(0), const240p(320)), const240p(4);
+			removetime: 1;          # refresh loop
+			pausemovetime: -1;
+			supermovetime: -1;
+			scale: .7,.7;#1 * const(size.xscale) * (scale x), .7 * const(size.yscale) * (scale y);
+			ownpal: 1;
+			# window: -12.5,-10,12.5,15;
+			ignorehitpause: 1;
+		}
+		# Stand Anim Test ----------
+		#if numExplod(2999105) = 0 {
+		explod{
+			anim: -1; #0;
+			animfreeze: 1 ;
+			id: 2999105; 
+			postype: left;          
+			bindtime: 1;
+			facing: cond(teamside = 1, 1, -1);		
+			sprpriority: -200; 
+			pos: cond(teamside = 1, const240p(8 + (const(size.head.pos.x) - (2.0 * const(size.head.pos.x)))),
+				 const240p(312 + ((-1.0 * const(size.head.pos.x)) + (2.0 * const(size.head.pos.x))))),
+				 const240p(14 + (const(size.head.pos.y) - (2 * const(size.head.pos.y))));
+			removetime: 1;          # refresh loop
+			pausemovetime: 0;
+			supermovetime: 0;
+			scale: .7 * const(size.xscale) * (scale x), .7* const(size.yscale) * (scale y);
+			ownpal: 1;
+			window: const240p((const(size.head.pos.x) - 8)/const(size.xscale)),const240p((const(size.head.pos.y) - 10)/const(size.yscale)),
+					const240p((const(size.head.pos.x) + 17)/const(size.xscale)),const240p((const(size.head.pos.y) + 15)/const(size.yscale));
+			ignorehitpause: 1;
+		}
+		#}
+	}
+}
+
+# Reset gauge hidden flag
+mapset{map: "_vnix_port_hidegauge"; value: 0}
+
+# Super Port Test
+ignorehitpause if Roundstate = 2
+&& !isHelper
+&& (teamside = 1 || teamside = 2)
+&& standBy = 0
+&& playerno = teamleader
+&& alive {
+	if map(_vnix_super_port) = 0 &&
+	(stateno = const(char.supermove1)
+	|| stateno = const(char.supermove2))
+	{
+		if time = 0 {
+			mapset{map: "_vnix_super_port"; value: 1}
+			explod{
+				anim: -1; #2999100;
+				ID: 2999100;
+				postype: left;
+				pos: 10,10;
+				scale: 2,2;
+				vel: cond(teamSide = 1, 0, -.5),0;
+				facing: 1;
+				ontop: 0;
+				sprpriority: -5;
+				removetime: 40;
+				pausemovetime: -1;
+				supermovetime: -1;
+				trans: addalpha;
+				alpha: 0,256;
+				window: const240p(0),const240p(13),const240p(112),const240p(89);
+				interpolation.time: 30;
+				interpolation.alpha: 256,0;
+				interpolation.scale: 1,1;
+			}
+		}
+	}
+	
+	if (stateno != const(char.supermove1)
+	|| stateno != const(char.supermove2))
+	{
+		mapset{map: "_vnix_super_port"; value: 0}
+	}
+}

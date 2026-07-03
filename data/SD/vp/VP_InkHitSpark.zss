@@ -1,0 +1,714 @@
+
+#===============================================================================
+# Configuration
+#===============================================================================
+
+[Function F_Vnix_InkSpark_Config()]
+
+# Ink Spark FX
+mapset{map: "_vnix_inkfx_cfg_enable"; value: 1} 		# Enable Ink Spark FX, 0 to disable
+mapset{map: "_vnix_inkfx_proj"; value: 1} 				# Enable Ink Spark FX on Projectiles & Helpers, 0 to disable (not stable yet)
+
+
+[StateDef -4]
+
+ignoreHitPause if !ishelper && (teamside = 1 || teamside = 2) && gamemode = "fightchallenge"  || gamemode =  "fightchallengevs"   {
+
+	# Initialize
+	if roundstate = 0 && time = 0 {
+		# Run config
+		call F_Vnix_InkSpark_Config();
+	}
+}
+
+ignoreHitPause if !const(Default.Enable.Action) || isHelper || teamSide = 0 {
+	# Do nothing, global code disabled locally or executed by helper or stage
+} else if roundState >= 2 {
+
+# ========================================================================================================================================
+# V-Nix - Custom Ink Hit Spark
+# ========================================================================================================================================
+	
+	if map(_vnix_inkfx_cfg_enable) != 0 && playerNo = teamLeader # && map(_vnix_hardhit) = 0
+	{
+	
+		if movehit && moveHitVar(frame) && moveHitVar(SparkX) != 0 && moveHitVar(SparkY) != 0
+		&& p2,GetHitVar(attr) = SCA, AA && pausetime = 0 && LocalCoord X <= 320
+		{
+			RemoveExplod{id: 10012}
+			RemoveExplod{id: 10060}
+			RemoveExplod{id: 10061}
+			RemoveExplod{id: 10062}
+			RemoveExplod{id: 30000}
+			RemoveExplod{id: 30003}
+			RemoveExplod{id: 30004}
+			RemoveExplod{id: 30005}
+			#mapset{map: "_vnix_hardhit"; value: 1}
+			# Impact
+			explod{
+				anim:  VP 10012;
+				ID: 10012;
+				postype: p1;
+				pos: const240p(MoveHitVar(SparkX)), const240p(MoveHitVar(SparkY));
+				scale: .5,.5;
+				angle: 0;
+				facing: 1;
+				ontop: 0;
+				trans: addalpha;
+				alpha: 128,128;
+				sprpriority: 1;
+				removetime: -2;
+				#pausemovetime: 1000;
+				#supermovetime: 1000;
+				ownpal: 1
+			}
+			# Impact Spark 1
+			explod{
+				anim: VP 10060;
+				ID: 10060;
+				postype: p1;
+				pos: const240p(MoveHitVar(SparkX)), const240p(MoveHitVar(SparkY));
+				scale: ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .5, .75)),(ifelse(Random <= 500, .5, .75))),
+					   ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .5, .75)),(ifelse(Random <= 500, .5, .75)));
+				angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+				facing: (ifelse(Random <= 500, 1, -1));
+				vfacing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				sprpriority: 0;
+				removetime: -2;
+				#pausemovetime: 1000;
+				#supermovetime: 1000;
+				ownpal: 1;
+				trans: Add
+			}
+			# Impact Spark 2
+			explod{
+				anim: VP 10061;
+				ID: 10061;
+				postype: p1;
+				pos: const240p(MoveHitVar(SparkX)), const240p(MoveHitVar(SparkY));
+				scale: ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .5, .75)),(ifelse(Random <= 500, .5, .75))),
+				       ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .5, .75)),(ifelse(Random <= 500, .5, .75)));
+				angle: -30 + ((Random / 33)*(ifelse(Random <= 500, 1, -1)));
+				facing: (ifelse(Random <= 500, 1, -1));
+				vfacing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				sprpriority: 3;
+				removetime: -2;
+				#pausemovetime: 1000;
+				#supermovetime: 1000;
+				ownpal: 1;
+				trans: Add
+			}
+			# Impact Spark 3
+			explod{
+				anim: VP 10062;
+				ID: 10062;
+				postype: p1;
+				pos: const240p(MoveHitVar(SparkX)), const240p(MoveHitVar(SparkY));
+				scale: ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .5, .75)),(ifelse(Random <= 500, .5, .75))),
+				       ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .5, .75)),(ifelse(Random <= 500, .5, .75)));
+				angle: -30 + ((Random / 33)*(ifelse(Random <= 500, 1, -1)));
+				facing: (ifelse(Random <= 500, 1, -1));
+				vfacing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				sprpriority: 3;
+				removetime: -2;
+				#pausemovetime: 1000;
+				#supermovetime: 1000;
+				ownpal: 1;
+				trans: Add
+			}
+			# Ink Effect
+			if TeamSide = 1 {
+				explod{
+					anim: VP 30004;
+					ID: 30004;
+					postype: p1;
+					pos: const240p(MoveHitVar(SparkX)), const240p(MoveHitVar(SparkY));
+					scale: ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .75, .66)),(ifelse(Random <= 500, .5, .66))),
+						   ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .75, .66)),(ifelse(Random <= 500, .5, .66)));
+					angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+					facing: (ifelse(Random <= 500, 1, -1));
+					vfacing: (ifelse(Random <= 500, 1, -1));
+					ontop: 0;
+					sprpriority: 3;
+					removetime: -2;
+					trans: addalpha;
+					alpha: 200, 32;
+					pausemovetime: 0;
+					supermovetime: 0;
+					ownpal: 1;
+					PalFx.Time: 18;
+					PalFx.Mul: 255, 140 + random%50, 0;
+					PalFx.Add: 100, 0, 0
+					#Interpolation.Time: 15;
+					#Interpolation.PalFx.Mul: 255, 215, 0;
+				}
+				explod{
+					anim: VP 30003;
+					ID: 30003;
+					postype: p1;
+					pos: const240p(MoveHitVar(SparkX)), const240p(MoveHitVar(SparkY));
+					scale: ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .75, .6)),(ifelse(Random <= 500, .5, .6))),
+						   ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .75, .6)),(ifelse(Random <= 500, .5, .6)));
+					angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+					facing: (ifelse(Random <= 500, 1, -1));
+					vfacing: (ifelse(Random <= 500, 1, -1));
+					ontop: 0;
+					vel: 0,0;
+					sprpriority: -2;
+					removetime: -2;
+					trans: addalpha;
+					alpha: 200, 32;
+					pausemovetime: 0;
+					supermovetime: 0;
+					ownpal: 1;
+					PalFx.Time: 15;
+					PalFx.Mul: 0, 191, 255;
+					PalFx.Add: 0, 0, 100;
+					#Interpolation.Time: 15;
+					#Interpolation.PalFx.Mul: 256, 0, 0;
+				}
+			} else {
+				explod{
+					anim: VP 30004;
+					ID: 30004;
+					postype: p1;
+					pos: const240p(MoveHitVar(SparkX)), const240p(MoveHitVar(SparkY));
+					scale: ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .75, .66)),(ifelse(Random <= 500, .5, .66))),
+						   ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .75, .66)),(ifelse(Random <= 500, .5, .66)));
+					angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+					facing: (ifelse(Random <= 500, 1, -1));
+					vfacing: (ifelse(Random <= 500, 1, -1));
+					ontop: 0;
+					sprpriority: 3;
+					removetime: -2;
+					trans: addalpha;
+					alpha: 200, 32;
+					pausemovetime: 0;
+					supermovetime: 0;
+					ownpal: 1;
+					PalFx.Time: 18;
+					PalFx.Mul: 0, 191, 255;
+					PalFx.Add: 0, 0, 100;
+					#Interpolation.Time: 15;
+					#Interpolation.PalFx.Mul: 256, 0, 0;
+				}
+				explod{
+					anim: VP 30003;
+					ID: 30003;
+					postype: p1;
+					pos: const240p(MoveHitVar(SparkX)), const240p(MoveHitVar(SparkY));
+					scale: ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .75, .6)),(ifelse(Random <= 500, .5, .6))),
+						   ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .75, .6)),(ifelse(Random <= 500, .5, .6)));
+					angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+					facing: (ifelse(Random <= 500, 1, -1));
+					vfacing: (ifelse(Random <= 500, 1, -1));
+					ontop: 0;
+					vel: 0,0;
+					sprpriority: -2;
+					removetime: -2;
+					trans: addalpha;
+					alpha: 200, 32;
+					pausemovetime: 0;
+					supermovetime: 0;
+					ownpal: 1;
+					PalFx.Time: 15;
+					PalFx.Mul: 255, 140 + random%50, 0;
+					PalFx.Add: 100, 0, 0;
+					#Interpolation.Time: 15;
+					#Interpolation.PalFx.Mul: 255, 0, 0;
+					#Interpolation.PalFx.Add: 25, 0, 0;
+				}
+			}
+			# Spark Effect
+			explod{
+				anim: VP (ifelse(p2,GetHitVar(damage) >= 50,30001, 30000));
+				ID: 30000;
+				postype: p1;
+				pos: const240p(MoveHitVar(SparkX)), const240p(MoveHitVar(SparkY));
+				scale: (ifelse(Random <= 500, .33, .25)),(ifelse(Random <= 500, .33, .25));
+				angle: Random / 3;
+				facing: (ifelse(Random <= 500, 1, -1));
+				vfacing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				sprpriority: -2;
+				removetime: -2;
+				#pausemovetime: 1000;
+				#supermovetime: 1000;
+				trans: add
+			}
+			if p2,GetHitVar(damage) >= 100 {
+				explod{
+					anim: VP 30005;
+					ID: 30005;
+					postype: p1;
+					pos: const240p(MoveHitVar(SparkX)), const240p((MoveHitVar(SparkY)) + 6);
+					scale: (ifelse(Random <= 500, .5, .33)), (ifelse(Random <= 500, .5, .33));
+					angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+					facing: 1;
+					vfacing: (ifelse(Random <= 500, 1, -1));
+					ontop: 0;
+					sprpriority: -3;
+					removetime: -2;
+					#pausemovetime: 1000;
+					#supermovetime: 1000;
+					ownpal: 1
+				}
+			}
+		} else if movehit && moveHitVar(frame) && moveHitVar(SparkX) = 0 && moveHitVar(SparkY) = 0
+		&& p2,GetHitVar(attr) = SCA, AA && pausetime = 0 && LocalCoord X > 320
+		{
+			RemoveExplod{id: 10012}
+			RemoveExplod{id: 10060}
+			RemoveExplod{id: 10061}
+			RemoveExplod{id: 10062}
+			RemoveExplod{id: 30000}
+			RemoveExplod{id: 30003}
+			RemoveExplod{id: 30004}
+			RemoveExplod{id: 30005}
+			#mapset{map: "_vnix_hardhit"; value: 1}
+			# Impact
+			explod{
+				anim: VP 10012;
+				ID: 10012;
+				postype: p2;
+				pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+				scale: .5,.5;
+				angle: 0;
+				facing: 1;
+				ontop: 0;
+				trans: addalpha;
+				alpha: 128,128;
+				sprpriority: 1;
+				removetime: -2;
+				#pausemovetime: 1000;
+				#supermovetime: 1000;
+				ownpal: 1
+			}
+			# Impact Spark 1
+			explod{
+				anim: VP 10060;
+				ID: 10060;
+				postype: p2;
+				pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+				scale: ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .5, .75)),(ifelse(Random <= 500, .5, .75))),
+					   ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .5, .75)),(ifelse(Random <= 500, .5, .75)));
+				angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+				facing: (ifelse(Random <= 500, 1, -1));
+				vfacing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				sprpriority: 0;
+				removetime: -2;
+				#pausemovetime: 1000;
+				#supermovetime: 1000;
+				ownpal: 1;
+				trans: Add
+			}
+			# Impact Spark 2
+			explod{
+				anim: VP 10061;
+				ID: 10061;
+				postype: p2;
+				pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+				scale: ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .5, .75)),(ifelse(Random <= 500, .5, .75))),
+				       ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .5, .75)),(ifelse(Random <= 500, .5, .75)));
+				angle: -30 + ((Random / 33)*(ifelse(Random <= 500, 1, -1)));
+				facing: (ifelse(Random <= 500, 1, -1));
+				vfacing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				sprpriority: 3;
+				removetime: -2;
+				#pausemovetime: 1000;
+				#supermovetime: 1000;
+				ownpal: 1;
+				trans: Add
+			}
+			# Impact Spark 3
+			explod{
+				anim: VP 10062;
+				ID: 10062;
+				postype: p2;
+				pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+				scale: ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .5, .75)),(ifelse(Random <= 500, .5, .75))),
+				       ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .5, .75)),(ifelse(Random <= 500, .5, .75)));
+				angle: -30 + ((Random / 33)*(ifelse(Random <= 500, 1, -1)));
+				facing: (ifelse(Random <= 500, 1, -1));
+				vfacing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				sprpriority: 3;
+				removetime: -2;
+				#pausemovetime: 1000;
+				#supermovetime: 1000;
+				ownpal: 1;
+				trans: Add
+			}
+			# Ink Effect
+			if TeamSide = 1 {
+				explod{
+					anim: VP 30004;
+					ID: 30004;
+					postype: p2;
+					pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+					scale: ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .75, .66)),(ifelse(Random <= 500, .5, .66))),
+						   ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .75, .66)),(ifelse(Random <= 500, .5, .66)));
+					angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+					facing: (ifelse(Random <= 500, 1, -1));
+					vfacing: (ifelse(Random <= 500, 1, -1));
+					ontop: 0;
+					sprpriority: 3;
+					removetime: -2;
+					trans: addalpha;
+					alpha: 200, 32;
+					pausemovetime: 0;
+					supermovetime: 0;
+					ownpal: 1;
+					PalFx.Time: 18;
+					PalFx.Mul: 255, 140 + random%50, 0;
+					PalFx.Add: 100, 0, 0
+					#Interpolation.Time: 15;
+					#Interpolation.PalFx.Mul: 255, 215, 0;
+				}
+				explod{
+					anim: VP 30003;
+					ID: 30003;
+					postype: p2;
+					pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+					scale: ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .75, .6)),(ifelse(Random <= 500, .5, .6))),
+						   ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .75, .6)),(ifelse(Random <= 500, .5, .6)));
+					angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+					facing: (ifelse(Random <= 500, 1, -1));
+					vfacing: (ifelse(Random <= 500, 1, -1));
+					ontop: 0;
+					vel: 0,0;
+					sprpriority: -2;
+					removetime: -2;
+					trans: addalpha;
+					alpha: 200, 32;
+					pausemovetime: 0;
+					supermovetime: 0;
+					ownpal: 1;
+					PalFx.Time: 15;
+					PalFx.Mul: 0, 191, 255;
+					PalFx.Add: 0, 0, 100;
+					#Interpolation.Time: 15;
+					#Interpolation.PalFx.Mul: 256, 0, 0;
+				}
+			} else {
+				explod{
+					anim: VP 30004;
+					ID: 30004;
+					postype: p2;
+					pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+					scale: ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .75, .66)),(ifelse(Random <= 500, .5, .66))),
+						   ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .75, .66)),(ifelse(Random <= 500, .5, .66)));
+					angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+					facing: (ifelse(Random <= 500, 1, -1));
+					vfacing: (ifelse(Random <= 500, 1, -1));
+					ontop: 0;
+					sprpriority: 3;
+					removetime: -2;
+					trans: addalpha;
+					alpha: 200, 32;
+					pausemovetime: 0;
+					supermovetime: 0;
+					ownpal: 1;
+					PalFx.Time: 18;
+					PalFx.Mul: 0, 191, 255;
+					PalFx.Add: 0, 0, 100;
+					#Interpolation.Time: 15;
+					#Interpolation.PalFx.Mul: 256, 0, 0;
+				}
+				explod{
+					anim: VP 30003;
+					ID: 30003;
+					postype: p2;
+					pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+					scale: ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .75, .6)),(ifelse(Random <= 500, .5, .6))),
+						   ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .75, .6)),(ifelse(Random <= 500, .5, .6)));
+					angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+					facing: (ifelse(Random <= 500, 1, -1));
+					vfacing: (ifelse(Random <= 500, 1, -1));
+					ontop: 0;
+					vel: 0,0;
+					sprpriority: -2;
+					removetime: -2;
+					trans: addalpha;
+					alpha: 200, 32;
+					pausemovetime: 0;
+					supermovetime: 0;
+					ownpal: 1;
+					PalFx.Time: 15;
+					PalFx.Mul: 255, 140 + random%50, 0;
+					PalFx.Add: 100, 0, 0
+					#Interpolation.Time: 15;
+					#Interpolation.PalFx.Mul: 255, 215, 0;
+				}
+			}
+			# Spark Effect
+			explod{
+				anim: VP (ifelse(p2,GetHitVar(damage) >= 50,30001, 30000));
+				ID: 30000;
+				postype: p2;
+				pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+				scale: (ifelse(Random <= 500, .33, .25)),(ifelse(Random <= 500, .33, .25));
+				angle: Random / 3;
+				facing: (ifelse(Random <= 500, 1, -1));
+				vfacing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				sprpriority: 2;
+				removetime: -2;
+				#pausemovetime: 1000;
+				#supermovetime: 1000;
+				trans: add
+			}
+			if p2,GetHitVar(damage) >= 100 {
+				explod{
+					anim: VP 30005;
+					ID: 30005;
+					postype: p2;
+					pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y) + 6;
+					scale: (ifelse(Random <= 500, .5, .33)), (ifelse(Random <= 500, .5, .33));
+					angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+					facing: 1;
+					vfacing: (ifelse(Random <= 500, 1, -1));
+					ontop: 0;
+					sprpriority: -3;
+					removetime: -2;
+					#pausemovetime: 1000;
+					#supermovetime: 1000;
+					ownpal: 1
+				}
+			}
+		} else if map(_vnix_inkfx_proj) != 0 && p2, getHitVar(frame) && p2, GetHitVar(attr) = SCA, AP
+		&& getHitVar(hitshaketime) < 5 && pausetime = 0  && p2, getHitVar(guarded) = 0
+		{
+			RemoveExplod{id: 10012}
+			RemoveExplod{id: 10060}
+			RemoveExplod{id: 10061}
+			RemoveExplod{id: 10062}
+			RemoveExplod{id: 30000}
+			RemoveExplod{id: 30003}
+			RemoveExplod{id: 30004}
+			RemoveExplod{id: 30005}
+			#mapset{map: "_vnix_hardhit"; value: 1}
+			# Impact
+			explod{
+				anim: VP 10012;
+				ID: 10012;
+				postype: p2;
+				pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+				scale: .5,.5;
+				angle: 0;
+				facing: 1;
+				ontop: 0;
+				trans: addalpha;
+				alpha: 128,128;
+				sprpriority: 1;
+				removetime: -2;
+				#pausemovetime: 1000;
+				#supermovetime: 1000;
+				ownpal: 1
+			}
+			# Impact Spark 1
+			explod{
+				anim: VP 10060;
+				ID: 10060;
+				postype: p2;
+				pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+				scale: ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .5, .75)),(ifelse(Random <= 500, .5, .75))),
+					   ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .5, .75)),(ifelse(Random <= 500, .5, .75)));
+				angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+				facing: (ifelse(Random <= 500, 1, -1));
+				vfacing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				sprpriority: 0;
+				removetime: -2;
+				#pausemovetime: 1000;
+				#supermovetime: 1000;
+				ownpal: 1;
+				trans: Add
+			}
+			# Impact Spark 2
+			explod{
+				anim: VP 10061;
+				ID: 10061;
+				postype: p2;
+				pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+				scale: ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .5, .75)),(ifelse(Random <= 500, .5, .75))),
+				       ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .5, .75)),(ifelse(Random <= 500, .5, .75)));
+				angle: -30 + ((Random / 33)*(ifelse(Random <= 500, 1, -1)));
+				facing: (ifelse(Random <= 500, 1, -1));
+				vfacing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				sprpriority: 3;
+				removetime: -2;
+				#pausemovetime: 1000;
+				#supermovetime: 1000;
+				ownpal: 1;
+				trans: Add
+			}
+			# Impact Spark 3
+			explod{
+				anim: VP 10062;
+				ID: 10062;
+				postype: p2;
+				pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+				scale: ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .5, .75)),(ifelse(Random <= 500, .5, .75))),
+				       ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .5, .75)),(ifelse(Random <= 500, .5, .75)));
+				angle: -30 + ((Random / 33)*(ifelse(Random <= 500, 1, -1)));
+				facing: (ifelse(Random <= 500, 1, -1));
+				vfacing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				sprpriority: 3;
+				removetime: -2;
+				#pausemovetime: 1000;
+				#supermovetime: 1000;
+				ownpal: 1;
+				trans: Add
+			}
+			# Ink Effect
+			if TeamSide = 1 {
+				explod{
+					anim: VP 30004;
+					ID: 30004;
+					postype: p2;
+					pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+					scale: ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .75, .66)),(ifelse(Random <= 500, .5, .66))),
+						   ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .75, .66)),(ifelse(Random <= 500, .5, .66)));
+					angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+					facing: (ifelse(Random <= 500, 1, -1));
+					vfacing: (ifelse(Random <= 500, 1, -1));
+					ontop: 0;
+					sprpriority: 3;
+					removetime: -2;
+					trans: addalpha;
+					alpha: 200, 32;
+					pausemovetime: 0;
+					supermovetime: 0;
+					ownpal: 1;
+					PalFx.Time: 18;
+					PalFx.Mul: 255, 140 + random%50, 0;
+					PalFx.Add: 100, 0, 0
+					#Interpolation.Time: 15;
+					#Interpolation.PalFx.Mul: 255, 215, 0;
+				}
+				explod{
+					anim: VP 30003;
+					ID: 30003;
+					postype: p2;
+					pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+					scale: ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .75, .6)),(ifelse(Random <= 500, .5, .6))),
+						   ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .75, .6)),(ifelse(Random <= 500, .5, .6)));
+					angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+					facing: (ifelse(Random <= 500, 1, -1));
+					vfacing: (ifelse(Random <= 500, 1, -1));
+					ontop: 0;
+					vel: 0,0;
+					sprpriority: -2;
+					removetime: -2;
+					trans: addalpha;
+					alpha: 200, 32;
+					pausemovetime: 0;
+					supermovetime: 0;
+					ownpal: 1;
+					PalFx.Time: 15;
+					PalFx.Mul: 0, 191, 255;
+					PalFx.Add: 0, 0, 100;
+					#Interpolation.Time: 15;
+					#Interpolation.PalFx.Mul: 256, 0, 0;
+				}
+			} else {
+				explod{
+					anim: VP 30004;
+					ID: 30004;
+					postype: p2;
+					pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+					scale: ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .75, .66)),(ifelse(Random <= 500, .5, .66))),
+						   ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .75, .66)),(ifelse(Random <= 500, .5, .66)));
+					angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+					facing: (ifelse(Random <= 500, 1, -1));
+					vfacing: (ifelse(Random <= 500, 1, -1));
+					ontop: 0;
+					sprpriority: 3;
+					removetime: -2;
+					trans: addalpha;
+					alpha: 200, 32;
+					pausemovetime: 0;
+					supermovetime: 0;
+					ownpal: 1;
+					PalFx.Time: 18;
+					PalFx.Mul: 0, 191, 255;
+					PalFx.Add: 0, 0, 100;
+					#Interpolation.Time: 15;
+					#Interpolation.PalFx.Mul: 256, 0, 0;
+				}
+				explod{
+					anim: VP 30003;
+					ID: 30003;
+					postype: p2;
+					pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+					scale: ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .75, .6)),(ifelse(Random <= 500, .5, .6))),
+						   ifelse(p2,GetHitVar(damage) >= 50,(ifelse(Random <= 500, .75, .6)),(ifelse(Random <= 500, .5, .6)));
+					angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+					facing: (ifelse(Random <= 500, 1, -1));
+					vfacing: (ifelse(Random <= 500, 1, -1));
+					ontop: 0;
+					vel: 0,0;
+					sprpriority: -2;
+					removetime: -2;
+					trans: addalpha;
+					alpha: 200, 32;
+					pausemovetime: 0;
+					supermovetime: 0;
+					ownpal: 1;
+					PalFx.Time: 15;
+					PalFx.Mul: 255, 140 + random%50, 0;
+					PalFx.Add: 100, 0, 0
+					#Interpolation.Time: 15;
+					#Interpolation.PalFx.Mul: 255, 215, 0;
+				}
+			}
+			# Spark Effect
+			explod{
+				anim: VP (ifelse(p2,GetHitVar(damage) >= 50,30001, 30000));
+				ID: 30000;
+				postype: p2;
+				pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+				scale: (ifelse(Random <= 500, .33, .25)),(ifelse(Random <= 500, .33, .25));
+				angle: Random / 3;
+				facing: (ifelse(Random <= 500, 1, -1));
+				vfacing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				sprpriority: 2;
+				removetime: -2;
+				#pausemovetime: 1000;
+				#supermovetime: 1000;
+				trans: add
+			}
+			if p2,GetHitVar(damage) >= 100 {
+				explod{
+					anim: VP 30005;
+					ID: 30005;
+					postype: p2;
+					pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y) + 6;
+					scale: (ifelse(Random <= 500, .5, .33)), (ifelse(Random <= 500, .5, .33));
+					angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+					facing: 1;
+					vfacing: (ifelse(Random <= 500, 1, -1));
+					ontop: 0;
+					sprpriority: -3;
+					removetime: -2;
+					#pausemovetime: 1000;
+					#supermovetime: 1000;
+					ownpal: 1
+				}
+			}
+		}
+	}
+	# Reset Hit Variable
+	#if map(_vnix_hardhit) != 0 && (p2, GetHitVar(hittime) < 5 || p2, GetHitVar(hitshaketime) < 5 || p2, GetHitVar(slidetime) < 5) {
+	#	mapset{map: "_vnix_hardhit"; value: 0}
+	#}
+}

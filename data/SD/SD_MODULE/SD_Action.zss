@@ -1,0 +1,847 @@
+
+#===============================================================================
+# Configuration
+#===============================================================================
+
+[Function F_Vnix_Action_Config()]
+
+# Enable Effects
+mapset{map: "_vnix_firstattack_cfg_enable"; value: 1} 	# Enable First Attack FX, 0 to disable
+mapset{map: "_vnix_counter_cfg_enable"; value: 1} 		# Enable Counter FX, 0 to disable
+mapset{map: "_vnix_superwin_cfg_enable"; value: 1} 		# Enable Super Win FX, 0 to disable
+mapset{map: "_vnix_hyperwin_cfg_enable"; value: 1} 		# Enable Hyper Win FX, 0 to disable
+
+# Smash Impact
+mapset{map: "_vnix_smashimpact_cfg_enable"; value: 1} 	# Enable Smash Impact, 0 to disable
+mapset{map: "_vnix_smashimpact_cfg_dmg"; value: 0} 	# Smash Impact Damage, positive means affected player gains life
+
+
+# ========================================================================================================================================
+# Global states (not halted by Pause/SuperPause, no helper limitations)
+# ========================================================================================================================================
+#
+#
+[StateDef -4]
+
+ignorehitpause if !ishelper && (teamside = 1 || teamside = 2) {
+
+	# Initialize
+	if roundstate = 0 {
+		if time = 0 {
+			# Run config
+			call F_Vnix_Action_Config();
+			mapset{map: "_vnix_critical_finish"; value: 0;}
+		}
+		AssertSpecial{flag: nobardisplay}
+	}
+	
+	# No bar display on win & remove explods
+	if Roundstate = [3,4] && !matchOver {
+		AssertSpecial{flag: nobardisplay}
+		removeExplod{id: 30501;}
+		removeExplod{id: 10027;}
+		removeExplod{id: 10033;}
+	}
+	
+	# No bar display on win & remove explods
+	if Roundstate = [3,4] {
+		# Critical KO Effects
+		if map(_vnix_critical_finish) {
+			assertSpecial{flag: nomusic}
+			bgpalfx{time: -1; color: 0; mul: 200,200,200;}
+			if numExplod(121) = 0 {
+				explod{
+					anim: VP 121;
+					id: 121;
+					postype: left;
+					pos: 0,0;
+					scale: 2,2;
+					angle: 0;
+					facing: 1;
+					ontop: 0;
+					under: 1;
+					sprpriority: 5;
+					removetime: -1;
+					pausemovetime: -1;
+					supermovetime: -1;
+					trans: Addalpha;
+					alpha: 128,256;
+					ownpal: 1;
+					#interpolation.time: 300;
+					#interpolation.alpha: 0,256;
+				}
+			}
+		}
+	}
+	
+	# Force enemy out of Bounds
+	if lose {
+		screenBound{value: 0}
+	}
+	
+	# KO Timer for Zoom
+	if fightScreenState(RoundDisplay) {
+		# Reset Maps
+		mapset{map: "_vnix_ko_flag"; value: 0}
+	}
+	
+	# Zoom to Winning Player
+	if Roundstate = 4 {
+		if !matchOver && lose {
+			zoom{
+				scale: 1.1;
+				time: 1;
+				pos: p2, Pos X, p2, Pos Y;
+				lag: 0.95;
+				stagebound: 1;
+				camerabound: 0;
+			}
+		}
+		if matchOver && lose {
+			zoom{
+				scale: 1.0;
+				time: 1;
+				pos: p2, Pos X, p2, Pos Y;
+				lag: 0.9985;
+				stagebound: 1;
+				camerabound: 0;
+			}
+			zoom{
+				scale: 1.5;
+				time: 1;
+				pos: 0, 0;
+				lag: 0.9985;
+				stagebound: 1;
+				camerabound: 0;
+			}
+		}
+	}
+	# bordes negros en rank
+	if Roundstate = 4 {
+		if !matchOver && lose {	
+		explod{
+		    anim: SD 3020;
+		    postype: LEFT;
+		    pos: -60,90;
+	        scale: 0.8,3;
+			angle: 0;
+			bindtime:-1;
+			ontop: 0;
+			sprpriority: -10;
+			pausemovetime: -1;
+			supermovetime: -1;
+			ownpal: 1;
+			}
+		explod{
+		    anim: SD 3020;
+		    postype: right;
+		    pos: 60,90;
+	        scale: 0.8,3;
+			angle: 0;
+			bindtime:-1;
+			ontop: 0;
+			facing: -1;
+			sprpriority: -10;
+			pausemovetime: -1;
+			supermovetime: -1;
+			ownpal: 1;
+			}
+		}
+	}	
+}
+# ========================================================================================================================================
+# V-Nix - Global IKEMEN Actions 
+# ========================================================================================================================================
+
+ignoreHitPause if !const(Default.Enable.Action) || isHelper || teamSide = 0 {
+	# Do nothing, global code disabled locally or executed by helper or stage
+} else if roundState >= 2 {
+
+	#;-------------------------------------------------------------------------------------
+	# First Attack
+	let ret = call IkSys_FirstAttack();
+	if $ret {
+		lifebarAction{spr: const(MsgFirstAttack), 0; top: 1}
+ 		lifebarAction{snd: 100, 0}
+		lifebarAction{snd: 10, 3}
+		if map(_vnix_firstattack_cfg_enable) != 0 {
+			superPause{
+				pos: 25, -57;
+				anim: -1;
+				poweradd: 500;
+				darken: 0;
+				time: 5;
+			}
+			bgpalfx{
+				time: 15;
+				add: -100, -100, -100;
+				sinadd: 64, 64, 64, 60;
+			}
+			# Check Localcoord & Spark Pos
+			if p2, gethitvar(attr) = SCA, AA && (MoveHitVar(SparkX) != 0 || MoveHitVar(SparkY) != 0) && LocalCoord X <= 320 {
+				# Ring
+				explod{
+					anim: VP 20015;
+					postype: p2;
+					pos:  p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+					scale: .35,.35;
+					angle: 0;
+					facing: (ifelse(Random <= 500, 1, -1));
+					ontop: 0;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1;
+					trans: Add
+				}
+				# Blue Spark
+				explod{
+					anim: VP 20016;
+					postype: p2;
+					pos:p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+					scale: .5,.5;
+					angle: 0;
+					facing: (ifelse(Random <= 500, 1, -1));
+					ontop: 1;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1;
+					trans: Add
+				} 
+			} else {
+				# Ring
+				explod{
+					anim: VP 20015;
+					postype: p2;
+					pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+					scale: .35,.35;
+					angle: 0;
+					facing: (ifelse(Random <= 500, 1, -1));
+					ontop: 0;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1;
+					trans: Add
+				}
+				# Blue Spark
+				explod{
+					anim: VP 20016;
+					postype: p2;
+					pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+					scale: .5,.5;
+					angle: 0;
+					facing: (ifelse(Random <= 500, 1, -1));
+					ontop: 1;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1;
+					trans: Add
+				}
+			}
+		}
+	}
+	
+	#;-------------------------------------------------------------------------------------
+	# Counter Hit
+	let ret = call IkSys_CounterHit();
+	if $ret && enemy, map(ikarmor_assertarmor) = 0 && enemy, map(ikarmor_assertarmor2) = 0 && enemy, map(_vnix_rush_armor) = 0 {
+		mapadd{map: "_vnix_counter_count"; value: 1}
+		lifebarAction{spr: const(MsgCounterHit), 0; top: 1}
+		lifebarAction{snd: 100, 1}
+		explod{
+		    anim: SD 3020;
+		    postype: LEFT;
+		    pos: -60,90;
+	        scale: 2,2;
+			angle: 0;
+			bindtime:-1;
+			ontop: 0;
+			sprpriority: -10;
+			pausemovetime: -1;
+			supermovetime: -1;
+			ownpal: 1;
+			}
+		explod{
+		    anim: SD 3020;
+		    postype: right;
+		    pos: 60,90;
+	        scale: 2,2;
+			angle: 0;
+			bindtime:-1;
+			ontop: 0;
+			facing: -1;
+			sprpriority: -10;
+			pausemovetime: -1;
+			supermovetime: -1;
+			ownpal: 1;
+		}
+	}
+	# Technical
+	let ret = call IkSys_Technical();
+	if $ret {
+		lifebarAction{spr: const(MsgTechnical), 0; top: 1}
+		lifebarAction{snd: 100, 2}
+	}
+	# Reversal
+	let ret = call IkSys_Reversal();
+	if $ret {
+		lifebarAction{spr: const(MsgReversal), 0; top: 1}
+		lifebarAction{snd: 100, 3}
+	}
+	# Parry
+	let ret = call IkSys_Parry();
+	if $ret {
+		lifebarAction{spr: const(MsgParry), 0; top: 1; redirectId: enemy,id}
+        lifebarAction{snd: 100, randomRange(4,7)}
+		explod{
+		    anim: SD 3020;
+		    postype: LEFT;
+		    pos: -60,90;
+	        scale: 2,2;
+			angle: 0;
+			bindtime:-1;
+			ontop: 0;
+			sprpriority: -10;
+			pausemovetime: -1;
+			supermovetime: -1;
+			ownpal: 1;
+			}
+		explod{
+		    anim: SD 3020;
+		    postype: right;
+		    pos: 60,90;
+	        scale: 2,2;
+			angle: 0;
+			bindtime:-1;
+			ontop: 0;
+			facing: -1;
+			sprpriority: -10;
+			pausemovetime: -1;
+			supermovetime: -1;
+			ownpal: 1;
+		}		
+		palfx{
+			time: 30;
+			add:(floor(fvar(35))), (floor(fvar(36))), (floor(fvar(37)));
+			color: 256;
+			redirectId: enemy,id;
+		}		
+	}
+	# Just Defend
+	let ret = call IkSys_JustDefend();
+	if $ret {
+		lifebarAction{spr: const(MsgJustDefend), 0; top: 1}
+		lifebarAction{snd: 100, randomRange(9,10)}
+	}
+	# Danger
+	let ret = call IkSys_Danger();
+	if $ret {
+		lifebarAction{spr: const(MsgDanger), 0; timeMul: 2; top: 1}
+ 		lifebarAction{snd: 100, 14}
+		palfx{
+			time: 30;
+			add: 255, 0, 0;
+			sinadd: -255, 0, 0, 120;
+		}
+	}
+	# Dizzy / Break
+	let ret = call IkSys_Dizzy();
+	if $ret {
+		lifebarAction{spr: const(MsgDizzy), 0; timeMul: 2; top: 1}
+		playsnd{value: VP 110, 16; volumescale: 200; freqmul: 1.0}
+		pause{time: 30;}
+		# Increase Break Points
+		modifyPlayer{attack: 100 + (map(_vnix_break_count) * 10); lifemax: lifeMax * 0.9; dizzyPointsMax: dizzyPointsMax * 1.1;}
+		# Break Effect
+		explod{
+			anim: VP 120;
+			postype: left;
+			pos: 0,0;
+			scale: 2,2;
+			angle: 0;
+			facing: 1;
+			ontop: 0;
+			under: 1;
+			removetime: -2;
+			pausemovetime: -1;
+			supermovetime: -1;
+			trans: Addalpha;
+			alpha: 256,256;
+			ownpal: 1;
+			interpolation.time: 30;
+			interpolation.alpha: 0,256;
+		}
+	}
+	# Combo Breaker
+	let ret = call IkSys_GuardBreak();
+	if $ret {
+		lifebarAction{spr: const(MsgGuardBreak), 0; timeMul: 2; top: 1}
+		lifebarAction{snd: 10, 11}
+		lifebarAction{snd: 10, 11}
+	}
+	# Partner Down
+	let ret = call IkSys_PartnerDown();
+	if $ret {
+		lifebarAction{spr: const(MsgPartnerDown), 0; top: 1}
+ 		lifebarAction{snd: 100, 11}
+		for i = 1; numpartner; 1 {
+			if partner($i - 1), alive = 1 {
+				palfx{time: -1; color: 0}
+				# Pause Screen
+				superPause{time: 30; darken: 0; anim: -1; redirectID: p2, ID}
+				# Screen flash
+				bgpalfx{
+					time: 30;
+					add: 256, 256, 256;
+					sinadd: -128, -128, -128, 120;
+				}
+				playsnd{value: VP 100, 40; volumescale:100; freqmul: 1.0}
+				break;
+			}
+		}
+	}
+	# code executed only by P1 and P2
+	if playerNo = teamSide {
+		# Combo Count
+		let ret = call IkSys_ComboCount();
+		if $ret {
+			# gdlk combo (mugen)
+			if $ret >= 25 {
+				lifebarAction{spr: const(MsgCombo25), 0; top: 1}
+				lifebarAction{snd: 200, 0}
+				lifebarAction{snd: 10, 10}
+				palfx{
+					time: 30;
+					add: 222, 201, 11;
+					sinadd: -222, -201, -11, 120;
+				}
+				afterImage{
+					length: 10;
+					palbright: 30, 30, 30;
+					palcontrast: 70, 70, 70;
+					paladd: -10, -10, -10;
+					palmul: .85, .85, .85;
+					timegap: 1;
+					framegap: 2;
+					trans: Add;
+					time: 30;
+				}	
+			# amazing combo (marvelous)
+			} else if $ret >= 20 {
+				lifebarAction{spr: const(MsgCombo20), 0; top: 1}
+				lifebarAction{snd: 10, 4}
+				palfx{
+					time: 25;
+					add: 143, 7, 202;
+					sinadd: -143, -7, -202, 120;
+				}
+				afterImage{
+					length: 10;
+					palbright: 30, 30, 30;
+					palcontrast: 70, 70, 70;
+					paladd: -10, -10, -10;
+					palmul: .85, .85, .85;
+					timegap: 1;
+					framegap: 2;
+					trans: Add;
+					time: 25;
+				}				
+			# great combo (fantastic)
+			} else if $ret >= 15 {
+				lifebarAction{spr: const(MsgCombo15), 0; top: 1}
+				lifebarAction{snd: 200, 2}
+				palfx{
+					time: 20;
+					add: 255, 255, 255;
+					sinadd: -255, -255, -255, 120;
+				}
+				afterImage{
+					length: 10;
+					palbright: 30, 30, 30;
+					palcontrast: 70, 70, 70;
+					paladd: -10, -10, -10;
+					palmul: .85, .85, .85;
+					timegap: 1;
+					framegap: 2;
+					trans: Add;
+					time: 20;
+				}				
+			# sweet combo (beautiful)
+			} else if $ret >= 10 {
+				lifebarAction{spr: const(MsgCombo10), 0; top: 1}
+				lifebarAction{snd: 10, 5}
+			# good combo (great)
+			} else if $ret >= 5 {
+				lifebarAction{spr: const(MsgCombo5), 0; top: 1}
+				lifebarAction{snd: 10,0}
+			# nice combo (good)
+			} else if $ret >= 3 {
+				lifebarAction{spr: const(MsgCombo3), 0; top: 1}
+				lifebarAction{snd: 200, 5}
+			}
+		}
+		# Win Perfect
+		let ret = call IkSys_WinPerfect();
+		if $ret {
+			lifebarAction{spr: const(MsgWinPerfect), 0; timeMul: 3; top: 1}
+			lifebarAction{snd: 10,7}
+			explod{
+				anim: VP 20502;
+				postype: left;
+				pos: const240p(160),const240p(85);
+				scale: 1.1,.25;
+				angle: 0;
+				facing: 1;
+				ontop: 1;
+				#trans: addalpha;
+				#alpha: 0,256;
+				sprpriority: 5;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				palfx.time: -1;
+				palfx.add: 255,255,255;
+				interpolation.time: 4;
+				interpolation.palfx.add: 0,0,0;
+				interpolation.scale: 1,1;
+				#interpolation.alpha: 256,0;
+			}
+			# Effects
+			explod{
+				anim: VP 20503;
+				postype: left;
+				pos: const240p(160),const240p(83.5);
+				scale: 2,1;
+				angle: 0;
+				facing: 1;
+				ontop: 1;
+				sprpriority: 5;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				palfx.time: -1;
+				palfx.add: 255,255,255;
+				palfx.mul: 255,255,255;
+			}
+			bgpalfx{
+				time: 30;
+				color: 0;
+			}
+		}
+		
+		#;-------------------------------------------------------------------------------------
+		# Win Hyper
+		let ret = call IkSys_WinHyper();
+		if $ret {
+			lifebarAction{spr: const(MsgWinHyper), 0; timeMul: 3; top: 1}
+			lifebarAction{snd: 10,14}
+			lifebarAction{snd: 10,14}
+			mapset{map: "_vnix_hyperko"; value: 1}
+			ScreenBound{value: 0}
+			ScreenBound{value: 1; RedirectID: p2, ID}
+			if map(_vnix_hyperwin_cfg_enable) != 0 {
+				# Glass Shatter 2
+				explod{
+					anim: VP 119;
+					postype: left;
+					pos: const240p(0),const240p(0);
+					scale: 1, 1;
+					angle: 0;
+					facing: 1;
+					ontop: 1;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1
+				}
+				playsnd{value: VP100, 27; volumescale:100; freqmul: 1.0}
+				# Light H
+				explod{
+					anim: VP 20000;
+					postype: left;
+					pos: const240p(160), const240p(120);
+					scale: .75,.75;
+					angle: 0;
+					facing: 1;
+					ontop: 0;
+					pausemovetime: -1;
+					supermovetime: -1;
+					sprpriority: -99;					
+					ownpal: 1
+				}
+				# Flash BG
+				explod{
+					anim: VP 20072;
+					postype: left;
+					pos: const240p(160), const240p(120);
+					scale: 2, 2.5;
+					angle: 0;
+					facing: 1;
+					ontop: 0;
+					pausemovetime: -1;
+					supermovetime: -1;
+					sprpriority: -99;
+					ownpal: 1;
+					trans: Add
+				}
+				# Red Ring BG
+				explod{
+					anim: VP 20070;
+					postype: left;
+					pos: const240p(160), const240p(120);
+					scale: .9, .9;
+					angle: 0;
+					facing: 1;
+					ontop: 0;
+					pausemovetime: -1;
+					supermovetime: -1;
+					sprpriority: -99;
+					ownpal: 1;
+					trans: Add
+				}
+				Pause{time: 30}
+				# Color BG
+				explod{
+					anim: VP 20106;
+					ID: 20106;
+					postype: left;
+					pos: const240p(0), const240p(0);
+					scale: 3, 3;
+					angle: 0;
+					facing: 1;
+					ontop: 0;
+					trans: addalpha;
+					alpha: 256, 64;
+					sprpriority: -99;
+					removetime: 30;
+					pausemovetime: -1;
+					supermovetime: -1;
+					palfx.time: 31;
+					palfx.mul: 160, 10, 0;
+					palfx.add: 0, 0, 0
+				}
+				# Zoom
+				if p2bodydist x > 120 {
+					zoom{
+						scale: 1.4;
+						time: 30;
+						pos: p2, pos x, p2, pos y;
+						lag: 0.758;
+						stagebound: 1;
+						camerabound: 1;
+					}
+				} else {
+					zoom{
+						scale: 1.4;
+						time: 30;
+						pos: (pos x + p2, pos x) / 2.0, max(stagevar(camera.boundhigh), (pos y + p2, pos y) / 4.0);
+						lag: 0.758;
+						stagebound: 1;
+						camerabound: 1;
+					}
+				}
+			}
+		}
+		
+		#;-------------------------------------------------------------------------------------
+		# Win Special
+		let ret = call IkSys_WinSpecial();
+		if $ret {
+			lifebarAction{spr: const(MsgWinSpecial), 0; timeMul: 3; top: 1}
+			lifebarAction{snd: 10,13}
+			lifebarAction{snd: 10,13}
+			mapset{map: "_vnix_superko"; value: 1}
+			ScreenBound{value: 0}
+			ScreenBound{value: 1; RedirectID: p2, ID}
+			if map(_vnix_superwin_cfg_enable) != 0 {
+				# Glass Shatter
+				explod{
+					anim: VP 118;
+					postype: left;
+					pos: const240p(0), const240p(0);
+					scale: 2, 2;
+					angle: 0;
+					facing: 1;
+					ontop: 1;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1
+				}
+				playsnd{value: VP100, 27; volumescale:100; freqmul: 1.0}
+				# Light S
+				explod{
+					anim: VP 20001;
+					postype: left;
+					pos: const240p(160), const240p(120);
+					scale: .75,.75;
+					angle: 0;
+					facing: 1;
+					ontop: 0;
+					pausemovetime: -1;
+					supermovetime: -1;
+					sprpriority: -99;
+					ownpal: 1
+				}
+				# Blue Ring BG
+				explod{
+					anim: VP 20060;
+					postype: left;
+					pos: const240p(160), const240p(120);
+					scale: .9, .9;
+					angle: 0;
+					facing: 1;
+					ontop: 0;
+					pausemovetime: -1;
+					supermovetime: -1;
+					sprpriority: -99;
+					ownpal: 1;
+					trans: Add
+				}
+				superPause{
+					pos: 0,0;
+					anim: -1;
+					poweradd: 0;
+					darken: 0;
+					time: 30;
+				}
+				# Color BG
+				explod{
+					anim: VP 20106;
+					ID: 20106;
+					postype: left;
+					pos: const240p(0), const240p(0);
+					scale: 3, 3;
+					angle: 0;
+					facing: 1;
+					ontop: 0;
+					trans: addalpha;
+					alpha: 256, 64;
+					sprpriority: -99;
+					removetime: 30;
+					pausemovetime: -1;
+					supermovetime: -1;
+					palfx.time: 31;
+					palfx.mul: 10, 0, 120;
+					palfx.add: 0, 0, 0
+				}
+				# Zoom
+				if p2bodydist x > 120 {
+					zoom{
+						scale: 1.25;
+						time: 30;
+						pos: p2, pos x, p2, pos y;
+						lag: 0.618;
+						stagebound: 1;
+						camerabound: 1;
+					}
+				} else {
+					zoom{
+						scale: 1.25;
+						time: 30;
+						pos: (pos x + p2, pos x) / 2.0, max(stagevar(camera.boundhigh), (pos y + p2, pos y) / 4.0);
+						lag: 0.618;
+						stagebound: 1;
+						camerabound: 1;
+					}
+				}
+			}
+		}	
+	}
+# ========================================================================================================================================
+# V-Nix - Custom Fall & Smash Impact
+# ========================================================================================================================================
+	
+	if stateno = 5100 && map(_vnix_smashimpact_cfg_enable) != 0 {
+		if time = 1 {
+			if sysvar(1) > 14 {
+				explod{anim: VP 64; pos: 0,0; postype: p1; removetime: -2; sprpriority: 9}
+				if StageConst(Vnix_No_Dust) != 1 {
+					explod{anim: VP 62; pos: 0,0; postype: p1; removetime: -2; sprpriority: 9}
+					explod{anim: VP 63; pos: 0,0; postype: p1; removetime: -2; sprpriority: -9}
+				}
+				EnvShake{time: 25; freq: 210; ampl: 10}
+				if !alive {
+					Lifebaraction{text: "Impact Overkill"; top: 1}
+				} else {
+					Lifebaraction{text: "Smash Impact"; top: 1}
+				}
+				LifeAdd{value: map(_vnix_smashimpact_cfg_dmg); kill: 1}
+				playSnd{value: VP 7, 2; channel: 1}
+			} else {
+				if mugenVersion < 1.0 {
+					gameMakeAnim{value: VP 60 + (sysvar(1) > 5) + (sysvar(1) > 14); pos: 0, 0; under: 1}
+					explod{anim: VP 4047; pos: 0,0; scale: .33, .25; postype: p1; facing: (ifelse(Random <= 500, 1, -1)); removetime: -2; sprpriority: -9}
+					if StageConst(Vnix_No_Dust) != 1 {
+						gameMakeAnim{value: VP 65 + (sysvar(1) > 5); pos: 0, 0; under: 1}
+					}
+				} else {
+					if StageConst(Vnix_No_Dust) != 1 {
+						explod{
+							anim: VP 4047;
+							postype: none; #p1
+							pos: pos x + cameraPos x, 0; #0, 0
+							scale: .33, .33;
+							facing: facing;
+							sprpriority: -10 #ifElse(sysvar(1) <= const240p(14), -10, 10);
+						}
+					}
+					explod{
+						anim: VP (60 + (sysvar(1) > const240p(5)) + (sysvar(1) > const240p(14)));
+						postype: none; #p1
+						pos: pos x + cameraPos x, 0; #0, 0
+						facing: facing;
+						sprpriority: ifElse(sysvar(1) <= const240p(14), -10, 10);
+					}
+					if StageConst(Vnix_No_Dust) != 1 {
+						explod{
+							anim: VP (65 + (sysvar(1) > const240p(5)));
+							postype: none; #p1
+							pos: pos x + cameraPos x, 0; #0, 0
+							facing: facing;
+							sprpriority: -10 #ifElse(sysvar(1) <= const240p(14), -10, 10);
+						}
+					}
+				}
+			}
+		}
+	}
+	if stateno = 5101 && map(_vnix_smashimpact_cfg_enable) != 0 && sysvar(1) > 14 && Timemod = 3,0 {
+		# pause{time:3}
+	}
+	if stateno = 5110 && map(_vnix_smashimpact_cfg_enable) != 0 {
+		if time = 1 {
+			if mugenVersion < 1.0 {
+				gameMakeAnim{value: VP 60 + (sysvar(1) > 5) + (sysvar(1) > 14); pos: 0, 0; under: 1}
+				explod{anim: VP 4047; pos: 0,0; scale: .25, .2; postype: p1; facing: (ifelse(Random <= 500, 1, -1)); removetime: -2; sprpriority: -9}
+				if StageConst(Vnix_No_Dust) != 1 {
+					gameMakeAnim{value: VP 65 + (sysvar(1) > 5); pos: 0, 0; under: 1}
+				}
+			} else {
+				if StageConst(Vnix_No_Dust) != 1 {
+					explod{
+						anim: VP 4047;
+						postype: none; #p1
+						pos: pos x + cameraPos x, 0; #0, 0
+						scale: .25, .25;
+						facing: facing;
+						sprpriority: -10 #ifElse(sysvar(1) <= const240p(14), -10, 10);
+					}
+				}
+				explod{
+					anim: VP (60 + (sysvar(1) > const240p(5)) + (sysvar(1) > const240p(14)));
+					postype: none; #p1
+					pos: pos x + cameraPos x, 0; #0, 0
+					facing: facing;
+					sprpriority: ifElse(sysvar(1) <= const240p(14), -10, 10);
+				}
+				if StageConst(Vnix_No_Dust) != 1 {
+					explod{
+						anim: VP (65 + (sysvar(1) > const240p(5)));
+						postype: none; #p1
+						pos: pos x + cameraPos x, 0; #0, 0
+						facing: facing;
+						sprpriority: -10 #ifElse(sysvar(1) <= const240p(14), -10, 10);
+					}
+				}
+			}
+		}
+	}
+}

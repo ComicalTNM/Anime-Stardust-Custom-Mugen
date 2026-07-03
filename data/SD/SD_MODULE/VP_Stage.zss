@@ -1,0 +1,846 @@
+
+
+#===============================================================================
+# Go Off Screen Right
+#===============================================================================
+# (a custom gethit state)
+[StateDef 115050; type: A; movetype: I; physics: N;]
+
+mapset{map: "_vnix_wallbroken_right"; value: 1;}
+mapset{map: "_vnix_wallbroken_right"; value: 1; redirectID: p2, ID;}
+nothitby{value: SCA}
+playerpush{value: 0;}
+
+if time = 0 {
+	changeanim2{value: 5050;}
+	velset{x: 0; y: 0;}
+}
+
+if time = 1 {
+	posadd{x: 600;}
+	posset{y: -200;}
+}
+
+if time = 80 {
+	velset{x: -6;}
+	velAdd{y: 10;}
+}
+
+if time = [0,10] {
+	assertSpecial{flag: invisible}
+}
+
+if time = [0,79] {
+	screenBound{value: 0}
+}
+
+if time = 81 {
+	selfstate{value: 5050; ctrl: 0;}
+}
+
+#===============================================================================
+# Run to Opponent Right
+#===============================================================================
+# (a custom gethit state)
+[StateDef 115051; type: S; movetype: I; physics: N;]
+
+mapset{map: "_vnix_wallbroken_right"; value: 1;}
+mapset{map: "_vnix_wallbroken_right"; value: 1; redirectID: p2, ID;}
+screenBound{value: 0}
+assertspecial{flag: noautoturn}
+
+if time = 0 {
+	velset{x: 0; y: 0;}
+	posset{y: 0}
+	posadd{x: -800}
+	changeanim2{value: 100;}
+}
+
+if time = 100 {
+	velset{x: 8}
+}
+if time >= 101 && p2bodydist X <= 80 {
+	selfstate{value: 0; ctrl: 1;}
+}
+
+#===============================================================================
+# Go Off Screen Left
+#===============================================================================
+# (a custom gethit state)
+[StateDef 115060; type: A; movetype: I; physics: N;]
+
+mapset{map: "_vnix_wallbroken_left"; value: 1;}
+mapset{map: "_vnix_wallbroken_left"; value: 1; redirectID: p2, ID;}
+nothitby{value: SCA}
+playerpush{value: 0;}
+
+if time = 0 {
+	changeanim2{value: 5050;}
+	velset{x: 0; y: 0;}
+}
+
+if time = 1 {
+	posadd{x: 600;}
+	posset{y: -200;}
+}
+
+if time = 80 {
+	velset{x: -6;}
+	velAdd{y: 10;}
+}
+
+if time = [0,10] {
+	assertSpecial{flag: invisible}
+}
+
+if time = [0,79] {
+	screenBound{value: 0}
+}
+
+if time = 81 {
+	selfstate{value: 5050; ctrl: 0;}
+}
+
+
+#===============================================================================
+# Run to Opponent Left
+#===============================================================================
+# (a custom gethit state)
+[StateDef 115061; type: S; movetype: I; physics: N;]
+
+mapset{map: "_vnix_wallbroken_left"; value: 1;}
+mapset{map: "_vnix_wallbroken_left"; value: 1; redirectID: p2, ID;}
+screenBound{value: 0}
+assertspecial{flag: noautoturn}
+
+if time = 0 {
+	velset{x: 0; y: 0;}
+	posset{y: 0}
+	posadd{x: -800}
+	changeanim2{value: 100;}
+}
+
+if time = 100 {
+	velset{x: 8}
+}
+if time >= 101 && p2bodydist X <= 80 {
+	selfstate{value: 0; ctrl: 1;}
+}
+
+
+#===============================================================================
+
+[StateDef -4]
+
+ignorehitpause if !ishelper && (teamside = 1 || teamside = 2) {
+
+	# Initialize
+	if roundstate = 0 && time = 0 {
+		mapset{map: "_vnix_screen_var"; value: 0}
+		mapset{map: "_vnix_wallhp_right"; value: 0}
+		mapset{map: "_vnix_wallhp_left"; value: 0}
+	}
+}
+	
+
+# Stage Elements
+ignorehitpause if !ishelper
+&& !isAsserted(noBG)
+&& (teamside = 1 || teamside = 2)
+&& playerno = teamleader
+&& standBy = 0 {
+
+	
+# ========================================================================================================================================
+# V-Nix - Training Stage
+# ========================================================================================================================================
+
+	if stagevar(info.name) = "Training Stage V" {
+		let damage = (100 -((100*life)/lifemax)) * 2.56;
+		if Roundstate = [1,2] && map(_pots_dash_hidegauge) = 0 {
+			# Hit Spark when Hit
+			if movehit && p2,GetHitVar(damage) >= 1 && p2,alive  {
+				explod{
+					anim: VP 333;
+					id: 797979;
+					postype: none;
+					pos: cond(facing = 1, const240p((MoveHitVar(SparkX)/4) + ((Pos X/4) + ((0.817 * zoomVar(scale)) * (cameraPos X / zoomVar(scale))))),
+						 const240p((-1.0*(MoveHitVar(SparkX)/4)) + ((Pos X/4) + ((0.817 * zoomVar(scale)) * (cameraPos X / zoomVar(scale)))))),
+						 const240p((MoveHitVar(SparkY)/4) + ((Pos Y/4) -130 + (.548 * (cameraPos Y / zoomVar(scale)))));
+					#cond(teamside = 1, const240p((15) + ((0.817 * cameraZoom) * (cameraPos X / cameraZoom))), const240p(-15 + ((0.817 * cameraZoom) * (cameraPos X / cameraZoom)))),
+					#	 const240p(-156 + (.548 * (cameraPos Y / cameraZoom))); #0.67,0.91
+					sprpriority: 5;
+					scale: .25,.25;
+					angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+					facing: (ifelse(Random <= 500, 1, -1));
+					ontop: 0;
+					under: 0;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1;
+					layerno: -1
+				}
+			} else if p2,GetHitVar(damage) >= 1 && p2stateno != [120,152] && p2,alive {
+				explod{
+					anim: VP 333;
+					id: 797979;
+					postype: none;
+					pos: cond(facing = 1, const240p((const(size.mid.pos.x)/4) + ((p2,Pos X/4) + ((0.817 * zoomVar(scale)) * (cameraPos X / zoomVar(scale))))),
+						 const240p((-1.0*(const(size.mid.pos.x)/4)) + ((p2,Pos X/4) + ((0.817 * zoomVar(scale)) * (cameraPos X / zoomVar(scale)))))),
+						 const240p((const(size.mid.pos.y)/4) + ((p2,Pos Y/4) -130 + (.548 * (cameraPos Y / zoomVar(scale)))));
+					#cond(teamside = 1, const240p((15) + ((0.817 * cameraZoom) * (cameraPos X / cameraZoom))), const240p(-15 + ((0.817 * cameraZoom) * (cameraPos X / cameraZoom)))),
+					#	 const240p(-156 + (.548 * (cameraPos Y / cameraZoom))); #0.67,0.91
+					sprpriority: 5;
+					scale: .25,.25;
+					angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+					facing: (ifelse(Random <= 500, 1, -1));
+					ontop: 0;
+					under: 0;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1;
+					layerno: -1
+				}
+			}
+			# Guard Spark
+			if moveGuarded && p2,alive && ((p2stateno = 150 || p2stateno = 152 || p2stateno = 154) && p2,time = 1) {
+				explod{
+					anim: VP 10050;
+					id: 797981;
+					postype: none;
+					pos: cond(facing = 1, const240p((MoveHitVar(SparkX)/4) + ((Pos X/4) + ((0.817 * zoomVar(scale)) * (cameraPos X / zoomVar(scale))))),
+						 const240p((-1.0*(MoveHitVar(SparkX)/4)) + ((Pos X/4) + ((0.817 * zoomVar(scale)) * (cameraPos X / zoomVar(scale)))))),
+						 const240p((MoveHitVar(SparkY)/4) + ((Pos Y/4) -130 + (.548 * (cameraPos Y / zoomVar(scale)))));
+					#cond(teamside = 1, const240p((15) + ((0.817 * cameraZoom) * (cameraPos X / cameraZoom))), const240p(-15 + ((0.817 * cameraZoom) * (cameraPos X / cameraZoom)))),
+					#	 const240p(-156 + (.548 * (cameraPos Y / cameraZoom))); #0.67,0.91
+					sprpriority: 5;
+					scale: .15,.15;
+					angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+					facing: (ifelse(Random <= 500, 1, -1));
+					ontop: 0;
+					under: 0;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1;
+					layerno: -1
+				}
+			} else if p2,GetHitVar(damage) >= 1 && p2stateno = [120,152] && p2,alive {
+				explod{
+					anim: VP 10050;
+					id: 797981;
+					postype: none;
+					pos: cond(facing = 1, const240p((const(size.mid.pos.x)/4) + ((p2,Pos X/4) + ((0.817 * zoomVar(scale)) * (cameraPos X / zoomVar(scale))))),
+						 const240p((-1.0*(const(size.mid.pos.x)/4)) + ((p2,Pos X/4) + ((0.817 * zoomVar(scale)) * (cameraPos X / zoomVar(scale)))))),
+						 const240p((const(size.mid.pos.y)/4) + ((p2,Pos Y/4) -130 + (.548 * (cameraPos Y / zoomVar(scale)))));
+					#cond(teamside = 1, const240p((15) + ((0.817 * cameraZoom) * (cameraPos X / cameraZoom))), const240p(-15 + ((0.817 * cameraZoom) * (cameraPos X / cameraZoom)))),
+					#	 const240p(-156 + (.548 * (cameraPos Y / cameraZoom))); #0.67,0.91
+					sprpriority: 5;
+					scale: .15,.15;
+					angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+					facing: (ifelse(Random <= 500, 1, -1));
+					ontop: 0;
+					under: 0;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1;
+					layerno: -1
+				}
+			}
+			# Ground Shockwave when falling
+			if map(_vnix_screen_shockwave) = 0 {
+				if (stateno = 5100 || stateno = 5110) && numExplod(797980) = 0 {
+					mapset{map: "_vnix_screen_shockwave"; value: 1}
+					explod{
+						anim: VP 4051;
+						id: 797980;
+						postype: none;
+						pos: cond(facing = 1,
+							 const240p((Pos X/4) - 2 + (.818 * cameraPos X)),
+							 const240p((Pos X/4) + 2 + (.818 * cameraPos X))),
+							 const240p((Pos Y/4) -128 + (.695 * cameraPos Y));
+						sprpriority: -6;
+						removetime: -2;
+						bindtime: 0;
+						scale: .15,.15;
+						angle: 0;
+						facing: (ifelse(Random <= 500, 1, -1));
+						ontop: 0;
+						under: 1;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						layerno: -1;
+						trans: Add
+					}
+				}
+			} else {
+				if stateno = 0 || stateno = 5101 {
+					mapset{map: "_vnix_screen_shockwave"; value: 0}
+				}
+			}			
+			if zoomVar(scale) <= 1.0 {
+				# Portaits on Screen
+				explod{
+					anim: 2999110; 
+					id: 2999110; #696969; 
+					postype: none;          
+					bindtime: 0; 
+					facing: cond(teamside = 1, 1, -1);	
+					sprpriority: -5; 
+					pos: cond(teamside = 1,
+					 const240p(-156.5  + (0.818 * cameraPos X) + ((0.818 * zoomVar(pos.x)))),
+					 const240p(156.5 + (0.818 * cameraPos X) + ((0.818 * zoomVar(pos.x))))),
+					 const240p(-193 + (.548 * (cameraPos Y / zoomVar(scale))));
+					# pos: cond(teamside = 1, const240p(-156.5 + ((0.818 * cameraZoom) * (cameraPos X / cameraZoom))) + cond(cameraZoom > 1.0, 300, 0),
+					#	 const240p(156.5 + ((0.818 * cameraZoom) * (cameraPos X / cameraZoom)))),
+					#	 const240p(-193 + (.548 * (cameraPos Y / cameraZoom))); #0.67,0.91
+					removetime: 1;          # refresh loop
+					pausemovetime: -1;
+					supermovetime: -1;
+					scale: .55, .55;
+					trans: addalpha;
+					alpha: 256,16;
+					random: cond(movetype = H && stateno != [120,152] && gethitvar(hitshaketime) >= 1,2,0),
+							cond(movetype = H && stateno != [120,152] && gethitvar(hitshaketime) >= 1,2,0);
+					ownpal: 1;
+					under: 1;
+					layerno: -1;
+					angle: angle;
+					space: stage;
+					palfx.time: cond(life <= lifemax * 0.25, -1, 0);
+					palfx.color: 1;
+					#palfx.add: cond(teamside = 1, 256, 135), cond(teamside = 1, 256, 206), cond(teamside = 1, 256, 256);
+					#palfx.mul: cond(teamside = 1, -128, 100), -128, cond(teamside = 1, -128, 200);
+					ignorehitpause: 1;
+				}
+			}
+			# Small Clones on Screen
+			explod{
+				anim: anim; 
+				id: 11696969; #696969; 
+				animplayerno: animplayerno; #ty P.O.T.S for help w/ this lol
+				postype: none;          
+				bindtime: -2; 
+				facing: cond(facing = 1, 1, -1);	
+				sprpriority: -5;
+				pos: cond(facing = 1,
+					 const240p((Pos X/4) - 2 + (.818 * cameraPos X)),
+					 const240p((Pos X/4) + 2 + (.818 * cameraPos X))),
+					 const240p((Pos Y/4) -128 + (.695 * cameraPos Y));
+				# pos: cond(teamside = 1, const240p(-30 + (0.35 * cameraPos X)), const240p(30 + (0.35 * cameraPos X))), const240p(-138 + (0.2 * cameraPos Y));
+				removetime: 1;          # refresh loop
+				animelem: animelemno(0);
+				pausemovetime: -1;
+				supermovetime: -1;
+				scale: .33 * const(size.xscale), .33 * const(size.yscale);
+				# trans: addalpha;
+				# alpha: 256 - $damage, 256;
+				random: cond(movetype = H && stateno != [120,152] && gethitvar(hitshaketime) >= 1,2,0),
+						cond(movetype = H && stateno != [120,152] && gethitvar(hitshaketime) >= 1,2,0);
+				ownpal: 1;
+				under: 1;
+				angle: angle;
+				palfx.time: cond(movetype = H && stateno != [120,152],-1,0);
+				palfx.add: 256,100,100;
+				palfx.mul: 200,100,100;
+				ignorehitpause: 1;
+				layerno: -1;
+				#window: const240p(-100/const(size.xscale)),const240p(-120/const(size.yscale)),const240p(300/const(size.xscale)),const240p(20/const(size.yscale))
+			}
+		}
+		# Remove any hitsparks when KOed
+		if Roundstate = 3 {
+			removeexplod{id: 797979}
+			removeexplod{id: 797980}
+			removeexplod{id: 797981}
+		}
+		# Win Animation on Screen
+		if Roundstate = 4 && win {
+			# Small Clones on Screen
+			explod{
+				anim: anim; 
+				id: 11696969; #696969; 
+				animplayerno: animplayerno; #ty P.O.T.S for help w/ this lol
+				postype: none;          
+				bindtime: -2; 
+				facing: cond(facing = 1, 1, -1);	
+				sprpriority: -5;
+				pos: const240p(-128 + (.818 * cameraPos X)),
+					 const240p(-128 + (.548 * cameraPos Y));
+				# pos: cond(teamside = 1, const240p(-30 + (0.35 * cameraPos X)), const240p(30 + (0.35 * cameraPos X))), const240p(-138 + (0.2 * cameraPos Y));
+				removetime: 1;          # refresh loop
+				animelem: animelemno(0);
+				pausemovetime: -1;
+				supermovetime: -1;
+				scale: .5 * const(size.xscale), .5 * const(size.yscale);
+				# trans: addalpha;
+				# alpha: 256 - $damage, 256;
+				random: cond(movetype = H && stateno != [120,152] && gethitvar(hitshaketime) >= 1,2,0),
+						cond(movetype = H && stateno != [120,152] && gethitvar(hitshaketime) >= 1,2,0);
+				ownpal: 1;
+				under: 1;
+				angle: angle;
+				palfx.time: cond(movetype = H && stateno != [120,152],-1,0);
+				palfx.add: 256,100,100;
+				palfx.mul: 200,100,100;
+				ignorehitpause: 1;
+				layerno: -1;
+				#window: const240p(-100/const(size.xscale)),const240p(-120/const(size.yscale)),const240p(300/const(size.xscale)),const240p(20/const(size.yscale))
+			}
+			explod{
+				anim: anim; 
+				id: 11696969; #696969; 
+				animplayerno: animplayerno; #ty P.O.T.S for help w/ this lol
+				postype: none;          
+				bindtime: -2; 
+				facing: cond(facing = 1, 1, -1);	
+				sprpriority: -5;
+				pos: const240p(128 + (.818 * cameraPos X)),
+					 const240p(-128 + (.548 * cameraPos Y));
+				# pos: cond(teamside = 1, const240p(-30 + (0.35 * cameraPos X)), const240p(30 + (0.35 * cameraPos X))), const240p(-138 + (0.2 * cameraPos Y));
+				removetime: 1;          # refresh loop
+				animelem: animelemno(0);
+				pausemovetime: -1;
+				supermovetime: -1;
+				scale: .5 * const(size.xscale), .5 * const(size.yscale);
+				# trans: addalpha;
+				# alpha: 256 - $damage, 256;
+				random: cond(movetype = H && stateno != [120,152] && gethitvar(hitshaketime) >= 1,2,0),
+						cond(movetype = H && stateno != [120,152] && gethitvar(hitshaketime) >= 1,2,0);
+				ownpal: 1;
+				under: 1;
+				angle: angle;
+				palfx.time: cond(movetype = H && stateno != [120,152],-1,0);
+				palfx.add: 256,100,100;
+				palfx.mul: 200,100,100;
+				ignorehitpause: 1;
+				layerno: -1;
+				#window: const240p(-100/const(size.xscale)),const240p(-120/const(size.yscale)),const240p(300/const(size.xscale)),const240p(20/const(size.yscale))
+			}
+		}
+	}
+
+
+# ========================================================================================================================================
+# Tekken 2 - Devil Kazuya Stage by GLB
+# ========================================================================================================================================
+
+	if stagevar(info.name) = "Tekken 2 - Devil" {
+		if alive && isAsserted(invisible) = 0 {
+			explod{
+				anim: anim; 
+				id: 11696969; #696969; 
+				animplayerno: animplayerno; #ty P.O.T.S for help w/ this lol
+				postype: none;          
+				bindtime: 0; 
+				facing: cond(facing = 1, 1, -1);	
+				sprpriority: -5; 
+				pos: cond(facing = 1, const240p((Pos X/2.5) - 1 + (cameraPos X)), const240p((Pos X/2.5) + 1 + (cameraPos X))), const240p((Pos Y/2) - 87 + (0.75 * cameraPos Y));
+				removetime: 1;          # refresh loop
+				animelem: animelemno(0);
+				pausemovetime: -1;
+				supermovetime: -1;
+				scale: .5 * const(size.xscale), .5 * const(size.yscale);
+				#trans: addalpha;
+				#alpha: 200,256;
+				ownpal: 1;
+				under: 1;
+				angle: angle;
+				ignorehitpause: 1;
+			}
+			explod{
+				anim: anim; 
+				id: 11696970; #696969; 
+				animplayerno: animplayerno; #ty P.O.T.S for help w/ this lol
+				postype: none;          
+				bindtime: 0; 
+				facing: cond(facing = 1, 1, -1);	
+				sprpriority: -6; 
+				pos: cond(facing = 1, const240p((Pos X/5) - 1 + (cameraPos X)), const240p((Pos X/5) + 1 + (cameraPos X))), const240p((Pos Y/4) - 133 + (0.85 * cameraPos Y));
+				removetime: 1;          # refresh loop
+				animelem: animelemno(0);
+				pausemovetime: -1;
+				supermovetime: -1;
+				scale: .25 * const(size.xscale), (.25 * const(size.yscale));
+				ownpal: 1;
+				under: 1;
+				angle: angle;
+				ignorehitpause: 1;
+			}	
+			explod{
+				anim: anim; 
+				id: 11696970; #696969; 
+				animplayerno: animplayerno; #ty P.O.T.S for help w/ this lol
+				postype: none;          
+				bindtime: 0; 
+				facing: cond(facing = 1, 1, -1);	
+				sprpriority: -7; 
+				pos: cond(facing = 1, const240p((Pos X/10) - 1 + (cameraPos X)), const240p((Pos X/10) + 1 + (cameraPos X))), const240p((Pos Y/8) - 157 + (1 * cameraPos Y));
+				removetime: 1;          # refresh loop
+				animelem: animelemno(0);
+				pausemovetime: -1;
+				supermovetime: -1;
+				scale: .125 * const(size.xscale), (.125 * const(size.yscale));
+				ownpal: 1;
+				under: 1;
+				angle: angle;
+				ignorehitpause: 1;
+			}
+		}
+		# Hit Spark when Hit
+		if movehit && p2,GetHitVar(damage) >= 1 && p2,alive  {
+			explod{
+				anim: VP 333;
+				id: 797979;
+				postype: none;
+				pos: cond(facing = 1, const240p((MoveHitVar(SparkX)/2) + ((Pos X/2) + ((cameraZoom) * (cameraPos X / cameraZoom)))),
+					 const240p((-1.0*(MoveHitVar(SparkX)/2)) + ((Pos X/2) + ((cameraZoom) * (cameraPos X / cameraZoom))))),
+					 const240p((MoveHitVar(SparkY)/2) + ((Pos Y/2) -87 + (cameraPos Y / cameraZoom)));
+				sprpriority: -4;
+				scale: .5,.5;
+				angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+				facing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				under: 1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				
+			}
+			explod{
+				anim: VP 333;
+				id: 797979;
+				postype: none;
+				pos: cond(facing = 1, const240p((MoveHitVar(SparkX)/5) + ((Pos X/5) + ((cameraZoom) * (cameraPos X / cameraZoom)))),
+					 const240p((-1.0*(MoveHitVar(SparkX)/5)) + ((Pos X/5) + ((cameraZoom) * (cameraPos X / cameraZoom))))),
+					 const240p((MoveHitVar(SparkY)/4) + ((Pos Y/4) -133 + (cameraPos Y / cameraZoom)));
+				sprpriority: -5;
+				scale: .25,.25;
+				angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+				facing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				under: 1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				
+			}
+			explod{
+				anim: VP 333;
+				id: 797979;
+				postype: none;
+				pos: cond(facing = 1, const240p((MoveHitVar(SparkX)/10) + ((Pos X/10) + ((cameraZoom) * (cameraPos X / cameraZoom)))),
+					 const240p((-1.0*(MoveHitVar(SparkX)/10)) + ((Pos X/10) + ((cameraZoom) * (cameraPos X / cameraZoom))))),
+					 const240p((MoveHitVar(SparkY)/8) + ((Pos Y/8) -157 + (cameraPos Y / cameraZoom)));
+				sprpriority: -6;
+				scale: .125,.125;
+				angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+				facing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				under: 1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				
+			}
+		} else if p2,GetHitVar(damage) >= 1 && p2stateno != [120,152] && p2,alive {
+			explod{
+				anim: VP 333;
+				id: 797979;
+				postype: none;
+				pos: cond(facing = 1, const240p((const(size.mid.pos.x)/2) + ((p2,Pos X/2) + ((cameraZoom) * (cameraPos X / cameraZoom)))),
+					 const240p((-1.0*(const(size.mid.pos.x)/2)) + ((p2,Pos X/2) + ((cameraZoom) * (cameraPos X / cameraZoom))))),
+					 const240p((const(size.mid.pos.y)/2) + ((p2,Pos Y/2) -87 + ((cameraPos Y / cameraZoom))));
+				sprpriority: 5;
+				scale: .5,.5;
+				angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+				facing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				under: 1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+			}
+			explod{
+				anim: VP 333;
+				id: 797979;
+				postype: none;
+				pos: cond(facing = 1, const240p((const(size.mid.pos.x)/5) + ((p2,Pos X/5) + ((cameraZoom) * (cameraPos X / cameraZoom)))),
+					 const240p((-1.0*(const(size.mid.pos.x)/5)) + ((p2,Pos X/5) + ((cameraZoom) * (cameraPos X / cameraZoom))))),
+					 const240p((const(size.mid.pos.y)/4) + ((p2,Pos Y/4) -133 + ((cameraPos Y / cameraZoom))));
+				sprpriority: 5;
+				scale: .25,.25;
+				angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+				facing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				under: 1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+			}
+			explod{
+				anim: VP 333;
+				id: 797979;
+				postype: none;
+				pos: cond(facing = 1, const240p((const(size.mid.pos.x)/10) + ((p2,Pos X/10) + ((cameraZoom) * (cameraPos X / cameraZoom)))),
+					 const240p((-1.0*(const(size.mid.pos.x)/10)) + ((p2,Pos X/10) + ((cameraZoom) * (cameraPos X / cameraZoom))))),
+					 const240p((const(size.mid.pos.y)/8) + ((p2,Pos Y/8) -157 + ((cameraPos Y / cameraZoom))));
+				sprpriority: 5;
+				scale: .125,.125;
+				angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+				facing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				under: 1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+			}
+		}
+		# Guard Spark
+		if moveGuarded && p2,alive && ((p2stateno = 150 || p2stateno = 152 || p2stateno = 154) && p2,time = 1) {
+			explod{
+				anim: VP 10050;
+				id: 797981;
+				postype: none;
+				pos: cond(facing = 1, const240p((MoveHitVar(SparkX)/2) + ((Pos X/2) + ((cameraZoom) * (cameraPos X / cameraZoom)))),
+					 const240p((-1.0*(MoveHitVar(SparkX)/2)) + ((Pos X/2) + ((cameraZoom) * (cameraPos X / cameraZoom))))),
+					 const240p((MoveHitVar(SparkY)/2) + ((Pos Y/2) -87 + ((cameraPos Y / cameraZoom))));
+				sprpriority: 5;
+				scale: .15,.15;
+				angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+				facing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				under: 0;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+			}
+			explod{
+				anim: VP 10050;
+				id: 797981;
+				postype: none;
+				pos: cond(facing = 1, const240p((MoveHitVar(SparkX)/5) + ((Pos X/5) + ((cameraZoom) * (cameraPos X / cameraZoom)))),
+					 const240p((-1.0*(MoveHitVar(SparkX)/5)) + ((Pos X/5) + ((cameraZoom) * (cameraPos X / cameraZoom))))),
+					 const240p((MoveHitVar(SparkY)/4) + ((Pos Y/4) -133 + ((cameraPos Y / cameraZoom))));
+				sprpriority: 5;
+				scale: .1,.1;
+				angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+				facing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				under: 0;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+			}
+			explod{
+				anim: VP 10050;
+				id: 797981;
+				postype: none;
+				pos: cond(facing = 1, const240p((MoveHitVar(SparkX)/10) + ((Pos X/10) + ((cameraZoom) * (cameraPos X / cameraZoom)))),
+					 const240p((-1.0*(MoveHitVar(SparkX)/10)) + ((Pos X/10) + ((cameraZoom) * (cameraPos X / cameraZoom))))),
+					 const240p((MoveHitVar(SparkY)/8) + ((Pos Y/8) -157 + ((cameraPos Y / cameraZoom))));
+				sprpriority: 5;
+				scale: .05,.05;
+				angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+				facing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				under: 0;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+			}
+		} else if p2,GetHitVar(damage) >= 1 && p2stateno = [120,152] && p2,alive {
+			explod{
+				anim: VP 10050;
+				id: 797981;
+				postype: none;
+				pos: cond(facing = 1, const240p((const(size.mid.pos.x)/2) + ((p2,Pos X/2) + ((cameraZoom) * (cameraPos X / cameraZoom)))),
+					 const240p((-1.0*(const(size.mid.pos.x)/2)) + ((p2,Pos X/2) + ((cameraZoom) * (cameraPos X / cameraZoom))))),
+					 const240p((const(size.mid.pos.y)/2) + ((p2,Pos Y/2) -87 + ((cameraPos Y / cameraZoom))));
+				sprpriority: 5;
+				scale: .15,.15;
+				angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+				facing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				under: 1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+			}
+			explod{
+				anim: VP 10050;
+				id: 797981;
+				postype: none;
+				pos: cond(facing = 1, const240p((const(size.mid.pos.x)/5) + ((p2,Pos X/5) + ((cameraZoom) * (cameraPos X / cameraZoom)))),
+					 const240p((-1.0*(const(size.mid.pos.x)/5)) + ((p2,Pos X/5) + ((cameraZoom) * (cameraPos X / cameraZoom))))),
+					 const240p((const(size.mid.pos.y)/4) + ((p2,Pos Y/4) -133 + ((cameraPos Y / cameraZoom))));
+				sprpriority: 5;
+				scale: .1,.1;
+				angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+				facing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				under: 1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+			}
+			explod{
+				anim: VP 10050;
+				id: 797981;
+				postype: none;
+				pos: cond(facing = 1, const240p((const(size.mid.pos.x)/10) + ((p2,Pos X/10) + ((cameraZoom) * (cameraPos X / cameraZoom)))),
+					 const240p((-1.0*(const(size.mid.pos.x)/10)) + ((p2,Pos X/10) + ((cameraZoom) * (cameraPos X / cameraZoom))))),
+					 const240p((const(size.mid.pos.y)/8) + ((p2,Pos Y/8) -157 + ((cameraPos Y / cameraZoom))));
+				sprpriority: 5;
+				scale: .05,.05;
+				angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+				facing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				under: 1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+			}
+		}
+		# Ground Shockwave when falling
+		if map(_vnix_screen_shockwave) = 0 {
+			if (stateno = 5100 || stateno = 5110) && numExplod(797980) = 0 {
+				mapset{map: "_vnix_screen_shockwave"; value: 1}
+				explod{
+					anim: VP 4051;
+					id: 797980;
+					postype: none;
+					pos: cond(facing = 1, const240p((Pos X/2.2) - 10 + ((cameraZoom) * (cameraPos X / cameraZoom))), const240p((Pos X/2.2) + 10 + ((cameraZoom) * (cameraPos X / cameraZoom)))),
+						 const240p((Pos Y/2) - 87 + ((cameraPos Y / cameraZoom))); #0.67,0.91
+					sprpriority: -6;
+					removetime: -2;
+					bindtime: 0;
+					scale: .15,.15;
+					angle: 0;
+					facing: (ifelse(Random <= 500, 1, -1));
+					ontop: 0;
+					under: 1;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1;
+				}
+				explod{
+					anim: VP 4051;
+					id: 797980;
+					postype: none;
+					pos: cond(facing = 1, const240p((Pos X/5) - 6 + ((cameraZoom) * (cameraPos X / cameraZoom))), const240p((Pos X/5) + 6 + ((cameraZoom) * (cameraPos X / cameraZoom)))),
+						 const240p((Pos Y/4) - 133 + ((cameraPos Y / cameraZoom))); #0.67,0.91
+					sprpriority: -6;
+					removetime: -2;
+					bindtime: 0;
+					scale: .1,.1;
+					angle: 0;
+					facing: (ifelse(Random <= 500, 1, -1));
+					ontop: 0;
+					under: 1;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1;
+				}
+				explod{
+					anim: VP 4051;
+					id: 797980;
+					postype: none;
+					pos: cond(facing = 1, const240p((Pos X/10) - 3 + ((cameraZoom) * (cameraPos X / cameraZoom))), const240p((Pos X/10) + 3 + ((cameraZoom) * (cameraPos X / cameraZoom)))),
+						 const240p((Pos Y/8) - 157 + ((cameraPos Y / cameraZoom))); #0.67,0.91
+					sprpriority: -6;
+					removetime: -2;
+					bindtime: 0;
+					scale: .05,.05;
+					angle: 0;
+					facing: (ifelse(Random <= 500, 1, -1));
+					ontop: 0;
+					under: 1;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1;
+				}
+			}
+		} else {
+			if stateno = 0 || stateno = 5101 {
+				mapset{map: "_vnix_screen_shockwave"; value: 0}
+			}
+		}				
+	}
+	
+# ========================================================================================================================================
+# Randragon Outskirts
+# ========================================================================================================================================
+	
+	if stagevar(info.name) = "Randragon Outskirts" {
+		# Wall Hit
+		if moveType = H
+		&& stateno != [120,155]
+		&& alive = 1
+		&& !isHelper {
+			# For Regular Bounds
+			if (stageBackEdgeDist <= 0 || stageFrontEdgeDist <= 0)
+			&& (vel X < -2 || vel X > 2)
+			&& gethitvar(hitshaketime) <= 2
+			&& InCustomState = 0
+			{
+				if stateType = S || stateType = C {
+					if stateno != 301027 && statetype != L {
+						selfState{value: 301027}
+					}
+				} else if stateType = A {
+					if stateno != 301028 && statetype != L {
+						selfState{value: 301028}
+					}
+				}
+			}
+		}
+		
+		if (stateno = 301027 || stateno = 301028)
+		&& (pos X + cameraPos X) = [265,270]
+		&& map(_vnix_wallbroken_right) = 0
+		#&& teamMode = Single
+		{
+			if map(_vnix_wallhp_right) != 100 && time = 1 {
+				mapadd{map: "_vnix_wallhp_right"; value: 10}
+				mapadd{map: "_vnix_wallhp_right"; value: 10; redirectID: p2, ID;}
+			} else if map(_vnix_wallhp_right) = 100 {
+				nothitby{value: SCA}
+				if time = 1 {
+					#posadd{x: 15}
+					#posadd{x: -15; redirectID: p2, ID;}
+				}
+			}
+		}
+		
+		if p2stateno = 115050
+		&& time >= 0 && stateno != 115051 {
+			removeexplod{}
+			selfstate{value: 115051; ctrl: 0;}
+		}
+		
+		if (stateno = 301027 || stateno = 301028)
+		&& (pos X + cameraPos X) = [-270,-265]
+		&& map(_vnix_wallbroken_left) = 0
+		#&& teamMode = Single
+		{
+			if map(_vnix_wallhp_left) != 100 && time = 1 {
+				mapadd{map: "_vnix_wallhp_left"; value: 10}
+				mapadd{map: "_vnix_wallhp_left"; value: 10; redirectID: p2, ID;}
+			} else if map(_vnix_wallhp_left) = 100 {
+				nothitby{value: SCA}
+				if time = 1 {
+					#posadd{x: -15}
+					#posadd{x: 15; redirectID: p2, ID;}
+				}
+			}
+		}
+		
+		if p2stateno = 115060
+		&& time >= 0 && stateno != 115061 {
+			removeexplod{}
+			selfstate{value: 115061; ctrl: 0;}
+		}		
+
+	}
+}

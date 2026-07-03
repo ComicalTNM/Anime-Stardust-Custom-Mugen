@@ -1,0 +1,173 @@
+# == Global States == #
+
+# Función matemática extraída de intro_delay para suavizar el volumen (Ease In/Out)
+[Function InterpolateValue(min, max, tick, ticks, mode) ret]
+let t = float($tick) / float($ticks);
+let t = cond($t > 1.0, 1.0, cond($t < 0.0, 0.0, $t));
+
+if $mode = 1 {
+    let easedT = $t ^ 3;
+} else if $mode = 2 {
+    let easedT = 1.0 - (1.0 - $t) ^ 3;
+} else if $mode = 3 {
+    let easedT = cond(
+        $t < 0.5,
+        1.0 - (1.0 - $t) ^ 3,
+        $t ^ 3
+    );
+} else {
+    let easedT = $t;
+}
+
+let ret = $min + ($max - $min) * cond($easedT > 1.0, 1.0, cond($easedT < 0.0, 0.0, $easedT));
+
+# Helper para mantener la Intro activa durante la cinemática de cámara
+[Statedef 9000800; type: S; ctrl: 0; velset: 0, 0;]
+AssertSpecial{flag:invisible}
+notHitBy{value: SCA}
+
+[StateDef -4]
+
+# Inicializar variables (Solo el Player 1 controla el escenario y la música)
+ignorehitpause if playerno = 1 && roundstate = 0 && !isHelper {
+	if numhelper(9000800) = 0 {
+		Helper {
+			name: "Intro AssertSpecial";
+			ID: 9000800;
+			stateno: 9000800;
+			pos: 0,0,0;
+			postype: p1;
+			keyctrl:0;
+			supermovetime:-1;
+			pausemovetime:-1;
+		}
+	}
+
+	# CONFIGURACIÓN DEL STAGE INTRO
+	map(bbtag_stageIntro) := 1;               
+	map(bbtag_stageIntroScrollOrder) := 3;    
+	map(bbtag_stageIntroTime) := 120;         
+	map(bbtag_stageIntroZoom) := 2.0;         
+	map(bbtag_IntroDelay) := 60;              
+	map(bbtag_cameraLag) := 0.9;              
+}
+
+ignorehitpause if roundState = [0,1] && !isHelper && teamSide != 0
+{
+	# LÓGICA DEL STAGE INTRO (Cámara y Fade-in)
+	if playerno = 1 && roundNo = 1 && map(bbtag_stageIntro) = 1 {
+		if !map(bbtag_stageIntroFinished) {
+			AssertSpecial{flag: Intro; redirectid: helper(9000800), id}
+		}
+
+		if !map(bbtag_stageIntroFinished) && !map(stageIntroBegun) {
+			map(stageIntroBegun) := 1;
+			map(stageIntroTime) := map(bbtag_stageIntroTime);
+		}
+
+		if map(stageIntroTime) >= 0 {
+			let c = (256 - (256 * (map(stageIntroTime) / map(bbtag_stageIntroTime))));
+			AllPalFX{mul: $c, $c, $c; time: 2}
+
+			if stagetime > 0 {
+				switch(map(bbtag_stageIntroScrollOrder)) {
+					case 1:
+						let siz = gamewidth/const240p(320/1.0 + (map(bbtag_stageIntroZoom)*(map(stageIntroTime)/map(bbtag_stageIntroTime))));
+						zoom{scale:$siz; pos:$siz*camerazoom, 0; lag:cond(map(stageIntroTime) = map(bbtag_stageIntroTime), 0, map(bbtag_cameraLag)); stagebound:1; camerabound:0}
+					case 2:
+						let pos = stageVar(camera.boundlow)*(map(stageIntroTime)/map(bbtag_stageIntroTime));
+						zoom{scale:stagevar(camera.startzoom); pos:0, $pos; lag:cond(map(stageIntroTime) = map(bbtag_stageIntroTime), 0, map(bbtag_cameraLag)); stagebound:1; camerabound:0}
+					case 3:
+						let pos = stageVar(camera.boundhigh)*(map(stageIntroTime)/map(bbtag_stageIntroTime));
+						zoom{scale:stagevar(camera.startzoom); pos:0, $pos; lag:cond(map(stageIntroTime) = map(bbtag_stageIntroTime), 0, map(bbtag_cameraLag)); stagebound:1; camerabound:0}
+				}
+			}
+		}
+
+		if map(stageIntroTime) > (map(bbtag_IntroDelay) * -1) && map(stageIntroBegun) {
+			if map(stageIntroTime) < 0 {
+				zoom{scale:stagevar(camera.startzoom); lag:map(bbtag_cameraLag); pos:0, 0; stagebound:1; camerabound:0}
+			}
+			map(stageIntroTime) := map(stageIntroTime) - 1;
+		}
+
+		if map(stageIntroTime) = (map(bbtag_IntroDelay) * -1) && !map(bbtag_stageIntroFinished) {
+			map(bbtag_stageIntroFinished) := 1;
+		}
+	}
+
+	# LÓGICA DE ESPERA DE INTROS
+	if stateno = 0 {
+		if enemy, stateno = [190,199] || enemy, stateno = [2190,2199] || enemy, stateno = 5900 || (roundNo = 1 && player(1), map(bbtag_stageIntro) = 1 && !player(1), map(bbtag_stageIntroFinished)) {
+			if ctrl { ctrlSet{value: 0} }
+			velSet{x: 0; y: 0}
+		}
+	}
+
+	# LÓGICA DE MOVIMIENTO LIBRE E IA
+	if stateno != [190,199] && stateno != [2190,2199] && enemy, stateno != [190,199] && enemy, stateno != [2190,2199] && stateno != 5900 && enemy, stateno != 5900 && (roundNo > 1 || player(1), map(bbtag_stageIntro) = 0 || player(1), map(bbtag_stageIntroFinished) = 1)
+	{
+		if stateno = 0 {
+			if !ctrl && TeamLeader = playerno { ctrlSet{value: 1} }
+		}
+		
+		# == BOZAL ==
+		notHitBy{value: SCA}
+		shiftInput{input: a; output: none}
+		shiftInput{input: b; output: none}
+		shiftInput{input: c; output: none}
+		shiftInput{input: x; output: none}
+		shiftInput{input: y; output: none}
+		shiftInput{input: z; output: none}
+		
+		AssertSpecial{flag: NoIntroReset; flag2: NoAICheat; flag3: NoStandGuard; flag4: NoCrouchGuard; flag5: NoAirGuard;}
+		
+		# == CEREBRO DE LA IA Y SISTEMA ANTI-COLISIÓN ==
+		if ailevel {
+			let abs_dist = abs(p2bodydist x);
+
+			if gametime % 15 = 0 {
+				let r = random % 100;
+
+				# IA completamente aleatoria priorizando retroceder
+				if $r < 2 { map(ai_action) := 0; }       # Adelante
+				else if $r < 70 { map(ai_action) := 1; } # Atrás
+				else if $r < 90 { map(ai_action) := 2; } # Abajo
+				else { map(ai_action) := 3; }            # Saltar
+			}
+
+			# AQUÍ ESTÁ LA MAGIA ARREGLADA: Usamos 'facing' para dar instrucciones absolutas
+			switch(map(ai_action)) {
+				case 0: # Ir hacia Adelante
+					if facing = 1 { AssertInput{flag: R} } else { AssertInput{flag: L} }
+				case 1: # Ir hacia Atrás
+					if facing = 1 { AssertInput{flag: L} } else { AssertInput{flag: R} }
+				case 2: AssertInput{flag: D}
+				case 3: AssertInput{flag: U}
+			}
+
+			# ZONA ANTI-BESO
+			if $abs_dist < const240p(65) {
+				# Cortamos la señal de ir hacia adelante dependendiendo de dónde mire
+				if facing = 1 { shiftInput{input: R; output: none} } 
+				else { shiftInput{input: L; output: none} }
+				
+				if random % 100 < 50 { 
+					if facing = 1 { AssertInput{flag: L} } else { AssertInput{flag: R} }
+				}
+				if random % 100 < 20 { AssertInput{flag: U} }
+			}
+			
+			# MURO DE EMERGENCIA
+			if $abs_dist < const240p(35) {
+				velSet{x: 0}
+				if facing = 1 { AssertInput{flag: L} } else { AssertInput{flag: R} }
+			}
+		}
+	}
+}
+# Restaurar controles
+else if roundstate = 2 && !isHelper && teamSide != 0 && roundNo = 1
+{
+	shiftInput{input: none; output: none}
+}

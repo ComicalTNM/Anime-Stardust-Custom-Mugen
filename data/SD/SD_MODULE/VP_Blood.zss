@@ -1,0 +1,194 @@
+# BLOODY! module by N_N, VPFG edits by V-Nix
+# 
+# simple MK-style blood
+# 
+# started 07/09/2025
+# v.04/01/2026
+
+#==============================================================
+# CONFIG
+#==============================================================
+
+[Function F_Blood_Config()]
+
+mapset{map: "_vnix_blood_cfg"; value: 1} 					# Allow Blood to show
+mapset{map: "_vnix_blood_cfg_threshold"; value: 1} 			# Blood only shows below 50% Health, set to 0 to allow blood to always show
+#mapset{map: "_blood_cfg_altColor"; value: 0} 				# Blood color, now uses Constants
+	# 0 - Red (default)
+	# 1 - Reptile
+	# 2 - Sweat
+	# 3 - Rainbow
+mapset{map: "_blood_cfg_splatterNoise"; value: 1} 			# Blood makes a "splat"
+	# 0 - Disabled
+	# 1 - Enabled (default)
+
+#==============================================================
+# HELPERS
+#==============================================================
+
+# Regular blood
+[Statedef 404000; type: A; movetype: I; physics: N; anim: BL4100+(random%3);]
+assertspecial{flag:noshadow;}
+sprpriority{value:5}
+
+# Change color
+	if !time && p2, const(Vnix_BloodColor) = 1 {
+		palfx{time: -1; hue: 192} ### REPTILE
+	}
+	if !time && p2, const(Vnix_BloodColor) = 2 {
+		palfx{time: -1; color: 0} ### SWEAT
+	}
+	if p2, const(Vnix_BloodColor) = 3 {
+		palfx{time: 1; hue: gametime*8} ### RAINBOW
+	}
+
+# This splatter moves a little
+if anim = 4102 && animelemtime(1) = 1 {
+		velset{x:-2}
+	}
+
+# Spawn droplets
+if numhelper(404143) < 4+(random%2) {
+	helper{
+		stateno: 404010;
+		id: 404143;
+		name: "droplets";
+		postype: p1;
+		ownpal: 0;
+		facing: -1;
+		extendsmap: 1;
+	}
+}
+
+if animtime = 0 {
+	destroyself{}
+}
+
+# Regular blood - droplets
+[Statedef 404010; type: A; movetype: I; physics: N; anim: BL4110;]
+assertspecial{flag:noshadow;}
+sprpriority{value: 3}
+
+# Change color
+	if map(_blood_cfg_altColor) = 3 {
+		palfx{time: 1; hue: gametime*8}
+	}
+
+# Initial vels
+	if !time && !(random%2) {
+		turn{}
+		}
+	if !time {
+		velset{x: -const240p(1+floor(random%25 * 0.1)); y: -const240p(3+floor(random%30 * 0.1));}
+		}
+
+# Gravity
+	if time >= 3 && pos y + vel y < 0 {
+		veladd{y:.16+(.24 * (time >= 10))}
+		}
+
+# Land & disappear
+	else if anim = 4110 && pos y + vel y >= 0 {
+		assertspecial{flag:invisible;}
+		posset{y:0+(random%5)}
+		velset{x:0; y:0}
+		
+		## this is much less resource-intensive than having each droplet go to a "fade out" state
+		explod{
+			anim: BL4111;
+			pos: 0,0;
+			postype: p1;
+			sprpriority: -5 + floor(pos y);
+			bindtime: 1;
+			scale: .5,.5;
+			ownpal: 0;
+			trans: addalpha;
+			alpha: 256,0;
+			interpolation.time: 450;
+			interpolation.alpha: 0,256
+		} ### ownpal = 0 is required for the alt colors to not reset
+		playsnd{value: BL1,(random%3); channel: 1; volumescale: 50*map(_blood_cfg_splatterNoise)}
+		destroyself{}
+	}
+
+#==============================================================
+# NEGATIVE
+#==============================================================
+
+[Statedef -4]
+
+# init
+if roundstate < 2 {
+	mapset{map: "_blood_spawn"; value: 0}
+	mapset{map: "_blood_cooldown"; value: 0}
+}
+
+
+# Spawner
+ignorehitpause if !ishelper {
+
+	# run config first
+	if roundstate = 0 {
+		call F_Blood_Config();
+	}
+	
+	if roundstate = [2,3] && map(_blood_cooldown) <= 0 && map(_vnix_blood_cfg) && p2, const(Vnix_NoBlood) = 0 {
+		
+		# OK to spawn? (Modificado para 50% de vida y 30% de probabilidad aleatoria)
+		if !map(_blood_spawn) && hitDefAttr = SCA, NA, SA && p2, life < p2, lifeMax * 0.40
+		{
+			if !p2,hitshakeover && p2,receiveddamage > 0 && !p2,standby && random < 50
+			{
+				mapset{map: "_blood_cooldown"; value: 0.9 * tickspersecond}
+				mapset{map: "_blood_spawn"; value: 1}
+			}
+		}
+
+		# spawn it
+		if map(_blood_spawn) {
+			if p2, getHitVar(attr) = SCA, AA,na  && moveHitVar(SparkX) != 0 && moveHitVar(SparkY) != 0 && LocalCoord X <= 320 {
+				helper{
+					stateno: 404000;
+					id: 404142;
+					name: "splatter";
+					pos: movehitvar(sparkx) + random%12, movehitvar(sparky);
+					postype: p1;
+					ownpal: 1;
+					facing: -1;
+					size.xscale: .5;
+					size.yscale: .5;
+					extendsmap: 1;
+				}
+			}
+			
+			if p2, getHitVar(attr) = SCA, AP,na|| LocalCoord X > 320 {
+				helper{
+					stateno: 404000;
+					id: 404142;
+					name: "splatter";
+					pos: p2, const(size.mid.pos.x) + (random%12), p2, const(size.mid.pos.y) + (random%12 * -1.0);
+					postype: p2;
+					ownpal: 1;
+					facing: -1;
+					size.xscale: .5;
+					size.yscale: .5;
+					extendsmap: 1;
+				}
+			}
+		
+			# But only once!
+			mapset{map: "_blood_spawn"; value: 0}
+		}
+	}
+}
+	
+# cooldown timer
+if map(_blood_cooldown) > 0 {
+	mapadd{map: "_blood_cooldown"; value: -1}
+}
+
+# Debug
+displaytoclipboard{
+	text: "spawn = %d, cooldown = %d";
+	params: ceil(map(_blood_spawn)), ceil(map(_blood_cooldown));
+}

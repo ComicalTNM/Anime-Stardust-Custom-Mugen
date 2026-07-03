@@ -1,0 +1,361 @@
+
+#===============================================================================
+# Configuration
+#===============================================================================
+
+[Function F_Vnix_Duel_Config()]
+
+# Enable Duel
+mapset{map: "_vnix_duel_cfg_enable"; value: 1} 	# Enable Duel, 0 to disable
+
+
+# ========================================================================================================================================
+# Global states (not halted by Pause/SuperPause, no helper limitations)
+# ========================================================================================================================================
+#
+[StateDef -4]
+
+ignorehitpause if !ishelper && (teamside = 1 || teamside = 2)   && gamemode = "fightchallenge"  || gamemode = "fightchallengevs"   {
+
+	# Initialize
+	if roundstate = 0 {
+		if time = 0 {
+			# Run config
+			call F_Vnix_Duel_Config();
+			mapset{map: "_vnix_duel_time"; value: 0;}
+			mapset{map: "_vnix_duel_state"; value: 0;}
+		}
+	}
+
+}
+
+
+# ========================================================================================================================================
+# V-Nix - Duel Module
+# ========================================================================================================================================
+
+ignoreHitPause if !const(Default.Enable.Action) || isHelper || teamSide = 0 {
+	# Do nothing, global code disabled locally or executed by helper or stage
+} else if roundState >= 2 {
+
+	# Duel Module
+	if map(_vnix_duel_cfg_enable) != 0 {
+	
+		# Input handling
+		if map(_vnix_duel_input) > 0 {
+			mapadd{map: "_vnix_duel_input"; value: -1}
+		}
+	
+		if AILevel {
+			# AI for Round 1
+			if roundNo = 1
+			&& teamMode = Single
+			&& life <= lifeMax * 0.5 && enemy, life <= lifeMax * 0.5
+			&& random < 150 && random < 100 && random < 50
+			&& map(_vnix_duel_state) = 0
+			&& roundState = 2
+			&& moveType != H && enemy, moveType != H
+			&& enemy, alive
+			{
+				mapset{map: "_vnix_duel_input"; value: 30}
+				mapset{map: "_vnix_duel_input"; value: 30; redirectID: enemy, ID;}
+			}
+			
+			# AI for Round 2
+			if roundNo = 2
+			&& teamMode = Single
+			&& life <= lifeMax * 0.5 && enemy, life <= lifeMax * 0.5
+			&& random < 150 && random < 100 && random < 50
+			&& map(_vnix_duel_state) = 0
+			&& roundState = 2
+			&& moveType != H && enemy, moveType != H
+			&& enemy, alive
+			{
+				mapset{map: "_vnix_duel_input"; value: 30}
+				mapset{map: "_vnix_duel_input"; value: 30; redirectID: enemy, ID;}
+			}
+			
+			# AI for Round 3
+			if roundNo > 2
+			&& teamMode = Single
+			&& roundState = 2
+			&& moveType != H && enemy, moveType != H
+			&& enemy, alive
+			{
+				if map(_vnix_duel_state) = 0 && random < 150 && random < 100 && random < 50
+				{
+					mapset{map: "_vnix_duel_input"; value: 30}
+					mapset{map: "_vnix_duel_input"; value: 30; redirectID: enemy, ID;}
+				}
+
+				if map(_vnix_duel_state) = 1 && random < 150 && random < 100 && random < 50
+				&& life <= lifeMax * 0.25 && enemy, life <= lifeMax * 0.25 && enemy, teamMode != Turns
+				{
+					mapset{map: "_vnix_duel_input"; value: 30}
+					mapset{map: "_vnix_duel_input"; value: 30; redirectID: enemy, ID;}
+				}
+			}
+		} else {
+			if inputtime(s) = 1 {
+				mapset{map: "_vnix_duel_input"; value: 30}
+			}
+		}
+		
+		# Duel Accepted - Phase 1
+		if map(_vnix_duel_input)
+		&& enemy, map(_vnix_duel_input)
+		&& map(_vnix_duel_state) = 0
+		&& map(_vnix_duel_match) = 0
+		&& pausetime = 0
+		{
+			notHitBy{value: SCA; time: 60;}
+			mapadd{map: "_vnix_duel_time"; value: 1;}
+			assertSpecial{flag: nomusic;}
+			if map(_vnix_duel_time) = 1 {
+				lifebaraction{text: "Duel Accepted"; top: 1}
+				powerSet{value: powerMax;}
+				#mapset{map: "_pots_dash_gauge"; value: 1}
+				if playerNo = 1 {
+					playsnd{value: VP 110, 12; volumescale: 100; freqmul: 1.0}
+					playsnd{value: VP 110, 13; volumescale: 100; freqmul: 1.0}
+				}
+				bgpalfx{
+					time: 30;
+					add: -128, -128, -128;
+				}
+				# Ground FX
+				explod{
+					anim: VP 10100;
+					posType: p1;
+					pos: 0, 0 - Pos Y;
+					velocity: 0, 0;
+					sprPriority: sprpriority - 1;
+					ownPal: 1;
+					facing: 1;
+					scale: .5, .5;
+					trans: Add;
+					bindTime: 0;
+					superMoveTime: -1;
+					pauseMoveTime: -1;
+					removeOnGetHit: 0;
+					ignoreHitPause: 1;
+					PalFx.Time: 23;
+					PalFx.Mul: 30, 144, 255;
+					PalFx.Add: 0, 200, 200
+				}
+				# Front FX
+				explod{
+					anim: VP 10016;
+					posType: p1;
+					pos: 0, 0;
+					velocity: 0, 0;
+					sprPriority: sprpriority + 1;
+					ownPal: 1;
+					facing: 1;
+					scale: 1, 1;
+					trans: Add;
+					bindTime: -1;
+					superMoveTime: -1;
+					pauseMoveTime: -1;
+					removeOnGetHit: 0;
+					ignoreHitPause: 1;
+					PalFx.Time: 23;
+					PalFx.Mul: 30, 144, 255;
+					PalFx.Add: 0, 200, 200
+				}
+			}
+			if map(_vnix_duel_time) = 5 {
+				explod{
+					postype: p1;
+					id: 694200;
+					pos: 0, 0;
+					vel: 0, 0;
+					facing: 1;
+					anim: anim;
+					animfreeze: 1;
+					animelem: animelemno(0);
+					sprpriority: sprpriority + 1;
+					removetime: 30;
+					pausemovetime: -1;
+					supermovetime: -1;
+					trans: addalpha;
+					alpha: 256,256;
+					scale: 1.0 * const(size.xscale), 1.0 * const(size.yscale);
+					palFx.time: 30;
+					palFx.mul: 30, 144, 255;
+					palFx.add: 0, 200, 200;
+					interpolation.time: 30;
+					interpolation.alpha: 0,256;
+					interpolation.scale: 1.15 * const(size.xscale), 1.15 * const(size.yscale);
+					ownpal: 1;
+				}
+				pause{time: 30}
+				mapset{map: "_vnix_duel_state"; value: 1;}
+				mapset{map: "_vnix_duel_state"; value: 1; redirectID: enemy, ID;}
+				mapset{map: "_vnix_duel_match"; value: 1;}
+				mapset{map: "_vnix_duel_input"; value: 0;}
+			}
+		}
+		
+		# Sudden Death - Phase 2
+		if map(_vnix_duel_input)
+		&& enemy, map(_vnix_duel_input)
+		&& map(_vnix_duel_state) = 1
+		&& map(_vnix_duel_match) = 0
+		&& pausetime = 0
+		{
+			notHitBy{value: SCA; time: 90;}
+			mapadd{map: "_vnix_duel_time"; value: 1;}
+			assertSpecial{flag: nomusic;}
+			if map(_vnix_duel_time) = 1 {
+				lifebaraction{text: "Sudden Death"; top: 1}
+				lifeSet{value: lifeMax * 0.01;}
+				mapset{map: "_pots_dash_gauge"; value: 1000}
+				bgpalfx{
+					time: 60;
+					add: -128, -128, -128;
+				}
+				
+				# Reset Buffs, Meta World & Items
+				defenceMulSet{value: 1;}
+				mapset{map: "_vnix_rushdrive_active"; value: 0}
+				mapset{map: "_vnix_item_slot1"; value: 0}
+				mapset{map: "_vnix_item_slot2"; value: 0}
+				mapset{map: "ikarmor_throw_protect2"; value: 0;}
+				mapset{map: "ikarmor_assertarmor2"; value: 0;}
+				mapset{map: "_vnix_armor_hp"; value: 0;}
+				mapset{map: "_vnix_phoenix_buff"; value: 0;}
+				mapset{map: "_vnix_phoenix_bufftime"; value: 0;}
+				mapset{map: "_vnix_crit_berry"; value: 0;}
+				mapset{map: "_vnix_greenpotion_dodge"; value: 0;}
+				mapset{map: "_vnix_meta_stock"; value: 0} # Empty Meta Stock
+				mapset{map: "_vnix_meta_active"; value: 0} # Reset Meta World
+				mapset{map: "_vnix_meta_break"; value: 1} # Break Meta World
+				mapset{map: "_vnix_meta_input"; value: 0} # Reset Input
+				mapset{map: "_vnix_meta_invert"; value: 0} # Reset World Invert
+				mapset{map: "_vnix_meta_time"; value: 0} # Reset Timer
+				mapset{map: "ikarmor_throw_protect"; value: 0;}
+				mapset{map: "ikarmor_assertarmor"; value: 0;}
+				mapset{map: "_vnix_mercury_buff"; value: 0}
+				mapset{map: "_vnix_raijin_buff"; value: 0}
+				mapset{map: "_vnix_pandora_buff"; value: 0}
+				mapset{map: "_vnix_soul_link"; value: 0}
+				mapset{map: "_vnix_life_steal"; value: 0}
+				afterImageTime{time: 0;}
+				removeExplod{id: 20605}
+				removeExplod{id: 20606}
+				removeExplod{id: 30603}
+				removeExplod{id: 30604}
+				removeExplod{id: 30605}
+				removeExplod{id: 30606}
+				removeExplod{id: 30607}
+				removeExplod{id: 30608}
+				removeExplod{id: 30609}
+				removeExplod{id: 30610}
+				removeExplod{id: 30611}
+				removeExplod{id: 30612}
+				removeExplod{id: 30613}
+				removeExplod{id: 30614}
+				removeExplod{id: 30615}
+				removeExplod{id: 30616}
+				removeExplod{id: 30617}
+				removeExplod{id: 30650}
+				stopSnd{channel: 5;}
+				
+				if playerNo = 1 {
+					playsnd{value: VP 110, 15; volumescale: 100; freqmul: 1.0}
+					playsnd{value: VP 110, 14; volumescale: 100; freqmul: 1.0}
+				}
+				# Ground FX
+				explod{
+					anim: VP 10100;
+					posType: p1;
+					pos: 0, 0 - Pos Y;
+					velocity: 0, 0;
+					sprPriority: sprpriority - 1;
+					ownPal: 1;
+					facing: 1;
+					scale: .5, .5;
+					trans: Add;
+					bindTime: 0;
+					superMoveTime: -1;
+					pauseMoveTime: -1;
+					removeOnGetHit: 0;
+					ignoreHitPause: 1;
+					PalFx.Time: 23;
+					PalFx.Mul: 255, 0, 0;
+					PalFx.Add: 100, 0, 0;
+				}
+				# Front FX
+				explod{
+					anim: VP 20081;
+					postype: p1;
+					pos: const(size.mid.pos.x), -10;
+					scale: .75, 1.25;
+					angle: random%10;
+					facing: 1;
+					ontop: 0;
+					vel: 0, -.5;
+					bindtime: 2;
+					sprpriority: 3;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1
+				}
+				explod{
+					anim: VP 20081;
+					postype: p1;
+					pos: const(size.mid.pos.x), -10;
+					scale: .75, .75;
+					angle: random%10;
+					facing: -1;
+					ontop: 0;
+					vel: 0, -1;
+					bindtime: 2;
+					sprpriority: -3;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1
+				}
+			}
+			if map(_vnix_duel_time) = 5 {
+				explod{
+					postype: p1;
+					id: 694200;
+					pos: 0, 0;
+					vel: 0, 0;
+					facing: 1;
+					anim: anim;
+					animfreeze: 1;
+					animelem: animelemno(0);
+					sprpriority: sprpriority + 1;
+					removetime: 30;
+					pausemovetime: -1;
+					supermovetime: -1;
+					trans: addalpha;
+					alpha: 256,256;
+					scale: 1.0 * const(size.xscale), 1.0 * const(size.yscale);
+					palFx.time: 30;
+					palFx.mul: 250, 0, 0;
+					palFx.add: 200, 0, 0;
+					interpolation.time: 30;
+					interpolation.alpha: 0,256;
+					interpolation.scale: 1.15 * const(size.xscale), 1.15 * const(size.yscale);
+					ownpal: 1;
+				}
+				pause{time: 60}
+				mapset{map: "_vnix_duel_state"; value: 2;}
+				mapset{map: "_vnix_duel_state"; value: 2; redirectID: enemy, ID;}
+				mapset{map: "_vnix_duel_match"; value: 1;}
+				mapset{map: "_vnix_duel_input"; value: 0;}
+			}
+		}
+		
+		# Reset Maps
+		if map(_vnix_duel_input) <= 0 {
+			mapset{map: "_vnix_duel_time"; value: 0;}
+			mapset{map: "_vnix_duel_match"; value: 0;}
+		}
+	}
+}
+

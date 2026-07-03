@@ -1,0 +1,1734 @@
+
+#===============================================================================
+# Configuration
+#===============================================================================
+
+[Function F_Vnix_Meta_Config()]
+
+mapset{map: "_vnix_meta_cfg_enable"; value: 1}			# Enable Meta World, 0 to disable
+mapset{map: "_vnix_meta_cfg_cost"; value: 1000}			# How much power it takes to activate
+
+mapset{map: "_vnix_meta_cfg_random"; value: 1}			# Enable random Meta World, 0 to deactivate
+mapset{map: "_vnix_meta_cfg_cpu"; value: 1}				# Enable random Meta World for CPU, 0 to deactivate
+mapset{map: "_vnix_meta_cfg_random_round"; value: 1}	# Enable random Meta World each round, 0 to make the Meta World from Round 1 persist until End of Match
+
+mapset{map: "_vnix_health_increase"; value: 1}			# Enable 20% more health for all characters (only if item & meta modules are active)
+
+
+# Hyper Armor Code by Kamekaze
+[StateDef 4123119; physics: N; type: S; anim:-2; moveType: A;]
+
+if time = 0 {
+	map(hittime):= -1;
+}
+
+ignorehitpause {
+	attackDist{value: 0}
+	if root, facing != facing {
+		turn{}
+	}
+	if root,statetype = A {
+		statetypeset{statetype: A}
+	} else if root,statetype = C {
+		statetypeset{statetype: C}
+	} else {
+		statetypeset{statetype: S}
+	}
+
+	assertspecial{flag:invisible}
+	hitOverride {
+		time: -1;
+		attr: SCA,AA,AP,AT;
+		stateno: 4123119;
+	}
+	if root,movetype != H {
+		hitby{value:SCA,AA,AP}
+	} else if root, movetype = H || !root, map(ikarmor_assertarmor) {
+		nothitby{value:SCA}
+	}
+
+	changeanim{value: root, anim; elem: root, animelemno(0)}
+	if !map(hitshaketime) {
+		bindtoroot{pos: 0, 0} #For nightly as of 5/30/24 or later change to 0,0 otherwise
+	}
+
+	if map(hitshaketime) {
+		map(hitshaketime) := map(hitshaketime) - 1;
+
+		if map(hitshaketime) % 2 {
+			offset{x:-1; redirectid: root, id}
+		} else {
+			offset{x:1; redirectid: root, id}
+		}
+		
+		assertspecial{flag:animfreeze}
+		
+		if !map(hitshaketime) {
+			map(receivedhit) := 0;
+		}
+	} else if map(slidetime) {
+		if map(xvel) && statetype != A {
+			veladd{x: map(xvel)*facing; redirectid: root, id}
+			map(xvel) := 0;
+		}
+		map(slidetime) := max(0, map(slidetime) - 2);
+	}
+
+	if map(hittime)>-1 && !map(hitshaketime) {
+		map(hittime):=map(hittime)-1;
+	}
+
+	if root, map(ikarmor_assertarmor) {
+		if gethitvar(hitshaketime) && !map(hitshaketime) && pausetime = 0 {
+			map(receivedhit) := 1;
+			map(idtarget) := gethitvar(id);
+			if root, stateno != [120,155] {
+				lifeadd{value: -gethitvar(damage) * 0.5; redirectid: root, id}
+			}
+			let pausetime = gethitvar(hitshaketime);
+			map(hitshaketime) := $pausetime;
+			map(hittime) := floor(gethitvar(hittime)*.55);
+			map(slidetime) := gethitvar(slidetime);
+			map(xvel):=gethitvar(xvel);
+			playsnd{value: VP 110, 6; volumescale: 200; freqmul: 1.0; channel: 5}
+			palfx{
+				time: 15;
+				add: 200, 200, 200;
+				sinadd: -128, -128, -128, 60;
+				redirectID: root, ID;
+			}
+		}
+	}
+}
+
+if map(hittime) > 0 && (!playeridexist(map(idtarget)) || !playerid(map(idtarget)),movecontact && !playerid(map(hittime)), ishelper) {
+	map(hittime):=0;
+}
+
+displaytoclipboard{text:"%d %d %d";params:map(rot),map(rw),map(oto)}
+
+if root, map(ikarmor_assertarmor) = 0 {
+	destroySelf{}
+}
+
+
+[StateDef -4]
+
+ignorehitpause if !ishelper && (teamside = 1 || teamside = 2) && playerNo = teamLeader  && gamemode = "fightchallenge" ||  gamemode =  "fightchallengevs"   {
+
+	# Initialize
+	if roundState = 0 && time = 0 {
+	
+		# Run config
+		call F_Vnix_Meta_Config();
+		
+		# Reset variables
+		mapset{map: "_vnix_meta_active"; value: 0}
+		mapset{map: "_vnix_meta_invert"; value: 0}
+		
+		if gameMode = "Training" {
+			mapset{map: "_vnix_metaworld_type"; value: const(Vnix_Meta_World);}
+		} else {
+			# Set Maps
+			if (AILevel && map(_vnix_meta_cfg_cpu)) || (!AILevel && map(_vnix_meta_cfg_random)) {
+				# Define Random Meta World
+				mapset{map: "_vnix_metaworld_type"; value: random%9;}
+				
+				# Random Meta World from Round 1 persist until end of match
+				if map(_vnix_meta_cfg_random_round) = 0 {
+					if RoundNo = 1 {
+						mapset{map: "_vnix_metaworld_static"; value: map(_vnix_metaworld_type);}
+					}
+					mapset{map: "_vnix_metaworld_type"; value: map(_vnix_metaworld_static);}
+				}
+				
+			} else {
+				# Use player defined Meta World
+				mapset{map: "_vnix_metaworld_type"; value: const(Vnix_Meta_World);}
+			}
+		}
+		
+		# Increase Life if both Items & Meta World
+		if map(_vnix_health_increase) && roundNo = 1 && (teamMode = Single || teamMode = Turns) && map(_vnix_meta_cfg_enable) && map(_vnix_potion_cfg_enable) {
+			modifyPlayer{lifemax: lifemax * 1.2}
+			lifeAdd{value: lifeMax; absolute: 1}
+		}
+	}
+	
+	if fightScreenState(RoundDisplay) {
+		# Reset Maps 
+		if teamMode = Single || teamMode = Turns {
+			mapset{map: "_vnix_meta_stock"; value: 3}
+		}
+	}
+	
+	if gameMode = "Training" {
+		mapset{map: "_vnix_meta_stock"; value: 3}
+	}
+	
+	if roundState = 2 && map(_vnix_meta_cfg_enable) != 0 {
+		# Input handling
+		if AIlevel && enemy, gethitvar(isbound) = 0 && pausetime = 0 && p2, pausetime = 0 {
+			if map(_vnix_metaworld_type) = 0
+			&& random <= 200 && random <= 350 && random <= 150
+			&& life = [lifeMax * 0.01, lifeMax * 0.5]
+			&& (map(_pots_dash_gauge) >= 500 && map(_pots_dash_burnout) = 0)
+			&& power >= map(_vnix_meta_cfg_cost)
+			&& moveType = I && stateType != A
+			&& (statetype != L || stateno = 5120) # Let AI use Meta World
+			&& (enemy, map(_vnix_meta_active) = 0 || (map(_vnix_meta_stock) >= 2 && enemy, map(_vnix_meta_active) = 1 && enemy, map(_vnix_meta_time) = [60,180]))
+			{
+				mapset{map: "_vnix_meta_input"; value: 1}
+			}
+
+			if (map(_vnix_metaworld_type) = 1 || map(_vnix_metaworld_type) = 2
+			|| map(_vnix_metaworld_type) = 3 || map(_vnix_metaworld_type) = 4
+			|| map(_vnix_metaworld_type) = 5 || map(_vnix_metaworld_type) = 6
+			|| map(_vnix_metaworld_type) = 7 || map(_vnix_metaworld_type) = 8)
+			&& random <= 200 && random <= 350 && random <= 150
+			&& (map(_pots_dash_gauge) >= 500 && map(_pots_dash_burnout) = 0)
+			&& power >= map(_vnix_meta_cfg_cost)
+			&& moveType = I && stateType != A
+			&& (statetype != L || stateno = 5120) # Let AI use Meta World
+			&& (enemy, map(_vnix_meta_active) = 0 || (map(_vnix_meta_stock) >= 2 && enemy, map(_vnix_meta_active) = 1 && enemy, map(_vnix_meta_time) = [60,180]))
+			{
+				mapset{map: "_vnix_meta_input"; value: 1}
+			}
+			
+		} else {
+			# Hold down buttons button
+			if inputtime(s) = 1 && inputtime(D) > 0 && stateType != A {
+				mapadd{map: "_vnix_meta_input"; value: 1}
+			}
+			if inputtime(D) < 0 {
+				mapset{map: "_vnix_meta_input"; value: 0}
+			}
+		}
+		
+		# Meta World Title
+		if map(_vnix_life_hidegauge) = 0 && (teamMode = Single || teamMode = Turns) {
+			if map(_vnix_metaworld_type) = 0 {
+				# Text
+				explod{
+					anim: VP 30610;
+					postype: left;
+					pos: const240p(cond(teamside = 1, 24.5, 214.5)), const240p(35);
+					scale: 1, 1;
+					angle: 0;
+					facing: 1;
+					ontop: 0;
+					removetime: 1;
+					sprpriority: -5;
+					pausemovetime: -1;
+					supermovetime: -1;
+					trans: addalpha;
+					alpha: cond(map(_vnix_meta_active), 256, 128),cond(map(_vnix_meta_active), 0, 128);
+					ownpal: 1;
+					palfx.time: -1;
+					palfx.color: cond(map(_vnix_meta_active), 256, 0);
+				}
+			}
+			if map(_vnix_metaworld_type) = 1 {
+				# Text
+				explod{
+					anim: VP 30611;
+					postype: left;
+					pos: const240p(cond(teamside = 1, 24.5, 217)), const240p(35);
+					scale: 1, 1;
+					angle: 0;
+					facing: 1;
+					ontop: 0;
+					removetime: 1;
+					sprpriority: -5;
+					pausemovetime: -1;
+					supermovetime: -1;
+					trans: addalpha;
+					alpha: cond(map(_vnix_meta_active), 256, 128),cond(map(_vnix_meta_active), 0, 128);
+					ownpal: 1;
+					palfx.time: -1;
+					palfx.color: cond(map(_vnix_meta_active), 256, 0);
+				}
+			}
+			if map(_vnix_metaworld_type) = 2 {
+				# Text
+				explod{
+					anim: VP 30612;
+					postype: left;
+					pos: const240p(cond(teamside = 1, 24.5, 215.5)), const240p(35);
+					scale: 1, 1;
+					angle: 0;
+					facing: 1;
+					ontop: 0;
+					removetime: 1;
+					sprpriority: -5;
+					pausemovetime: -1;
+					supermovetime: -1;
+					trans: addalpha;
+					alpha: cond(map(_vnix_meta_active), 256, 128),cond(map(_vnix_meta_active), 0, 128);
+					ownpal: 1;
+					palfx.time: -1;
+					palfx.color: cond(map(_vnix_meta_active), 256, 0);
+				}
+			}
+			if map(_vnix_metaworld_type) = 3 {
+				# Text
+				explod{
+					anim: VP 30613;
+					postype: left;
+					pos: const240p(cond(teamside = 1, 24.5, 221.5)), const240p(35);
+					scale: 1, 1;
+					angle: 0;
+					facing: 1;
+					ontop: 0;
+					removetime: 1;
+					sprpriority: -5;
+					pausemovetime: -1;
+					supermovetime: -1;
+					trans: addalpha;
+					alpha: cond(map(_vnix_meta_active), 256, 128),cond(map(_vnix_meta_active), 0, 128);
+					ownpal: 1;
+					palfx.time: -1;
+					palfx.color: cond(map(_vnix_meta_active), 256, 0);
+				}
+			}
+			if map(_vnix_metaworld_type) = 4 {
+				# Text
+				explod{
+					anim: VP 30614;
+					postype: left;
+					pos: const240p(cond(teamside = 1, 24.5, 237.5)), const240p(35);
+					scale: 1, 1;
+					angle: 0;
+					facing: 1;
+					ontop: 0;
+					removetime: 1;
+					sprpriority: -5;
+					pausemovetime: -1;
+					supermovetime: -1;
+					trans: addalpha;
+					alpha: cond(map(_vnix_meta_active), 256, 128),cond(map(_vnix_meta_active), 0, 128);
+					ownpal: 1;
+					palfx.time: -1;
+					palfx.color: cond(map(_vnix_meta_active), 256, 0);
+				}
+			}
+			if map(_vnix_metaworld_type) = 5 {
+				# Text
+				explod{
+					anim: VP 30615;
+					postype: left;
+					pos: const240p(cond(teamside = 1, 24.5, 221.5)), const240p(35);
+					scale: 1, 1;
+					angle: 0;
+					facing: 1;
+					ontop: 0;
+					removetime: 1;
+					sprpriority: -5;
+					pausemovetime: -1;
+					supermovetime: -1;
+					trans: addalpha;
+					alpha: cond(map(_vnix_meta_active), 256, 128),cond(map(_vnix_meta_active), 0, 128);
+					ownpal: 1;
+					palfx.time: -1;
+					palfx.color: cond(map(_vnix_meta_active), 256, 0);
+				}
+			}
+			if map(_vnix_metaworld_type) = 6 {
+				# Text
+				explod{
+					anim: VP 30616;
+					postype: left;
+					pos: const240p(cond(teamside = 1, 24.5, 223.5)), const240p(35);
+					scale: 1, 1;
+					angle: 0;
+					facing: 1;
+					ontop: 0;
+					removetime: 1;
+					sprpriority: -5;
+					pausemovetime: -1;
+					supermovetime: -1;
+					trans: addalpha;
+					alpha: cond(map(_vnix_meta_active), 256, 128),cond(map(_vnix_meta_active), 0, 128);
+					ownpal: 1;
+					palfx.time: -1;
+					palfx.color: cond(map(_vnix_meta_active), 256, 0);
+				}
+			}
+			if map(_vnix_metaworld_type) = 7 {
+				# Text
+				explod{
+					anim: VP 30617;
+					postype: left;
+					pos: const240p(cond(teamside = 1, 24.5, 238)), const240p(35);
+					scale: 1, 1;
+					angle: 0;
+					facing: 1;
+					ontop: 0;
+					removetime: 1;
+					sprpriority: -5;
+					pausemovetime: -1;
+					supermovetime: -1;
+					trans: addalpha;
+					alpha: cond(map(_vnix_meta_active), 256, 128),cond(map(_vnix_meta_active), 0, 128);
+					ownpal: 1;
+					palfx.time: -1;
+					palfx.color: cond(map(_vnix_meta_active), 256, 0);
+				}
+			}
+			if map(_vnix_metaworld_type) = 8 {
+				# Text
+				explod{
+					anim: VP 30618;
+					postype: left;
+					pos: const240p(cond(teamside = 1, 24.5, 239)), const240p(35);
+					scale: 1, 1;
+					angle: 0;
+					facing: 1;
+					ontop: 0;
+					removetime: 1;
+					sprpriority: -5;
+					pausemovetime: -1;
+					supermovetime: -1;
+					trans: addalpha;
+					alpha: cond(map(_vnix_meta_active), 256, 128),cond(map(_vnix_meta_active), 0, 128);
+					ownpal: 1;
+					palfx.time: -1;
+					palfx.color: cond(map(_vnix_meta_active), 256, 0);
+				}
+			}
+		}
+		
+		# Meta World
+		if time > 0
+		&& !incustomstate
+		&& map(_vnix_meta_input) >= 1
+		&& map(_vnix_meta_active) = 0
+		&& map(_pots_dash_gauge) >= 500
+		&& map(_pots_dash_burnout) = 0
+		&& power >= map(_vnix_meta_cfg_cost)
+		&& map(_vnix_meta_stock) > 0
+		&& alive
+		&& (teamMode = Single || teamMode = Turns)
+		&& moveType != H
+		&& (map(_vnix_metaworld_type) = 0 || map(_vnix_metaworld_type) = 1
+		   || (map(_vnix_metaworld_type) = 2 && map(ikarmor_assertarmor2) = 0)
+		   || map(_vnix_metaworld_type) = 3 || map(_vnix_metaworld_type) = 4
+		   || map(_vnix_metaworld_type) = 5 || map(_vnix_metaworld_type) = 6
+		   || map(_vnix_metaworld_type) = 7 || map(_vnix_metaworld_type) = 8)
+		&& (enemy, map(_vnix_meta_active) = 0 || (enemy, map(_vnix_meta_active) = 1 && enemy, map(_vnix_meta_time) = [60,180])) # For Meta World Counters
+		{
+			if enemy, map(_vnix_meta_active) = 1 {
+				lifebaraction{text: "Meta World Counter"; top: 1}
+			} else {
+				lifebaraction{text: "Meta World"; top: 1}
+			}
+			mapset{map: "_vnix_meta_active"; value: 1}
+			mapadd{map: "_pots_dash_gauge"; value: -500}
+			mapadd{map: "_vnix_meta_stock"; value: -1}
+			mapset{map: "_vnix_meta_invert"; value: 1}
+			pause{time: 60; movetime: 60}
+			powerAdd{value: -abs(map(_vnix_meta_cfg_cost));}
+			# World Summon
+			explod{
+				anim: VP 20111;
+				ID: 20111;
+				postype: left;
+				pos: const240p(160), const240p(120);
+				scale: 1,1;
+				angle: 0;
+				facing: 1;
+				under: 1;
+				trans: Addalpha;
+				alpha: 128,256;
+				layerno: 0;
+				sprpriority: -99;
+				removetime: -1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				interpolation.time: 60;
+				interpolation.scale: 1.2,1.2;
+				interpolation.alpha: 0,256;
+			}
+
+			explod{
+				anim: VP 30601;
+				postype: left;
+				pos: const240p(0),const240p(0);
+				scale: 1, 1;
+				angle: 0;
+				facing: 1;
+				ontop: 1;
+				trans: Addalpha;
+				alpha: 256,256;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				interpolation.time: 60;
+				interpolation.alpha: 0,256;
+			}
+			playsnd{value: VP 110, 4; volumescale: 100; freqmul: 1.0}
+			posFreeze{value: 1;}
+			posFreeze{value: 1; redirectID: enemy, ID;}
+			nothitby{value: SCA; time: 30;}
+			if enemy, map(_vnix_meta_active) = 1 {
+				mapset{map: "_vnix_meta_break"; value: 1; redirectID: enemy, ID}
+			}
+		}
+		
+
+		# Meta World Effects
+		if map(_vnix_meta_active) != 0 && alive {
+		
+			mapadd{map: "_vnix_meta_time"; value: 1}
+			
+			# Invert World
+			if map(_vnix_meta_invert) = 1 {
+				if stagevar(info.name) = "spider's web"
+				|| stagevar(info.name) = "MvC BathHouse- Mens Area"
+				|| stagevar(info.name) = "KOF'96 - Stadium"
+				|| stagevar(info.name) = "KOGA - Meta"
+				{
+					bgpalfx{
+						time: 1;
+						color: 256;
+					}
+				} else {
+					bgpalfx{
+						time: 1;
+						color: 64;
+					}
+				}
+			}
+			
+			# Meta Border
+			explod{
+				anim: VP 40000;
+				postype: left;
+				pos: const240p(0), const240p(0);
+				scale: 1,1;
+				angle: 0;
+				facing: 1;
+				ontop: 0;
+				under: 1;
+				sprpriority: -99;
+				removetime: 1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				trans: add;
+				palfx.time: -1;
+				palfx.add: 125,125,125;
+			}
+			
+			# Meta World Text
+			explod{
+				anim: VP 30622;
+				postype: left;
+				pos: const240p(160), const240p(0);
+				scale: 1, 1;
+				angle: 0;
+				facing: 1;
+				ontop: 0;
+				removetime: 1;
+				sprpriority: -5;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1
+			}
+			
+			# Timer
+			explod{
+				anim: VP 30623;
+				id: 30650;
+				postype: left;
+				pos: const240p(160), const240p(44);
+				scale: 1 - float(map(_vnix_meta_time) * 0.00185), 1;
+				angle: 0;
+				facing: 1;
+				ontop: 0;
+				removetime: 1;
+				sprpriority: -5;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+			}
+			
+			# Timer BG
+			explod{
+				anim: VP 30623;
+				id: 30650;
+				postype: left;
+				pos: const240p(160), const240p(44);
+				scale: 1, 1;
+				angle: 0;
+				facing: 1;
+				ontop: 0;
+				removetime: 1;
+				sprpriority: -5;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				trans: addalpha;
+				alpha: 0,128;
+				palfx.time: -1;
+				palfx.add: -255,-255,-255;
+			}
+			
+			# Buffs ;======================================================
+			
+			# General Buffs ; ---------------------------------------------
+			
+			# Extra Damage for Normals & Specials
+			if enemy, getHitVar(frame) && enemy, getHitVar(attr) = SCA, NA, SA, NP, SP, NT, ST && pausetime = 0 {
+				targetLifeAdd{value: -10; absolute: 1; kill: 0}
+			}
+			
+			# Special Buffs ; ---------------------------------------------
+			
+			# Yggdrasil's Might - Health Recovery
+			if map(_vnix_metaworld_type) = 0 {
+				if life < lifeMax && map(_vnix_meta_time)%2 = 0 && moveType != H {
+					lifeAdd{value: 1; absolute: 1; kill: 0}
+				}
+				mapset{map: "_pots_dash_gauge_cooldown"; value: 0}
+				if map(_vnix_meta_time) = 30 {
+					playsnd{value: VP 110, 3; volumescale: 100; freqmul: 1.0; channel: 5}
+				}
+				palfx {
+					time: 1;
+					add: 0,30,0;
+				}
+				if gametime%15 = 0 {
+					explod{
+						anim: VP 30603;
+						id: 30603;
+						postype: p1;
+						pos: 10, -30;
+						scale: .5,.5;
+						random: 20,0;
+						velocity: 0, -2;
+						angle: 0;
+						facing: 1;
+						sprpriority: 5;
+						removetime: 40;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						trans: addalpha;
+						alpha: 256,256;
+						palfx.time: -1;
+						palfx.mul: 0,200,0;
+						interpolation.time: 40;
+						interpolation.alpha: 0,256;
+					}
+				}
+				if gametime%18 = 0 {
+					explod{
+						anim: VP 30603;
+						id: 30604;
+						postype: p1;
+						pos: 10, -40;
+						scale: .5,.5;
+						random: 20,0;
+						velocity: 0, -2;
+						angle: 0;
+						facing: 1;
+						sprpriority: 5;
+						removetime: 40;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						trans: addalpha;
+						alpha: 256,256;
+						interpolation.time: 40;
+						interpolation.alpha: 0,256;
+					}
+				}
+			}
+			
+			# Firebird Encore - Enemy Burn
+			if map(_vnix_metaworld_type) = 1 {
+				if enemy, life >= 1 && map(_vnix_meta_time)%2 = 0 {
+					lifeAdd{value: -1; absolute: 1; kill: 0; redirectID: enemy, ID;}
+				}
+				mapset{map: "_pots_dash_gauge_cooldown"; value: 1; redirectID: enemy, ID;}
+				palfx {
+					time: 1;
+					add: 30,0,0;
+					redirectID: enemy, ID;
+				}
+				if map(_vnix_meta_time) = 30 {
+					playsnd{value: VP 110, 5; volumescale: 50; freqmul: 1.0; channel: 5; loop: 1;}
+				}
+				if numExplod(30605) = 0 {
+					explod{
+						anim: VP 30605;
+						id: 30605;
+						postype: left;
+						pos: const240p(160), const240p(30);
+						scale: 2,2;
+						velocity: 0, 0;
+						angle: 0;
+						facing: 1;
+						under: 1;
+						sprpriority: -99;
+						removetime: -1;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						trans: add;
+					}
+				}
+				if numExplod(30616) = 0 {
+					explod{
+						anim: VP 30604;
+						id: 30616;
+						postype: p2;
+						pos: const(size.mid.pos.x), -15;
+						scale: 2,1.2;
+						velocity: 0, 0;
+						angle: 0;
+						bindtime: -1;
+						facing: cond(random <= 500, 1, -1);
+						sprpriority: -5;
+						removetime: -1;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						trans: add;
+					}
+				}
+				if numExplod(30617) = 0 {
+					explod{
+						anim: VP 30604;
+						id: 30617;
+						postype: p2;
+						pos: const(size.mid.pos.x), const(size.mid.pos.y) + 10;
+						scale: .5,.5;
+						velocity: 0, 0;
+						angle: 0;
+						bindtime: -1;
+						facing: cond(random <= 500, 1, -1);
+						sprpriority: 5;
+						removetime: -1;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						trans: add;
+					}
+				}
+				if gametime%15 = 0 {
+					explod{
+						anim: VP 30606;
+						id: 30606;
+						postype: p2;
+						pos: 0, 0;
+						scale: 1,1;
+						random: 20,0;
+						velocity: 0, -2;
+						angle: 0;
+						facing: 1;
+						sprpriority: 5;
+						removetime: 40;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						trans: addalpha;
+						alpha: 256,256;
+						interpolation.time: 40;
+						interpolation.alpha: 0,256;
+					}
+				}
+				if gametime%18 = 0 {
+					explod{
+						anim: VP 30606;
+						id: 30607;
+						postype: p2;
+						pos: 0, -20;
+						scale: 1,1;
+						random: 20,0;
+						velocity: 0, -2;
+						angle: 0;
+						facing: 1;
+						sprpriority: 5;
+						removetime: 40;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						trans: addalpha;
+						alpha: 256,256;
+						interpolation.time: 40;
+						interpolation.alpha: 0,256;
+					}
+				}
+			}
+			
+			# Vulcan's Armory - Hyper Armor
+			if map(_vnix_metaworld_type) = 2 {
+				mapset{map: "ikarmor_throw_protect"; value: 1;}
+				mapset{map: "ikarmor_assertarmor"; value: 1;}
+				
+				defenceMulSet{value: .5}
+				
+				# Extend Hit Time
+				if enemy, hitDefAttr = SCA, AA
+				&& enemy, movehitvar(frame)
+				&& (enemy, movehit || enemy, moveguarded) {
+					modifyplayer{hitpausetime: 30; redirectID: enemy, ID}
+				}
+				palfx {
+					time: 1;
+					add: 0,0,30;
+				}
+				if map(_vnix_meta_time) = 30 {
+					playsnd{value: VP 110, 6; volumescale: 200; freqmul: 1.0; channel: 5}
+				}
+				if numExplod(30608) = 0 {
+					explod{
+						anim: VP 30607;
+						id: 30608;
+						postype: p1;
+						pos: const(size.mid.pos.x), const(size.mid.pos.y);
+						scale: .75,.75;
+						velocity: 0, 0;
+						angle: 0;
+						facing: 1;
+						sprpriority: 5;
+						removetime: -1;
+						bindtime: -1;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						trans: add;
+					}
+				}
+			}
+			
+			# Mercury's Trail - Speed Boost & Infinite Rush Cancel
+			if map(_vnix_metaworld_type) = 3 {
+				
+				# Skip position update on Walk & Run
+				if stateno = 20 || stateno = 50 || stateno = 100  {
+					posadd{x: vel x * 1.25;}
+				}
+				
+				# Faster Hit Time
+				if hitDefAttr = SCA, AA
+				&& combocount <= 5
+				&& movehitvar(frame)
+				&& (movehit || moveguarded) {
+					modifyplayer{hitpausetime: 5;}
+				}
+				
+				mapset{map: "_vnix_mercury_buff"; value: 1}
+				
+				if map(_vnix_mercury_buff) {
+					mapset{map: "_pots_dash_gauge"; value: 1000;}
+				}
+				
+				palfx {
+					time: 1;
+					add: 30,0,30;
+				}
+				
+				# Purple AfterImages
+				if stateno = 0 {
+					afterImage{
+						length: 10;
+						palbright: 30, 0, 30;
+						palcontrast: 70, 0, 70;
+						paladd: -10, 0, -10;
+						palmul: 1.85, 0, 1.85;
+						timegap: 1;
+						framegap: 2;
+						trans: Add;
+						time: -1;
+					}
+				}
+				
+				if map(_vnix_meta_time) = 30 {
+					playsnd{value: VP 110, 8; volumescale: 200; freqmul: 1.0; channel: 5}
+				}
+				if gametime%15 = 0 {
+					explod{
+						anim: VP 30625;
+						id: 30611;
+						postype: p1;
+						pos: 0, -30;
+						scale: .5,.5;
+						random: 20,0;
+						velocity: 0, -2;
+						angle: -90;
+						facing: 1;
+						sprpriority: 5;
+						removetime: 40;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						trans: addalpha;
+						alpha: 256,256;
+						palfx.time: -1;
+						palfx.mul: 128,0,128;
+						palfx.add: 100,0,100;
+						palfx.color: 0;
+						interpolation.time: 40;
+						interpolation.alpha: 0,256;
+					}
+				}
+				if gametime%18 = 0 {
+					explod{
+						anim: VP 30625;
+						id: 30612;
+						postype: p1;
+						pos: 0, -50;
+						scale: .5,.5;
+						random: 20,0;
+						velocity: 0, -2;
+						angle: -90;
+						facing: 1;
+						sprpriority: 5;
+						removetime: 40;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						trans: addalpha;
+						alpha: 256,256;
+						palfx.time: -1;
+						palfx.mul: 128,0,128;
+						palfx.add: 100,0,100;
+						palfx.color: 0;
+						interpolation.time: 40;
+						interpolation.alpha: 0,256;
+					}
+				}
+				if numExplod(30609) = 0 {
+					explod{
+						anim: VP 30608;
+						id: 30609;
+						postype: left;
+						pos: const240p(cond(teamside = 1, 0, 320)), const240p(0);
+						scale: 1.25, 1;
+						velocity: 0, 0;
+						angle: 0;
+						facing: cond(teamside = 1, 1, -1);
+						under: 1;
+						sprpriority: -5;
+						removetime: -1;
+						bindtime: -1;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						trans: addalpha;
+						alpha: 128,256;
+						palfx.time: -1;
+						palfx.mul: 255,0,255;
+						palfx.color: 0;
+					}
+				}
+			}
+			
+			# Aion's Clock - Slow Debuff
+			if map(_vnix_metaworld_type) = 4 {
+				
+				# Slow Enemy Walk & Run
+				if enemy, stateno = 20 || enemy, stateno = 50 || enemy, stateno = 100  {
+					posadd{x: enemy, vel x * -0.5; redirectID: enemy, ID}
+				}
+				
+				# Extend Hit Time
+				if enemy, hitDefAttr = SCA, AA
+				&& enemy, movehitvar(frame)
+				&& (enemy, movehit || enemy, moveguarded) {
+					modifyplayer{hitpausetime: 20; redirectID: enemy, ID}
+				}
+				
+				# Extend Hit Stun
+				if enemy, gethitvar(frame) && enemy, inCustomState = 0 && enemy, getHitVar(attr) != SCA, AT {
+					gethitvarset{hitshaketime: enemy, gethitvar(hitshaketime) + 20; ctrltime: enemy, gethitvar(ctrltime) + 20; redirectID: enemy, ID;} # Extra stun
+				}
+				
+				palfx {
+					time: 1;
+					add: 0,30,30;
+					redirectID: enemy, ID;
+				}
+				
+				if map(_vnix_meta_time) = 30 {
+					playsnd{value: VP 110, 7; volumescale: 200; freqmul: 1.0; channel: 5}
+				}
+
+				if numExplod(30613) = 0 {
+					explod{
+						anim: VP 30626;
+						id: 30613;
+						postype: p2;
+						pos: const(size.mid.pos.x) + 10, const(size.mid.pos.y);
+						scale: 1,1;
+						velocity: 0, 0;
+						angle: 0;
+						facing: 1;
+						sprpriority: 5;
+						removetime: -1;
+						bindtime: -1;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						trans: add;
+					}
+				}
+				if numExplod(30610) = 0 {
+					explod{
+						anim: VP 30609;
+						id: 30610;
+						postype: left;
+						pos: const240p(cond(teamside = 1, 0, 320)), const240p(0);
+						scale: 1.25, 1;
+						velocity: 0, 0;
+						angle: 0;
+						facing: cond(teamside = 1, 1, -1);
+						under: 1;
+						sprpriority: -5;
+						removetime: -1;
+						bindtime: -1;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						trans: addalpha;
+						alpha: 128,256;
+						palfx.time: -1;
+						palfx.mul: 0,255,0;
+						palfx.color: 0;
+					}
+				}
+			}
+			
+			# Raijin's Torrent - Infinite Powerbar
+			if map(_vnix_metaworld_type) = 5 {
+				
+				mapset{map: "_vnix_raijin_buff"; value: 1}
+				
+				powerSet{value: powerMax;}
+				
+				palfx {
+					time: 1;
+					add: 30,30,0;
+				}
+				
+				if map(_vnix_meta_time) = 1 {
+					playsnd{value: VP 110, 9; volumescale: 200; freqmul: 1.0; channel: 5}
+					explod {
+						anim: VP 6030;
+						postype: p1;
+						pos: const(size.mid.pos.x), -80;
+						vel: 0, -1;
+						scale: 1, 1;
+						sprpriority: 5;
+						angle: 270;
+						facing: ifelse(facing=1, 1, -1);
+						trans: addalpha;
+						alpha: 256, 256;
+						ontop: 0;
+						bindtime: 1;
+						removetime: 20;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						PalFx.Time: 23;
+						PalFx.Mul: 255, 215, 0;
+						PalFx.Add: 200, 200, 0
+					}
+				}
+
+				if gametime%6 = 0 {
+					explod {
+						anim: VP 6030;
+						postype: p1;
+						pos: 0, -30;
+						vel: 0, -2;
+						scale: .125, .125;
+						random: 50,0;
+						sprpriority: 5;
+						angle: 270;
+						facing: ifelse(facing=1, 1, -1);
+						trans: addalpha;
+						alpha: 256, 256;
+						ontop: 0;
+						bindtime: 0;
+						removetime: 20;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						PalFx.Time: 23;
+						PalFx.Mul: 255, 215, 0;
+						PalFx.Add: 200, 200, 0;
+						interpolation.time: 24;
+						interpolation.alpha: 0,256;
+					}
+				}
+				if gametime%9 = 0 {
+					explod {
+						anim: VP 6030;
+						postype: p1;
+						pos: 0, -45;
+						vel: 0, -2;
+						scale: .125, .125;
+						random: 50,0;
+						sprpriority: 5;
+						angle: 270;
+						facing: ifelse(facing=1, 1, -1);
+						trans: addalpha;
+						alpha: 256, 256;
+						ontop: 0;
+						bindtime: 0;
+						removetime: 20;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						PalFx.Time: 23;
+						PalFx.Mul: 255, 215, 0;
+						PalFx.Add: 200, 200, 0;
+						interpolation.time: 24;
+						interpolation.alpha: 0,256;
+					}
+				}
+				if gametime%12 = 0 {
+					explod {
+						anim: VP 6030;
+						postype: p1;
+						pos: 0, -60;
+						vel: 0, -2;
+						scale: .125, .125;
+						random: 50,0;
+						sprpriority: 5;
+						angle: 270;
+						facing: ifelse(facing=1, 1, -1);
+						trans: addalpha;
+						alpha: 256, 256;
+						ontop: 0;
+						bindtime: 0;
+						removetime: 20;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						PalFx.Time: 23;
+						PalFx.Mul: 255, 215, 0;
+						PalFx.Add: 200, 200, 0;
+						interpolation.time: 24;
+						interpolation.alpha: 0,256;
+					}
+				}
+				if gametime%15 = 0 {
+					explod {
+						anim: VP 6030;
+						postype: p1;
+						pos: 0, -75;
+						vel: 0, -2;
+						scale: .125, .125;
+						random: 50,0;
+						sprpriority: 5;
+						angle: 270;
+						facing: ifelse(facing=1, 1, -1);
+						trans: addalpha;
+						alpha: 256, 256;
+						ontop: 0;
+						bindtime: 0;
+						removetime: 20;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						PalFx.Time: 23;
+						PalFx.Mul: 255, 215, 0;
+						PalFx.Add: 200, 200, 0;
+						interpolation.time: 24;
+						interpolation.alpha: 0,256;
+					}
+				}
+				if gametime%18 = 0 {
+					explod {
+						anim: VP 6030;
+						postype: p1;
+						pos: 0, -90;
+						vel: 0, -2;
+						scale: .125, .125;
+						random: 50,0;
+						sprpriority: 5;
+						angle: 270;
+						facing: ifelse(facing=1, 1, -1);
+						trans: addalpha;
+						alpha: 256, 256;
+						ontop: 0;
+						bindtime: 0;
+						removetime: 20;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						PalFx.Time: 23;
+						PalFx.Mul: 255, 215, 0;
+						PalFx.Add: 200, 200, 0;
+						interpolation.time: 24;
+						interpolation.alpha: 0,256;
+					}
+				}
+			}
+			
+			# Asura's Wrath - Unguardable Strikes
+			if map(_vnix_metaworld_type) = 6 {
+				
+				mapset{map: "_vnix_asura_buff"; value: 1}
+				
+				assertspecial{flag: unguardable;}
+				
+				if moveHitVar(frame) && moveHit && hitDefAttr = SCA, AA && pausetime = 0
+				&& enemy, map(ikarmor_assertarmor) = 0 && enemy, map(ikarmor_assertarmor2) = 0
+				{
+					getHitVarSet{hitshaketime: enemy, gethitvar(hitshaketime) + 20 * cond(enemy, stateType != A, 1.0, 0.5); redirectID: enemy, ID;}
+					playsnd{value: VP 100, 45; volumescale: 200; freqmul: 1.0}
+					# Glass shards
+					let direction = (random / 1000.0) * ifelse(random < 667, -1, 1);
+					explod{
+						anim: GO const(FxGuardBreakSpark) + randomRange(0, 2);
+						postype: p2;
+						pos: 0, const(size.mid.pos.y) * ifElse(stateType = C, 0.5, 1) - 0.5 * const(size.mid.pos.y) * $direction;
+						sprpriority: 6;
+						ownpal: 1;
+						random: const(size.ground.front), 0;
+						scale: 0.20 + (random / 5000.0), 0.20 + (random / 5000.0);
+						angle: (random % 360);
+						vel: const240p(3.0 - (random / 333.3)), const240p(random / 200.0) * $direction;
+						accel: 0, const240p(0.1);
+						facing: ifElse(random < 500, 1, -1);
+						vfacing: ifElse(random < 500, 1, -1);
+						pausemovetime: -1;
+						ignorehitpause: 1;
+					}
+					let direction = (random / 1000.0) * ifelse(random < 667, -1, 1);
+					explod{
+						anim: GO const(FxGuardBreakSpark) + randomRange(0, 2);
+						postype: p2;
+						pos: 0, const(size.mid.pos.y) * ifElse(stateType = C, 0.5, 1) - 0.5 * const(size.mid.pos.y) * $direction;
+						sprpriority: 6;
+						ownpal: 1;
+						random: const(size.ground.front), 0;
+						scale: 0.20 + (random / 5000.0), 0.20 + (random / 5000.0);
+						angle: (random % 360);
+						vel: const240p(3.0 - (random / 333.3)), const240p(random / 200.0) * $direction;
+						accel: 0, const240p(0.1);
+						facing: ifElse(random < 500, 1, -1);
+						vfacing: ifElse(random < 500, 1, -1);
+						pausemovetime: -1;
+						ignorehitpause: 1;
+					}
+					let direction = (random / 1000.0) * ifelse(random < 667, -1, 1);
+					explod{
+						anim: GO const(FxGuardBreakSpark) + randomRange(0, 2);
+						postype: p2;
+						pos: 0, const(size.mid.pos.y) * ifElse(stateType = C, 0.5, 1) - 0.5 * const(size.mid.pos.y) * $direction;
+						sprpriority: 6;
+						ownpal: 1;
+						random: const(size.ground.front), 0;
+						scale: 0.20 + (random / 5000.0), 0.20 + (random / 5000.0);
+						angle: (random % 360);
+						vel: const240p(3.0 - (random / 333.3)), const240p(random / 200.0) * $direction;
+						accel: 0, const240p(0.1);
+						facing: ifElse(random < 500, 1, -1);
+						vfacing: ifElse(random < 500, 1, -1);
+						pausemovetime: -1;
+						ignorehitpause: 1;
+					}
+				}
+				
+				palfx {
+					time: 1;
+					add: 30,0,0;
+				}
+				
+				if gametime % 10 = 0 {
+					explod{
+						postype: p1;
+						pos: 0, 0;
+						vel: 0, 0;
+						facing: 1;
+						anim: anim;
+						id: 30700;
+						animfreeze: 1;
+						animelem: animelemno(0) - 1;
+						sprpriority: sprpriority - 1;
+						pausemovetime: -1;
+						supermovetime: -1;
+						removetime: 30;
+						trans: addalpha;
+						alpha: 256, 256;
+						scale: const(size.xscale), const(size.yscale);
+						palfx.time: -1;
+						palfx.color: 0;
+						palfx.mul: 255, 0,0;
+						ownpal: 1;
+						interpolation.time: 30;
+						interpolation.alpha: 0,256;
+						interpolation.scale: const(size.xscale) * 1.2, const(size.yscale) * 1.2;
+					}
+				}
+				
+				if map(_vnix_meta_time) = 1 {
+					playsnd{value: VP 7, 10; volumescale: 200; freqmul: 1.0; channel: 5}
+					explod{
+						anim: VP 40109;
+						postype: p1;
+						pos: const(size.mid.pos.x), 0;
+						scale: .45  + (random%50/100), .75 + (random%50/100);
+						angle: 10 - random%20;
+						random: 24, 0;
+						facing: cond(random <= 500, 1, -1);
+						trans: Addalpha;
+						alpha: 256,256;
+						ontop: 0;
+						vel: 0, -2;
+						bindtime: 2;
+						sprpriority: 3;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						palfx.time: -1;
+						palfx.add: 200,0,0;
+						palfx.color: 0;
+						interpolation.time: 40;
+						interpolation.alpha: 0,256;
+						interpolation.scale: .5,.75;
+					}
+					explod{
+						anim: VP 40109;
+						postype: p1;
+						pos: const(size.mid.pos.x), -30;
+						scale: .45  + (random%50/100), .75 + (random%50/100);
+						angle: 10 - random%20;
+						random: 24, 0;
+						facing: cond(random <= 500, 1, -1);
+						trans: Addalpha;
+						alpha: 256,256;
+						ontop: 0;
+						vel: 0, -2;
+						bindtime: 2;
+						sprpriority: 3;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						palfx.time: -1;
+						palfx.add: 200,0,0;
+						palfx.color: 0;
+						interpolation.time: 40;
+						interpolation.alpha: 0,256;
+						interpolation.scale: .5,.75;
+					}
+				}
+			}
+			
+			# Gaia's Force - Gravity Multiplier
+			if map(_vnix_metaworld_type) = 7 {
+				
+				mapset{map: "_vnix_gaia_buff"; value: 1}
+				
+				# Ensure Smash Impact
+				if enemy, pausetime = 0 && enemy, inCustomState = 0 {
+					if enemy, moveType = H && enemy, prevstateno != [20,199] {
+						enemy, sysvar(1) := 16;
+					}
+					if enemy, stateType = A && enemy, pos y < -10 {
+						velAdd{y: .75; redirectID: enemy, ID;}
+					}
+				}
+				
+				# Guaranteed Guard Crush
+				guardPointsAdd{value: -9999; redirectID: enemy, ID;}
+				
+				# Slow Enemy Walk
+				if enemy, stateno = 20 {
+					posadd{x: enemy, vel x * -0.8; redirectID: enemy, ID}
+				}
+				
+				# Make opponents trip on dashes & runs
+				if (enemy, stateno = 100 || enemy, stateno = 105) && random <= 450 && random <= 350
+				{
+					velset{y: 0; redirectID: enemy, ID;}
+					lifeadd{value: -10; absolute: 1; kill: 0; redirectID: enemy, ID;}
+					selfstate{value: 5110; redirectID: enemy, ID;}
+				}
+				
+				palfx {
+					time: 1;
+					add: 30,30,30;
+					redirectID: enemy, ID
+				}
+				
+				if gametime%15 = 0 {
+					explod{
+						anim: VP 30625;
+						id: 30611;
+						postype: p2;
+						pos: 0, -70;
+						scale: .5,.5;
+						random: 20,0;
+						velocity: 0, 2;
+						angle: 90;
+						facing: 1;
+						sprpriority: 5;
+						removetime: 40;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						trans: addalpha;
+						alpha: 256,256;
+						palfx.time: -1;
+						palfx.mul: 128,128,128;
+						#palfx.add: 100,100,100;
+						palfx.color: 0;
+						interpolation.time: 40;
+						interpolation.alpha: 0,256;
+					}
+				}
+				if gametime%18 = 0 {
+					explod{
+						anim: VP 30625;
+						id: 30612;
+						postype: p2;
+						pos: 0, -90;
+						scale: .5,.5;
+						random: 20,0;
+						velocity: 0, 2;
+						angle: 90;
+						facing: 1;
+						sprpriority: 5;
+						removetime: 40;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						trans: addalpha;
+						alpha: 256,256;
+						palfx.time: -1;
+						palfx.mul: 128,128,128;
+						#palfx.add: 100,100,100;
+						palfx.color: 0;
+						interpolation.time: 40;
+						interpolation.alpha: 0,256;
+					}
+				}
+				
+				if map(_vnix_meta_time) = 1 {
+					playsnd{value: VP 7, 11; volumescale: 200; freqmul: 1.0; channel: 5}
+				}
+			}
+			
+			# Loki's Deceit - Reverse Inputs
+			if map(_vnix_metaworld_type) = 8 {
+				
+				mapset{map: "_vnix_loki_debuff"; value: 1; redirectID: enemy, ID}
+				
+				if enemy, stateno = 0 {
+					if enemy, selfstatenoexist(5300) {
+						changeAnim{value: 5300; redirectID: enemy, ID}
+					}
+				}
+				
+				palfx {
+					time: 1;
+					add: 0,30,30;
+					redirectID: enemy, ID
+				}
+				
+				if gametime % 10 = 0 {
+					explod{
+						postype: p1;
+						pos: 0, 0;
+						vel: cond(random <= 500, 1, -1), 0;
+						facing: 1;
+						anim: enemy, anim;
+						id: 30700;
+						animfreeze: 1;
+						animelem: enemy, animelemno(0) - 1;
+						sprpriority: enemy, sprpriority - 1;
+						pausemovetime: -1;
+						supermovetime: -1;
+						removetime: 30;
+						trans: addalpha;
+						alpha: 256, 256;
+						scale: enemy, const(size.xscale), enemy, const(size.yscale);
+						palfx.time: -1;
+						palfx.color: 0;
+						palfx.mul: 0, 255,0;
+						ownpal: 1;
+						interpolation.time: 30;
+						interpolation.alpha: 0,256;
+						interpolation.scale: enemy, const(size.xscale) * 1.2, enemy, const(size.yscale) * 1.2;
+						redirectID: enemy, ID
+					}
+				}
+				
+				if map(_vnix_meta_time) = 1 {
+					playsnd{value: VP 7, 12; volumescale: 200; freqmul: 1.0; channel: 5}
+				}
+			}
+					
+			# Forced Deactivation
+			if map(_vnix_meta_time) = 540 || map(_vnix_meta_break) = 1 {
+				lifebaraction{text: "World Break"; top: 1}
+				defenceMulSet{value: 1;}
+				if map(_vnix_raijin_buff) {
+					powerAdd{value: powerMax * -1.0}
+				}
+				if map(_vnix_mercury_buff) {
+					mapset{map: "_pots_dash_gauge"; value: 1;}
+				}
+				# Break Effect
+				explod{
+					anim: VP 30600;
+					postype: left;
+					pos: const240p(0),const240p(0);
+					scale: 1, 1;
+					angle: 0;
+					facing: 1;
+					ontop: 1;
+					trans: Add;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1
+				}
+				afterImageTime{
+					time: 10;
+				}
+				playsnd{value: VP 110, 2; volumescale: 100; freqmul: 1.0}
+				mapset{map: "_vnix_meta_active"; value: 0} # Reset Meta World
+				mapset{map: "_vnix_meta_break"; value: 0} # Reset Break Debuff
+				mapset{map: "_vnix_meta_input"; value: 0} # Reset Input
+				mapset{map: "_vnix_meta_invert"; value: 0} # Reset World Invert
+				mapset{map: "_vnix_meta_time"; value: 0} # Reset Timer
+				mapset{map: "ikarmor_throw_protect"; value: 0;}
+				mapset{map: "ikarmor_assertarmor"; value: 0;}
+				mapset{map: "_vnix_mercury_buff"; value: 0}
+				mapset{map: "_vnix_raijin_buff"; value: 0}
+				mapset{map: "_vnix_loki_debuff"; value: 0; redirectID: enemy, ID}
+				removeExplod{id: 30603}
+				removeExplod{id: 30604}
+				removeExplod{id: 30605}
+				removeExplod{id: 30606}
+				removeExplod{id: 30607}
+				removeExplod{id: 30608}
+				removeExplod{id: 30609}
+				removeExplod{id: 30610}
+				removeExplod{id: 30611}
+				removeExplod{id: 30612}
+				removeExplod{id: 30613}
+				removeExplod{id: 30614}
+				removeExplod{id: 30615}
+				removeExplod{id: 30616}
+				removeExplod{id: 30617}
+				removeExplod{id: 30650}
+				removeExplod{id: 30700}
+				stopSnd{channel: 5;}
+			}
+		}
+		
+		# Meta World Stock
+		if (teamMode = Single || teamMode = Turns) && map(_vnix_life_hidegauge) = 0 {
+			if map(_vnix_meta_stock) >= 1 {
+				explod{
+					anim: VP 30620;
+					postype: left;
+					pos: const240p(cond(teamside = 1, 108.5, 211.5)), const240p(38.5);
+					scale: 1, 1;
+					angle: 0;
+					facing: cond(teamside = 1, 1, -1);
+					ontop: 0;
+					removetime: 1;
+					sprpriority: -5;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1
+				}
+			}
+			if map(_vnix_meta_stock) >= 2 {
+				explod{
+					anim: VP 30620;
+					postype: left;
+					pos: const240p(cond(teamside = 1, 114, 206)), const240p(38.5);
+					scale: 1, 1;
+					angle: 0;
+					facing: cond(teamside = 1, 1, -1);
+					ontop: 0;
+					removetime: 1;
+					sprpriority: -5;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1
+				}
+			}
+			if map(_vnix_meta_stock) >= 3 {
+				explod{
+					anim: VP 30620;
+					postype: left;
+					pos: const240p(cond(teamside = 1, 119.5, 200.5)), const240p(38.5);
+					scale: 1, 1;
+					angle: 0;
+					facing: cond(teamside = 1, 1, -1);
+					ontop: 0;
+					removetime: 1;
+					sprpriority: -5;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1
+				}
+			}
+			# Stock BG
+			explod{
+				anim: VP 30621;
+				postype: left;
+				pos: const240p(cond(teamside = 1, 108.5, 211.5)), const240p(38.5);
+				scale: 1, 1;
+				angle: 0;
+				facing: cond(teamside = 1, 1, -1);
+				ontop: 0;
+				removetime: 1;
+				sprpriority: -5;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1
+			}
+		}
+	}
+	
+	if roundState = 3 && map(_vnix_meta_cfg_enable) != 0 && map(_vnix_meta_active) != 0 {
+		# Forced Deactivate
+		if power <= 0 || map(_vnix_meta_break) = 1 || roundState = 3 {
+			lifebaraction{text: "World Break"; top: 1}
+			defenceMulSet{value: 1;}
+			# Break Effect
+			explod{
+				anim: VP 30600;
+				postype: left;
+				pos: const240p(0),const240p(0);
+				scale: 1, 1;
+				angle: 0;
+				facing: 1;
+				ontop: 1;
+				trans: Add;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1
+			}
+			afterImageTime{
+				time: 10;
+			}
+			playsnd{value: VP 110, 2; volumescale: 100; freqmul: 1.0}
+			mapset{map: "_vnix_meta_active"; value: 0} # Reset Meta World
+			mapset{map: "_vnix_meta_break"; value: 0} # Reset Break Debuff
+			mapset{map: "_vnix_meta_input"; value: 0} # Reset Input
+			mapset{map: "_vnix_meta_invert"; value: 0} # Reset World Invert
+			mapset{map: "_vnix_meta_time"; value: 0} # Reset Timer
+			mapset{map: "ikarmor_throw_protect"; value: 0;}
+			mapset{map: "ikarmor_assertarmor"; value: 0;}
+			mapset{map: "_vnix_mercury_buff"; value: 0}
+			mapset{map: "_vnix_raijin_buff"; value: 0}
+			mapset{map: "_vnix_loki_debuff"; value: 0; redirectID: enemy, ID}
+			removeExplod{id: 30603}
+			removeExplod{id: 30604}
+			removeExplod{id: 30605}
+			removeExplod{id: 30606}
+			removeExplod{id: 30607}
+			removeExplod{id: 30608}
+			removeExplod{id: 30609}
+			removeExplod{id: 30610}
+			removeExplod{id: 30611}
+			removeExplod{id: 30612}
+			removeExplod{id: 30613}
+			removeExplod{id: 30614}
+			removeExplod{id: 30615}
+			removeExplod{id: 30616}
+			removeExplod{id: 30617}
+			removeExplod{id: 30650}
+			removeExplod{id: 30700}
+			stopSnd{channel: 5;}
+		}
+	}
+
+	
+	# Reset Buffs
+	if Roundstate = [3,4] {
+		mapset{map: "_vnix_meta_active"; value: 0}
+		mapset{map: "_vnix_meta_invert"; value: 0}
+		mapset{map: "_vnix_meta_input"; value: 0} # Reset Input
+	}
+
+}
+
+# test
+ignorehitpause if roundstate = [0,2] && !ishelper && playerNo < 9 && (teamside = 1 || teamside = 2) && playerNo = teamLeader {
+	text{
+		font: F 7;
+		text: "player 1 state %v";
+		params: player(1), map(_vnix_intro_stateno); #map(_vnix_intro_stateno);
+		removetime: 1;
+		layerno: 1;
+		velocity: 0,0;
+		align: cond(teamside = 1, 1, -1);
+		localcoord: 320, 240;
+		pos: cond(teamside = 1, 30, 290), 1150;
+		scale: 1,1;
+		color: 255,255,255;
+	}
+	text{
+		font: F 7;
+		text: "player 2 state %v";
+		params: player(2), stateno; #map(_vnix_special_intro);
+		removetime: 1;
+		layerno: 1;
+		velocity: 0,0;
+		align: cond(teamside = 1, 1, -1);
+		localcoord: 320, 240;
+		pos: cond(teamside = 1, 30, 290), 1160;
+		scale: 1,1;
+		color: 255,255,255;
+	}
+	text{
+		font: F 7;
+		text: "%v";
+		params: float(life) / lifeMax; #map(_vnix_special_intro);
+		removetime: 1;
+		layerno: 1;
+		velocity: 0,0;
+		align: cond(teamside = 1, 1, -1);
+		localcoord: 320, 240;
+		pos: cond(teamside = 1, 30, 290), 1170;
+		scale: 1,1;
+		color: 255,255,255;
+	}
+}
+
+[StateDef +1]
+
+map(armor_helper_st) := 4123119;
+
+# Call Hyper Armor Helper
+if const(ikarmor_no_armor) = 0 && !ishelper && map(ikarmor_assertarmor) {
+	if !numhelper(map(armor_helper_st)) {
+		Helper{
+			id: map(armor_helper_st);
+			stateno: map(armor_helper_st);
+			ownpal: 1;
+			name: "Ik Armor Hp";
+			size.height: 0;
+			keyctrl:0;
+			pausemovetime: 99999;
+			supermovetime: 99999;
+		}
+	}
+
+	ignoreHitPause if map(ikarmor_assertarmor) || (numhelper(map(armor_helper_st)) && helper(map(armor_helper_st)), map(receivedhit)) {
+		if !map(ikarmor_throw_protect) {
+			hitby{value:SCA,AT}
+		} else {
+			nothitby{value:SCA}
+		}
+	}
+}
+
+ignoreHitPause if p2, numhelper(map(armor_helper_st)) && p2, helper(map(armor_helper_st)), map(hitshaketime) && !p2,pausetime && !ishelper {
+	pause{time: p2, helper(map(armor_helper_st)), map(hitshaketime) - 1; movetime: p2,helper(map(armor_helper_st)), map(hitshaketime) - 1}
+}

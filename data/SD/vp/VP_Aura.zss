@@ -1,0 +1,349 @@
+
+#===============================================================================
+# Configuration
+#===============================================================================
+
+[Function F_Vnix_Ink_Config()]
+
+# Enable Effects
+mapset{map: "_vnix_glow_cfg_enable"; value: 0} 	# Enable Glow FX, 0 to disable
+mapset{map: "_vnix_ink_cfg_enable"; value: 1} 	# Enable Ink Outline FX, 0 to disable
+
+#===============================================================================
+# Glow Module
+#===============================================================================
+
+[Function glow(alpha,quality,size,r,g,b, p, id, ignorehit, movehitpause)] 
+#alpha, quality, size, r, g, b, sprpriority, updatehitpause, movehitpause
+
+#alpha: 		controls the opacity of explods
+#quality: 		controls distribution of the explod scattering (divided by 10 and then multiplied by nested loop)
+#size: 			glow radius;
+#r,g,b: 		colors;
+#sprpriority: 	sprpriority of the explods (usually smaller than 0);
+#ignorehit: 	updates the anim during hitpause;
+#movehitpause: 	lets the explod run during hitpause (controls ignorehitpause parameter on explods)
+
+ignoreHitPause{
+	let a = $alpha;
+	let q = $quality/10;
+	if ((hitPauseTime && $ignorehit) || !hitPauseTime || isAsserted(animatehitpause)) && !pauseTime{
+		map(glow.frame) := animElemNo(0);
+	}
+	removeExplod{id: $id;}
+	for i = 0; $q; 1 {
+		for h = 0; $q; 1
+		{
+			if (($h%2 = 0 && $i%2 = 0) || ($h%2 = 1 && $i%2 = 1)) && (gameTime%2 = 0)
+			{
+				explod{
+					anim: anim; 
+					id: $id; 
+					animplayerno: animplayerno; #ty P.O.T.S for help w/ this lol
+					postype: p1;          
+					bindtime: 1;            
+					sprpriority: $p; 
+					pos: -($size/2)+$h*($size/$q), -($size/2)+$i*($size/$q);
+					removetime: 2;          # refresh loop
+					animelem: map(glow.frame);
+					pausemovetime: -1;
+					supermovetime: -1;
+					scale: 1 * const(size.xscale) * (scale x), 1 * const(size.yscale) * (scale y);
+					trans: addalpha;
+					alpha: $a,255-$a;
+					ownpal: 1;
+					under: 1;
+					angle: angle;
+					palfx.time: -1;
+					palfx.add: 256,256,256;
+					palfx.mul: $r,$g,$b;
+					ignorehitpause: $movehitpause;
+				}
+			}
+
+			if (($h%2 = 0 && $i%2 = 1) || ($h%2 = 1 && $i%2 = 0)) && (gameTime%2 = 1)
+			{
+				explod{
+					anim: anim; 
+					id: $id; 
+					animplayerno: animplayerno; 
+					postype: p1; 
+					bindtime: 1; 
+					sprpriority: $p; 
+					pos: -($size/2)+$h*($size/$q), -($size/2)+$i*($size/$q);
+					removetime: 2; 
+					animelem: map(glow.frame);
+					pausemovetime: -1;
+					supermovetime: -1;
+					scale: 1 * const(size.xscale) * (scale x), 1 * const(size.yscale) * (scale y);
+					trans: addalpha;
+					alpha: $a,255-$a;
+					ownpal: 1;
+					under: 1;
+					angle: angle;
+					palfx.time: -1;
+					palfx.add: 256,256,256;
+					palfx.mul: $r,$g,$b;
+					ignorehitpause: $movehitpause;
+				}
+			}
+		}
+	}
+}
+
+#===============================================================================
+# Global states (not halted by Pause/SuperPause, no helper limitations)
+#===============================================================================
+[StateDef -4]
+
+ignorehitpause if !ishelper && (teamside = 1 || teamside = 2)  && gamemode = "fightchallenge" || gamemode = "fightchallengevs"  {
+
+	# Initialize
+	if roundstate = 0 && time = 0 {
+		# Run config
+		call F_Vnix_Ink_Config();
+	}
+}
+
+[StateDef +1]
+ignoreHitPause
+{
+	# cel-shaded look.
+	if !isHelper && map(_vnix_ink_cfg_enable) != 0 && map(_vnix_phase_buff) = 0 { 
+		if playerno < 9
+		&& !IsAsserted(Invisible)
+		#&& stateno != 225201950
+		&& name != "Predator Warrior"
+		{ 
+			#alpha, quality, size, r, g, b, priority, id, updatehitpause, movehitpause(explod)
+			call glow(100, 45, 2.5, 0, 0, 0, 1, 92000, 1, 1);
+		}
+	}
+	
+	if isHelper && root, map(_vnix_ink_cfg_enable) != 0 && root, map(_vnix_phase_buff) = 0 {
+	   if anim = root, anim
+	   #&& root, stateno != 225201950
+	   && root, IsAsserted(Invisible) {
+	  		#alpha, quality, size, r, g, b, priority, id, updatehitpause, movehitpause(explod)
+			call glow(100, 45, 2.5, 0, 0, 0, 1, 92000, 1, 1);
+		}
+	}
+
+	
+	# cel-shaded look
+	if !isHelper && Roundstate = 2 && name = "Predator Warrior" && var(21) = 0 && map(_vnix_phase_buff) = 0 {
+		#alpha, quality, size, r, g, b, priority, id, updatehitpause, movehitpause(explod)
+		call glow(100, 45, 2.5, 0, 0, 0, 1, 92000, 1, 1);
+	}
+
+	# max power level, or level 3. aura goes rainbow here for default mugen characters.
+	if !isHelper && map(_vnix_glow_cfg_enable) != 0 && map(_vnix_phase_buff) = 0 {
+		if gameMode != "training" && power = powermax && Alive = 1 && playerno < 9 && !IsAsserted(Invisible) {
+			#alpha, quality, size, r, g, b, priority, id, updatehitpause, movehitpause(explod)
+			if map(_vnix_ink_cfg_enable) != 0 {
+				call glow(25, 80, 6.1, 175 + 175*cos(gameTime * 0.1),180 + 180* sin (gameTime * 0.08),180 + 180 * cos (gameTime * 0.05 +45), 1, 92001, 1, 1);
+			} else {
+				call glow(25, 50, 5, 175 + 175*cos(gameTime * 0.1),180 + 180* sin (gameTime * 0.08),180 + 180 * cos (gameTime * 0.05 +45), 1, 92001, 1, 1);
+			}
+			if map(_vnix_maxglow) = 0 {
+				mapset{map: "_vnix_maxglow"; value: 1}
+				lifebaraction{text: "Full Power"; top: 1}
+				playsnd{value: VP 100, 35; volumescale:100; freqmul: 1.0}
+				# Ground FX
+				explod{
+					anim: VP 10100;
+					posType: p1;
+					pos: 0, 0 - Pos Y;
+					velocity: 0, 0;
+					sprPriority: sprpriority - 1;
+					ownPal: 1;
+					facing: 1;
+					scale: .33, .33;
+					trans: Add;
+					bindTime: 0;
+					superMoveTime: -1;
+					pauseMoveTime: -1;
+					removeOnGetHit: 0;
+					ignoreHitPause: 1;
+					PalFx.Time: 23;
+					PalFx.Mul: 30, 144, 255;
+					PalFx.Add: 0, 200, 200
+				}
+				# Front FX
+				explod{
+					anim: VP 10101;
+					posType: p1;
+					pos: 0, -10;
+					velocity: 0, 0;
+					sprPriority: sprpriority + 1;
+					ownPal: 1;
+					facing: 1;
+					scale: .67, 1;
+					trans: Add;
+					bindTime: -1;
+					superMoveTime: -1;
+					pauseMoveTime: -1;
+					removeOnGetHit: 0;
+					ignoreHitPause: 1;
+					PalFx.Time: 23;
+					PalFx.Mul: 30, 144, 255;
+					PalFx.Add: 0, 200, 200
+				}
+			}
+		}
+	}
+	
+	# max power level, or level 3. aura goes rainbow here for default mugen characters.
+	if isHelper && root, map(_vnix_glow_cfg_enable) != 0 && root, map(_vnix_phase_buff) = 0 {
+		if gameMode != "training" && anim = root, anim && root, power = powermax && root, Alive = 1 && root, playerno < 9 && root, IsAsserted(Invisible) {
+			#alpha, quality, size, r, g, b, priority, id, updatehitpause, movehitpause(explod)
+			if root, map(_vnix_ink_cfg_enable) != 0 {
+				call glow(25, 80, 6.1, 175 + 175*cos(gameTime * 0.1),180 + 180* sin (gameTime * 0.08),180 + 180 * cos (gameTime * 0.05 +45), 1, 92001, 1, 1);
+			} else {
+				call glow(25, 50, 5, 175 + 175*cos(gameTime * 0.1),180 + 180* sin (gameTime * 0.08),180 + 180 * cos (gameTime * 0.05 +45), 1, 92001, 1, 1);
+			}
+			if root, map(_vnix_maxglow) = 0 {
+				rootmapset{map: "_vnix_maxglow"; value: 1}
+				playsnd{value: VP 100, 35; volumescale:100; freqmul: 1.0}
+				# Ground FX
+				explod{
+					anim: VP 10100;
+					posType: p1;
+					pos: 0, 0 - Pos Y;
+					velocity: 0, 0;
+					sprPriority: root, sprpriority - 1;
+					ownPal: 1;
+					facing: 1;
+					scale: .33, .33;
+					trans: Add;
+					bindTime: 0;
+					superMoveTime: -1;
+					pauseMoveTime: -1;
+					removeOnGetHit: 0;
+					ignoreHitPause: 1;
+					PalFx.Time: 23;
+					PalFx.Mul: 30, 144, 255;
+					PalFx.Add: 0, 200, 200
+				}
+				# Front FX
+				explod{
+					anim: VP 10101;
+					posType: p1;
+					pos: 0, -10;
+					velocity: 0, 0;
+					sprPriority: 5;
+					ownPal: 1;
+					facing: 1;
+					scale: .67, 1;
+					trans: Add;
+					bindTime: -1;
+					superMoveTime: -1;
+					pauseMoveTime: -1;
+					removeOnGetHit: 0;
+					ignoreHitPause: 1;
+					PalFx.Time: 23;
+					PalFx.Mul: 30, 144, 255;
+					PalFx.Add: 0, 200, 200
+				}
+			}
+		}
+	}
+
+	
+# ========================================================================================================================================
+# V-Nix - Rush Drive Glow
+# ========================================================================================================================================
+	
+	# Normal Characters
+	if RoundState = 2 && !isHelper && map(_vnix_rushdrive_active) != 0 && Alive = 1 && playerno < 9 && !IsAsserted(Invisible) && map(_vnix_phase_buff) = 0 {
+		#alpha, quality, size, r, g, b, priority, id, updatehitpause, movehitpause(explod)
+		call glow(40, 50 + random%50, 6.5 + cond(map(_pots_dash_burnout) != 0, 2, 0), 250 + 100 * cos(gameTime * 0.5),0,0, 1, 92010, 1, 1);
+	}
+	
+	# Helper Characters
+	if RoundState = 2 && isHelper && anim = root, anim && root, map(_vnix_rushdrive_active) != 0 && root, Alive = 1
+	   && root, playerno < 9 && root, IsAsserted(Invisible) && root, map(_vnix_phase_buff) = 0 {
+		#alpha, quality, size, r, g, b, priority, id, updatehitpause, movehitpause(explod)
+		call glow(40, 50 + random%50, 6.5 + cond(map(_pots_dash_burnout) != 0, 4, 0), 180 + 70*cos(gameTime * 0.05),0,0, 1, 92010, 1, 1);
+	}
+	
+# ========================================================================================================================================
+# V-Nix - Raijin's Torrent Glow
+# ========================================================================================================================================
+	
+	# Normal Characters
+	if RoundState = 2 && !isHelper && map(_vnix_raijin_buff) != 0 && Alive = 1 && playerno < 9 && !IsAsserted(Invisible) && map(_vnix_phase_buff) = 0 {
+		#alpha, quality, size, r, g, b, priority, id, updatehitpause, movehitpause(explod)
+		call glow(40, 50 + random%50, 10.5, 250 + 100 * cos(gameTime * 0.5),250 + 100 * cos(gameTime * 0.5),0, 1, 92020, 1, 1);
+	}
+	
+	# Helper Characters
+	if RoundState = 2 && isHelper && anim = root, anim && root, map(_vnix_raijin_buff) != 0 && root, Alive = 1
+	   && root, playerno < 9 && root, IsAsserted(Invisible) && root, map(_vnix_phase_buff) = 0 {
+		#alpha, quality, size, r, g, b, priority, id, updatehitpause, movehitpause(explod)
+		call glow(40, 50 + random%50, 10.5, 250 + 100 * cos(gameTime * 0.5),250 + 100 * cos(gameTime * 0.5),0, 1, 92020, 1, 1);
+	}
+	
+# ========================================================================================================================================
+# V-Nix - Pain Killer Glow
+# ========================================================================================================================================
+	
+	# Normal Characters
+	if RoundState = 2 && !isHelper && map(_vnix_armor_hp) != 0 && Alive = 1 && playerno < 9 && !IsAsserted(Invisible) && map(_vnix_phase_buff) = 0 {
+		#alpha, quality, size, r, g, b, priority, id, updatehitpause, movehitpause(explod)
+		call glow(40, 50 + random%50, 10.5, 250,250,250, 1, 92020, 1, 1);
+	}
+	
+	# Helper Characters
+	if RoundState = 2 && isHelper && anim = root, anim && root, map(_vnix_armor_hp) != 0 && root, Alive = 1
+	   && root, playerno < 9 && root, IsAsserted(Invisible) && root, map(_vnix_phase_buff) = 0 {
+		#alpha, quality, size, r, g, b, priority, id, updatehitpause, movehitpause(explod)
+		call glow(40, 50 + random%50, 10.5, 250,250,250, 1, 92020, 1, 1);
+	}
+	
+# ========================================================================================================================================
+# V-Nix - Soul Link Glow
+# ========================================================================================================================================
+	
+	# Normal Characters
+	if RoundState = 2 && !isHelper && map(_vnix_soul_link) && Alive = 1 && playerno < 9 && !IsAsserted(Invisible) && map(_vnix_phase_buff) = 0 {
+		#alpha, quality, size, r, g, b, priority, id, updatehitpause, movehitpause(explod)
+		call glow(40, 50 + random%50, 10.5, 0,250,0, 1, 92020, 1, 1);
+	}
+	
+	# Helper Characters
+	if RoundState = 2 && isHelper && anim = root, anim && root, map(_vnix_soul_link) && root, Alive = 1
+	   && root, playerno < 9 && root, IsAsserted(Invisible) && root, map(_vnix_phase_buff) = 0 {
+		#alpha, quality, size, r, g, b, priority, id, updatehitpause, movehitpause(explod)
+		call glow(40, 50 + random%50, 10.5, 0,250,0, 1, 92020, 1, 1);
+	}
+	
+# ========================================================================================================================================
+# V-Nix - Last Stand Glow
+# ========================================================================================================================================
+	
+	# Normal Characters
+	if RoundState = 2 && !isHelper && map(_vnix_laststand_buff) && Alive = 1 && playerno < 9 && !IsAsserted(Invisible) && map(_vnix_phase_buff) = 0 {
+		#alpha, quality, size, r, g, b, priority, id, updatehitpause, movehitpause(explod)
+		call glow(40, 50 + random%50, 8.5, 128,0,128, 1, 92020, 1, 1);
+	}
+	
+	# Helper Characters
+	if RoundState = 2 && isHelper && anim = root, anim && root, map(_vnix_laststand_buff) && root, Alive = 1
+	   && root, playerno < 9 && root, IsAsserted(Invisible) && root, map(_vnix_phase_buff) = 0 {
+		#alpha, quality, size, r, g, b, priority, id, updatehitpause, movehitpause(explod)
+		call glow(40, 50 + random%50, 8.5, 128,0,128, 1, 92020, 1, 1);
+	}
+	
+	# For Red Health Auras
+	#if !isHelper &&  life < (lifemax * 0.3) && Alive = 1 {
+	#	call glow(25, 50, 5, 255,165,0, 1, 92000, 1, 1);
+	#}
+	
+	# Reset MAX Power Effect
+	if !isHelper && power != powermax {
+		mapset{map: "_vnix_maxglow"; value: 0}
+	} else if isHelper && root, power != powermax {
+		rootmapset{map: "_vnix_maxglow"; value: 0}
+	}
+}

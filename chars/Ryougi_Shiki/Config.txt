@@ -1,0 +1,169 @@
+;---------------------------------------------------------------------------
+; Config
+[Statedef 5900]
+Type = S
+
+;===============================================================================
+;POWER BLAST
+;===============================================================================
+
+[State 5900, Null] ;Active/Desactive
+Type = Null
+Trigger1 = RoundsExisted = 0
+Trigger1 = Var(3) := 1
+IgnoreHitPause = 1
+;0 - Descative
+;1 - Active
+
+;===============================================================================
+;AWAKEN
+;===============================================================================
+
+[State 5900, Null] ;Active/Desactive
+Type = Null
+Trigger1 = RoundsExisted = 0
+Trigger1 = Var(6) := 1
+IgnoreHitPause = 1
+;0 - Descative
+;1 - Active
+
+;===============================================================================
+;HUD
+;===============================================================================
+
+[State 5900, Null] ;Pos X for HUD 
+Type = Null
+Trigger1 = RoundsExisted = 0
+Trigger1 = Var(8) := 120
+IgnoreHitPause = 1
+;0 -  Minimun
+;1280 - Maximun
+
+[State 5900, Null] ;Pos Y for HUD 
+Type = Null
+Trigger1 = RoundsExisted = 0
+Trigger1 = Var(9) := 120
+IgnoreHitPause = 1
+;0 -  Minimun
+;720 - Maximun
+
+;===============================================================================
+;SHIELD
+;===============================================================================
+
+[State 5900, Null] ;Active/Desactive
+Type = Null
+Trigger1 = RoundsExisted = 0
+Trigger1 = Var(12) := 1
+IgnoreHitPause = 1
+;0 - Descative
+;1 - Active
+
+;Don't mess with anything below that line
+;===============================================================================
+
+
+;[State 5900, ChangeAnim]
+;Type = ChangeAnim
+;Trigger1 = TeamSide = 2
+;Trigger1 =  SelfAnimExist(1)
+;Value = 1
+;IgnoreHitPause = 1
+;Persistent = 0
+
+[State 5900, Null]
+Type = Null
+Trigger1 = !Time
+Trigger1 =  RoundNO = 1
+Trigger1 = Var(34) := PalNO
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 5900, RemapPal]
+Type = RemapPal
+Trigger1 = !Time
+Source = 1,0
+Dest = 1,Var(34)
+Persistent = 0
+
+[State 5900, Null]
+Type = Null
+Trigger1 =  RoundNO = 1
+Trigger1 = Var(4) := 0
+IgnoreHitPause = 1
+
+[State 5900, Helper]
+Type = Helper
+Trigger1 = !AiLevel
+Trigger1 =  RoundNO = 1
+Trigger1 = !NumHelper(11050)
+Name = "Palette Selector"
+ID = 11050
+StateNO = 11050
+OwnPal = 1
+SuperMoveTime = 99999
+PauseMoveTime = 99999
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 5900, Helper]
+Type = Helper
+Trigger1 = !AiLevel
+Trigger1 = Time
+Trigger1 = NumHelper(11050)
+Trigger1 = Helper(11050),StateNO = 11050
+Trigger1 = !NumHelper(11060)
+Trigger1 = Command = "fwd" || Command = "back" 
+Name = "Palette Transition"
+ID = 11060
+StateNO = 11060
+OwnPal = 1
+SuperMoveTime = 99999
+PauseMoveTime = 99999
+Size.XScale = 4
+Size.YScale = 4
+Size.Height = Var(34)
+IgnoreHitPause = 1
+
+[State 5900, VarAdd]
+Type = VarAdd
+Trigger1 = !AiLevel
+Trigger1 = Time
+Trigger1 = Var(34) < 12
+Trigger1 = NumHelper(11050)
+Trigger1 = Helper(11050),StateNO = 11050
+Trigger1 = Command = "fwd" 
+var(34) = 1
+IgnoreHitPause = 1
+
+[State 5900, VarAdd]
+Type = VarAdd
+Trigger1 = !AiLevel
+Trigger1 = Time
+Trigger1 = Var(34) > 1
+Trigger1 = NumHelper(11050)
+Trigger1 = Helper(11050),StateNO = 11050
+Trigger1 = Command = "back"
+var(34) = -1
+IgnoreHitPause = 1
+
+[State 5900, RemapPal]
+Type = RemapPal
+Trigger1 = !AiLevel
+Trigger1 = Time
+Source = 1,0
+Dest = 1,Var(34)
+IgnoreHitPause = 1
+
+[State 5900, ChangeState]
+type = ChangeState
+Trigger1 = RoundNO = 1
+Trigger1 = !NumHelper(11050)
+Value = 190
+
+[State 5900, ChangeState]
+Type = ChangeState
+Trigger1 = StateNO = 5900
+Trigger1 = !NumHelper(11050)
+Value = 0
+

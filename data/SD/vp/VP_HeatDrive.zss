@@ -1,0 +1,395 @@
+
+#===============================================================================
+# Configuration
+#===============================================================================
+
+[Function F_Vnix_RushDrive_Config()]
+
+mapset{map: "_vnix_rushdrive_cfg_enable"; value: 0}			# Enable Heat Drive / X Factor, 0 to disable
+mapset{map: "_vnix_rushdrive_cfg_life"; value: 25}			# Life needed to activate Heat Drive (25 = 25%)
+mapset{map: "_vnix_rushdrive_cfg_cost"; value: 1}			# How fast does the gauge & life value deplete. 1 is normal, higher is faster depletion
+
+
+[StateDef -4]
+
+ignorehitpause if !ishelper && (teamside = 1 || teamside = 2) && gamemode = "fightchallenge"  ||  gamemode =  "fightchallengevs"    {
+
+	# Initialize
+	if roundstate = 0 && time = 0 {
+		# Run config
+		call F_Vnix_RushDrive_Config();
+		# Reset variables
+		mapset{map: "_vnix_rushdrive_active"; value: 0}
+		mapset{map: "_vnix_rushdrive_dmg"; value: 0}
+	}
+
+	if Roundstate = 2 && map(_vnix_rushdrive_cfg_enable) != 0 {
+		# Input handling
+		if AIlevel {
+			if (life = [lifeMax * 0.5, lifeMax * 0.8])
+			&& random < 150
+			&& random < 50
+			&& random < 250
+			#&& (map(_pots_dash_gauge) > 500 && map(_pots_dash_burnout) = 0)
+			&& moveType = I && stateType != A
+			&& (statetype != L || stateno = 5120) { # Let AI use X-Factor
+				mapset{map: "_vnix_rushdrive_input"; value: 60}
+			}
+		} else {
+			# Hold start button while standing
+			if inputtime(s) > 1 && moveType = I && stateType != A {
+				mapadd{map: "_vnix_rushdrive_input"; value: 1}
+			}
+			if inputtime(s) < 0 {
+				mapset{map: "_vnix_rushdrive_input"; value: 0}
+			}
+		}
+
+		# Heat Drive
+		if time > 0
+		&& !incustomstate
+		&& map(_vnix_rushdrive_input) >= 60
+		&& map(_vnix_rushdrive_active) = 0
+		#&& map(_pots_dash_burnout) != 0
+		&& alive
+		&& life >= lifeMax * float(map(_vnix_rushdrive_cfg_life) / 100)
+		&& statetype != L
+		{
+			lifebaraction{text: "Heat Drive"; top: 1}
+			playsnd{value: VP 100, 48; volumescale: 200; freqmul: 1.0}
+			mapset{map: "_vnix_rushdrive_input"; value: 0} # Reset Input
+			
+			# Basic Effects
+			palfx{time: 30; add: 128, 128, 128; sinadd: -128, -128, -128, 120}
+			Pause{
+				time: 30;
+				movetime: 0;
+				pausebg: 1
+			}
+			bgpalfx{
+				time: 30;
+				add: -128, -128, -128;
+			}
+			
+			zoom{
+				scale: 1.1;
+				time: 10;
+				pos: Pos X, Pos Y;
+				lag: 0;
+				stagebound: 1;
+				camerabound: 1;
+			}
+			
+			# Activation Effect
+			explod{
+				anim: VP 20081;
+				postype: p1;
+				pos: const(size.mid.pos.x), -10;
+				scale: .75, .75;
+				angle: random%10;
+				facing: 1;
+				ontop: 0;
+				vel: 0, -.5;
+				bindtime: 2;
+				sprpriority: 3;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1
+			}
+			explod{
+				anim: VP 20081;
+				postype: p1;
+				pos: const(size.mid.pos.x), -10;
+				scale: .75, .5;
+				angle: random%10;
+				facing: -1;
+				ontop: 0;
+				vel: 0, -1;
+				bindtime: 2;
+				sprpriority: -3;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1
+			}
+			explod{
+				anim: VP 20084;
+				postype: p1;
+				pos: const(size.mid.pos.x), 0;
+				scale: .5, 1;
+				angle: 0;
+				facing: 1;
+				trans: Addalpha;
+				alpha: 256,256;
+				ontop: 0;
+				under: 0;
+				vel: 0, -1;
+				bindtime: 0;
+				removetime: -2;
+				sprpriority: 4;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				palfx.time: -1;
+				palfx.add: 250,0,0;
+			}
+			explod{
+				anim: VP 20083;
+				postype: p1;
+				pos: const(size.mid.pos.x), const(size.mid.pos.y);
+				scale: 1, 1;
+				angle: 0;
+				facing: 1;
+				trans: Add;
+				ontop: 0;
+				vel: 0, 0;
+				bindtime: -1;
+				sprpriority: 4;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1
+			}
+			explod {
+				anim: VP 6030;
+				postype: p1;
+				pos: const(size.mid.pos.x), -80;
+				vel: 0, -1;
+				scale: .5, .5;
+				sprpriority: -5;
+				angle: 270;
+				facing: ifelse(facing=1, 1, -1);
+				#trans: addalpha;
+				#alpha: 256, 256;
+				ontop: 0;
+				bindtime: 1;
+				removetime: 20;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				PalFX.Time: 23;
+				PalFx.Add: 200, 0, 0
+			}
+			
+			mapset{map: "_vnix_rushdrive_active"; value: 1}
+			
+		}
+		
+		# Rush Drive Buffs
+		if map(_vnix_rushdrive_active) != 0 && alive {
+			palfx{
+				time: 1;
+				mul: 200,200,200;
+				add: -100,-100,-100
+				#color: 128;
+			}
+
+			if standBy = 0 {
+				# Deplete Rush Gauge before Life
+				#if map(_pots_dash_gauge) > 0 && map(_pots_dash_burnout) = 0 {
+				#	if moveType != H {
+				#		mapadd{map: "_pots_dash_gauge"; value: -abs(map(_vnix_rushdrive_cfg_cost))}
+				#	}
+				#	mapset{map: "_pots_dash_gauge_cooldown"; value: 480} # Extended Rush Gauge Cooldown
+				#}
+				# Life Burn
+				if moveType != H {
+					# Deplete Health
+					if life >= lifeMax * float(map(_vnix_rushdrive_cfg_life) / 100)
+					&& moveType != A 
+					&& map(_vnix_meta_active) = 0
+					&& gametime%4 = 0
+					{
+						lifeAdd{value: -abs(map(_vnix_rushdrive_cfg_cost)); absolute: 1; kill: 0}
+					}
+				}
+				
+				# Enter Level 2
+				if life <= lifeMax * 0.5 {
+					# Increase Damage
+					targetLifeAdd {
+						value: p2,GetHitVar(damage) * (-1.0 * 0.25);
+						absolute: 1;
+						kill: 0
+					}
+					if (gametime % 15) = 0 {
+						explod{
+							anim: VP 20085;
+							postype: p1;
+							pos: const(size.mid.pos.x) + 10, -1.0 * random%40;
+							scale: .25  + (random%50/100), .25 + (random%50/100);
+							angle: 10 - random%20;
+							random: 24, 0;
+							facing: cond(random <= 500, 1, -1);
+							trans: Addalpha;
+							alpha: 256,256;
+							ontop: 0;
+							vel: 0, -.5;
+							bindtime: 2;
+							sprpriority: 3;
+							pausemovetime: -1;
+							supermovetime: -1;
+							ownpal: 1;
+							interpolation.time: 40;
+							interpolation.alpha: 0,256;
+							interpolation.scale: .5,.75;
+						}
+						explod{
+							anim: VP 20085;
+							postype: p1;
+							pos: const(size.mid.pos.x) - 5, -1.0 * random%40;
+							scale: .25  + (random%50/100), .25 + (random%50/100);
+							angle: 10 - random%20;
+							random: 24, 0;
+							facing: cond(random <= 500, 1, -1);
+							trans: Addalpha;
+							alpha: 256,256;
+							ontop: 0;
+							vel: 0, -.5;
+							bindtime: 2;
+							sprpriority: 3;
+							pausemovetime: -1;
+							supermovetime: -1;
+							ownpal: 1;
+							interpolation.time: 40;
+							interpolation.alpha: 0,256;
+							interpolation.scale: .5,.75;
+						}
+						explod{
+							anim: VP 20085;
+							postype: p1;
+							pos: const(size.mid.pos.x) + 5, -1.0 * random%40;
+							scale: .5 + (random%25/100), .5 + (random%25/100);
+							angle: 10 - random%20;
+							random: 24, 0;
+							facing: cond(random <= 500, 1, -1);
+							ontop: 0;
+							trans: Addalpha;
+							alpha: 256,256;
+							vel: 0, -1;
+							bindtime: 2;
+							sprpriority: -3;
+							pausemovetime: -1;
+							supermovetime: -1;
+							ownpal: 1;
+							interpolation.time: 40;
+							interpolation.alpha: 0,256;
+							interpolation.scale: .5,.75;
+						}		
+					}				
+				}
+			}
+
+			# PotS' Rainbow Edition Code - Makeshift Turbo
+			if pausetime = 0
+			&& p2, pausetime = 0
+			&& gethitvar(isbound) = 0
+			&& hitDefAttr != SCA, HA, HP, HT
+			&& cond(numtarget, target, gethitvar(isbound) = 0, 1) {
+			
+				if (gametime % 2) = 0 { # Original seems to be 14 (1.077 times faster)
+					# Buffer animation frames to be skipped
+					mapadd{map: "_pots_rainbow_turboskip"; value: 1}
+				}
+				# Skip animation frames on Normals & Walk
+				if animelemtime(animelemno(0)) > 0 # Do not skip first frame of an element
+				&& animelemtime(animelemno(0) + 1) < 0 # Do not skip last element
+				&& (hitDefAttr = SCA, NA, NP, NT || stateno = 20)
+				&& map(_pots_rainbow_turboskip) >= -animelemtime(animelemno(0) + 1) {
+					changeanim{value: anim; elem: animelemno(0) + 1}
+					mapset{map: "_pots_rainbow_turboskip"; value: 0}
+				}
+				
+				# Skip position update on Walk & Run
+				if stateno = 20 || stateno = 50 || stateno = 100  {
+					posadd{x: vel x * 0.8;}
+				}
+				
+				# Shorten Hit Pause
+				if MoveType = A && combocount <= 5 { # To Avoid Infinites
+					modifyPlayer{hitpausetime: 0;}
+				}
+			}
+				
+			# Red AfterImages
+			if stateno = 0 {
+				afterImage{
+					length: 10;
+					palbright: 30, 30, 30;
+					palcontrast: 70, 70, 70;
+					paladd: -10, -10, -10;
+					palmul: 1.85, .85, .85;
+					timegap: 1;
+					framegap: 2;
+					trans: Add;
+					time: -1;
+				}
+			}
+			
+			# Damage Tracker Non-Projectiles
+			if p2, getHitVar(damage) >= 1 {
+				mapadd{map: "_vnix_rushdrive_dmg"; value: p2, getHitVar(damage)}
+			}
+		
+			# Forced Deactivate
+			if life < lifeMax * float(map(_vnix_rushdrive_cfg_life) / 100) && moveType = H && stateno != [120,155] {
+				lifebaraction{text: "Over Heat"; top: 1}
+				playsnd{value: VP 100, 49; volumescale: 200; freqmul: 1.0}
+				mapset{map: "_vnix_rushdrive_active"; value: 0}
+				mapset{map: "_vnix_rushdrive_input"; value: 0} # Reset Input
+				# Red FX
+				explod{
+					anim: VP 10050;
+					postype: p1;
+					pos: const(size.mid.pos.x), const(size.mid.pos.y);
+					scale: .75, .75;
+					angle: 0;
+					facing: 1;
+					ontop: 0;
+					bindtime: -1;
+					sprpriority: 3;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1;
+					palfx.time: -1;
+					palfx.mul: 255,0,0;
+				}
+				explod{
+					anim: VP 20082;
+					postype: p1;
+					pos: const(size.mid.pos.x), const(size.mid.pos.y);
+					scale: .4, .4;
+					angle: 0;
+					facing: 1;
+					ontop: 0;
+					bindtime: -1;
+					sprpriority: 3;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1;
+					palfx.time: -1;
+					palfx.mul: 255,0,0;
+				}
+				Pause{
+					time: 30;
+					movetime: 0;
+					pausebg: 1
+				}
+				bgPalFx{
+					time: 30;
+					add: -64, -64, -64;
+					color: 32;
+				}
+				afterImageTime{
+					time: 10;
+				}
+			}
+		}
+	}
+	
+	# Reset Buffs
+	if Roundstate = [3,4] {
+		mapset{map: "_vnix_rushdrive_active"; value: 0}
+		mapset{map: "_vnix_rushdrive_input"; value: 0} # Reset Input
+		afterImageTime{time: 0;}
+	}
+
+}

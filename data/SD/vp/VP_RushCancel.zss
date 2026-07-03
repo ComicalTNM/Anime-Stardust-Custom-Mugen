@@ -1,0 +1,2280 @@
+# Universal Dash Cancel System by Phantom.of.the.Server
+# For Ikemen GO November 2024 build and above
+
+# See the readme for installation instructions
+
+
+#===============================================================================
+# Configuration
+#===============================================================================
+
+[Function F_PotS_Dash_Config()]
+
+### RULES ###
+
+mapset{map: "_pots_dash_cfg_cost_momentum"; value: 0}		# How much gauge is spent when acting out of a dash. Out of 1000
+mapset{map: "_pots_dash_cfg_cost_cancel"; value: 200}		# How much gauge is spent when dash cancelling
+mapset{map: "_pots_dash_cfg_allow_super"; value: 1}			# Allow dash cancelling out of supers
+mapset{map: "_pots_dash_cfg_cost_super"; value: 400}		# How much gauge is spent when dash cancelling out of a super move
+mapset{map: "_pots_dash_cfg_allow_fireball"; value: 1}		# Allow dash cancelling out of fireballs
+mapset{map: "_pots_dash_cfg_friction"; value: 0.90}			# Friction to use during dash momentum
+mapset{map: "_pots_dash_cfg_scaling"; value: 500}			# Damage scaling. When combo damage reaches this value, scaling will be at 50%
+mapset{map: "_pots_dash_cfg_gauge_refill"; value: 1.0}		# Gauge recovery speed
+
+mapset{map: "_vnix_dash_smash_pausetime"; value: 20}		# Rush Chain Pausetime
+mapset{map: "_vnix_dash_cfg_impact"; value: 1}				# Enable Rush Impact, 0 to disable
+
+
+### GAUGE TEXT ###
+
+mapset{map: "_pots_dash_cfg_text_font"; value: 1}			# Font number to use from the lifebars. Default -1 (debug font)
+mapset{map: "_pots_dash_cfg_text_layer"; value: 0}			# Layer number for text. 0 behind chars. 1 in front
+mapset{map: "_pots_dash_cfg_text_scale"; value: 0.2}		# Text scale
+mapset{map: "_pots_dash_cfg_text_posx"; value: 44}			# Text X offset 80
+mapset{map: "_pots_dash_cfg_text_posy"; value: 22}			# Text Y offset
+mapset{map: "_pots_dash_cfg_text_shadow"; value: 0}			# Draw shadows under text
+
+
+# ===================================================================================
+# Rush Impact - Attack
+# ===================================================================================
+
+[StateDef 420700; 
+	type: S;
+	moveType: A;
+	physics: S;
+	poweradd: 0;
+	juggle: 15;
+	anim: -1;
+	sprPriority: 2;
+	ctrl: 0;
+	velset: 0,0;
+]
+
+# For big characters
+if const(size.xscale) != 1.0 && const(size.yscale) != 1.0 {
+	transformClsn{scale: 1.0/const(size.xscale), 1.0/const(size.yscale)}
+}
+
+overrideClsn{group: Clsn1; index: -1; rect: -19, -107, 76, 0}
+
+assertSpecial{flag: noinput; flag2: nohardcodedKeys; flag3: noAILevel}
+
+# Rush Breaker Armor
+if map(_vnix_rush_armor) > 0 && enemy, map(_vnix_rush_armor) >= 0 {
+	hitOverride{
+		attr: SCA,NA,SA,HA,NP,SP,HP;
+		slot: 0;
+		stateno: 420705;
+		time: 1;
+		forceair: 0;
+	}
+	assertspecial{flag: nohitdamage;}
+}
+
+if time = [0,10] && prevStateNo != 420705 {
+	assertspecial{flag: animfreeze}
+	posadd{x: 1;}
+	if enemy, stateno = 420700 && p2bodydist X < 30 && gametime%2 = 0 {
+		pause{time: 2;}
+	}
+}
+
+if time = 1 {
+	if prevStateNo != 420705 {
+	
+		mapset{map: "_vnix_rush_armor"; value: 2;}
+		mapadd{map: "_pots_dash_gauge"; value: -200;}
+		mapadd{map: "_pots_dash_gauge_cooldown"; value: 120;}
+		
+		palfx{
+			time: 10;
+			add: 255, 255, 255;
+			sinadd: -255, -255, -255, 120;
+		}
+		
+		playsnd{value: VP 110, 40; volumescale: 200; freqmul: 1.0}
+	
+		# Ink Streaks
+		explod{
+			anim: VP 40108;
+			ID: 40108;
+			postype: p1;
+			pos: const(size.mid.pos.x) + 10, const(size.mid.pos.y);
+			vel: 0,0;
+			scale: 1.5,.85;
+			angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+			facing: 1;
+			vfacing: 1; #(ifelse(Random <= 500, 1, -1));
+			layerno: 0;
+			sprpriority: -2;
+			removetime: -2;
+			bindtime: -1;
+			pausemovetime: -1;
+			supermovetime: -1;
+			palfx.time: -1;
+			palfx.add: random%255,random%255,random%255;
+			#interpolation.time: 20;
+			#interpolation.offset: 100, const(size.mid.pos.y);
+		}
+		explod{
+			anim: VP 40108;
+			ID: 40108;
+			postype: p1;
+			pos: const(size.mid.pos.x) + 10, const(size.mid.pos.y);
+			vel: 0,0;
+			scale: 1,.85;
+			angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+			facing: 1;
+			vfacing: 1;#(ifelse(Random <= 500, 1, -1));
+			trans: add;
+			layerno: 0;
+			sprpriority: 5;
+			removetime: -2;
+			bindtime: -1;
+			pausemovetime: -1;
+			supermovetime: -1;
+			palfx.time: -1;
+			palfx.add: random%255,random%255,random%255;
+		}
+		
+		# Color Ink Spark
+		explod{
+			anim: VP 30006;
+			ID: 30006;
+			postype: p1;
+			pos: const(size.mid.pos.x) + 10, const(size.mid.pos.y);
+			scale: .5,.5;
+			angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+			facing: 1;
+			vfacing: (ifelse(Random <= 500, 1, -1));
+			ontop: 0;
+			sprpriority: -3;
+			removetime: -2;
+			ownpal: 1;
+			palfx.time: -1;
+			palfx.add: random%255,random%255,random%255;
+		}
+		
+		# Decide Animation used - Make sure the anim has red Clsn boxes
+		if const(Vnix_Impact) = 0 {
+			if Random <= 500 {
+				if selfAnimExist(220) {
+					changeAnim{value: 220}
+				} else if selfAnimExist(210) {
+					changeAnim{value: 210}
+				} else if selfAnimExist(200) {
+					changeAnim{value: 200}
+				} else {
+					changeAnim{value: 420700}
+				}
+			} else {
+				if selfAnimExist(250) {
+					changeAnim{value: 250}
+				} else if selfAnimExist(240) {
+					changeAnim{value: 240}
+				} else if selfAnimExist(230) {
+					changeAnim{value: 230}
+				}  else {
+					changeAnim{value: 420700}
+				}
+			}
+		} else {
+			changeAnim{value: const(Vnix_Impact)}
+		}
+	}
+}
+
+ignoreHitPause persistent(0) if time = 10 {
+	playsnd{value: VP 110, 39; volumescale: 200; freqmul: 1.0}
+}
+
+if movehit = 0 {
+	hitDef{
+		attr: S,SA;
+		damage: 120,0;
+		animtype: Hard;
+		guardflag: MA;
+		hitflag: MAF;
+		priority: 4,hit;
+		sparkno: -1;
+		guard.sparkno: -1;
+		sparkxy: -20,-60;
+		hitsound: VP 110,38;
+		guardsound: -1;
+		pausetime: 30, 30;
+		ground.slidetime: 15;
+		ground.hittime: 15;
+		ground.velocity: -5, cond(enemy, stateno = 420700, 0, -4);
+		air.velocity: -5,-4;
+		ground.cornerpush.veloff: 0;
+		guard.cornerpush.veloff: -20;
+		getpower: 0,0;
+		fall: cond(enemy, stateno = 420700, 0, 1);
+		fall.recover: 0;
+		yaccel: .3;
+		down.bounce: 0;
+	}
+}
+
+
+
+ignoreHitPause if movehit && movehitvar(frame) {
+	if enemy, prevstateno = 420700 {
+		lifebarAction{text: "Rush Punish"; top: 1;}
+		playsnd{value: VP 110, 41; volumescale: 200; freqmul: 1.0}
+		envShake{time: 40; freq: 160; ampl: -2;}
+		bgpalfx{
+			time: 30;
+			add: -128, -128, -128;
+			sinadd: 48, 48, 48, 120;
+		}
+		if p2StateType = S {
+			selfstate{value: 420710; ctrl: 0; redirectID: enemy, ID;}
+		}
+	} else {
+		if enemy, stateno != [420700,420705] {
+			lifebarAction{text: "Rush Impact"; top: 1;}
+			if p2StateType = S {
+				selfstate{value: 420710; ctrl: 0; redirectID: enemy, ID;}
+			}
+		}
+		playsnd{value: VP 110, 38; volumescale: 200; freqmul: 1.0}
+		envShake{time: 20; freq: 160; ampl: -2; phase: 90;}
+	}
+	if p2StateType = A {
+		mapadd{map: "_pots_dash_gauge"; value: -200; redirectID: enemy, ID;}
+		mapadd{map: "_pots_dash_gauge_cooldown"; value: 120; redirectID: enemy, ID;}
+	}
+	# Hard Hitspark
+	explod{
+		anim: VP 333;
+		postype: p2;
+		pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+		scale: 1.25, 1.25;
+		angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+		facing: (ifelse(Random <= 500, 1, -1));
+		ontop: 0;
+		sprpriority: 4;
+		pausemovetime: 5;
+		supermovetime: 5;
+		ownpal: 1;
+		palfx.time: -1;
+	}
+	explod{
+		anim: VP ifelse(TeamSide = 1, 30017, 30018);
+		ID: 30007;
+		postype: p1;
+		pos: const240p(MoveHitVar(SparkX)), const240p(MoveHitVar(SparkY));
+		scale: cond(enemy, stateno = 420700, 1, .85),cond(enemy, stateno = 420700, 1, .85);
+		angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+		facing: -1;
+		vfacing: (ifelse(Random <= 500, 1, -1));
+		ontop: 0;
+		sprpriority: p2, sprpriority;
+		removetime: -2;
+		pausemovetime: 5;
+		supermovetime: 5;
+		ownpal: 1;
+		PalFx.Time: -1;
+		#PalFx.Mul: random%135, random%135, random%135;
+		PalFx.Add: 0, 120 + random%130, 120 + random%130;
+	}
+}
+
+ignorehitpause if moveGuarded {
+	guardPointsAdd{value: -9999; redirectID: enemy, ID;}
+	nothitby{value: SCA; time: 1; redirectID: enemy, ID;}
+}
+
+# Zoom Effect
+ignoreHitPause if moveType = A {
+	if movehit = 1 {
+		zoom{
+			scale: cond(enemy, prevstateno = 420700, 1.33, 1.15);
+			time: 60;
+			pos: const240p((pos x + p2, pos x) / 2.0), 0;
+			lag: 0.85;
+			stagebound: 1;
+			camerabound: 1;
+		}
+	} else {
+		zoom{
+			scale: 1.0;
+			time: 60;
+			pos: const240p((pos x + p2, pos x) / 2.0), 0;
+			lag: 0.9;
+			stagebound: 1;
+			camerabound: 1;
+		}
+	}
+}
+
+if animtime = 0 || time >= 40 {
+	mapset{map: "_vnix_rush_armor"; value: 0;}
+	mapset{map: "_vnix_rush_armor"; value: 0; redirectID: enemy, ID;}
+	selfstate{value: 0; ctrl: 1}
+}
+
+# ===================================================================================
+# Rush Impact - Armor
+# ===================================================================================
+
+[StateDef 420705; 
+	type: U;
+	moveType: H;
+	physics: U;
+	ctrl: 0;
+]
+
+assertSpecial{flag: noinput; flag2: nohardcodedKeys; flag3: noAILevel}
+
+if time = 0 {
+	if map(_vnix_rush_armor) > 0 {
+		mapadd{map: "_vnix_rush_armor"; value: -1;}
+		if enemy, stateno = 420700 {
+			mapadd{map: "_vnix_rush_armor"; value: -2;}
+		}
+		playsnd{value: VP 110, 37; volumescale: 200; freqmul: 1.0}
+		palfx{
+			time: 30;
+			add: 255, 255, 255;
+			sinadd: -255, -255, -255, 120;
+		}
+	}
+	if map(_vnix_rush_armor) = 0 {
+		playSnd{value: GO 5400, 0; volume: 200}
+		explod{
+			anim: VP 40105;
+			postype: p1;
+			pos: const(size.mid.pos.x) - 10, const(size.mid.pos.y);
+			scale: .25,.25;
+			angle: -90;
+			random: 0,0;
+			facing: 1;
+			bindtime: 0;
+			vel: 1,0;
+			sprpriority: 3;
+			removetime: -2;
+			pausemovetime: -1;
+			supermovetime: -1;
+			trans: Addalpha;
+			alpha: 256,256;
+			ownpal: 1;
+			layerno: 1;
+			interpolation.time: 50;
+			interpolation.alpha: 0,256;
+			interpolation.scale: .667,.667;
+		}
+	}
+}
+
+if hitShakeOver = 0 {
+	changeAnim{value: anim; elem: animelemno(0);}
+} else {
+	selfstate{value: 420700; ctrl: 0;}
+}
+
+# ===================================================================================
+# Rush Impact - Crumble
+# ===================================================================================
+
+[StateDef 420710; 
+	type: S;
+	moveType: I;
+	physics: S;
+	ctrl: 0;
+	anim: -2;
+]
+
+assertSpecial{flag: noinput; flag2: nohardcodedKeys; flag3: noAILevel}
+
+if time = 0 {
+	mapadd{map: "_pots_dash_gauge"; value: -200;}
+	mapadd{map: "_pots_dash_gauge_cooldown"; value: 120;}
+	changeanim{value: 420710}
+}
+
+if time = 1 {
+	explod{
+		anim: VP ifelse(TeamSide = 1, 30027, 30028);
+		ID: 30010;
+		postype: p1;
+		pos: const(size.mid.pos.x), 0;
+		scale: cond(enemy, stateno = 420700, 1, .75), .2;
+		angle: 0;
+		facing: 1;
+		vfacing: (ifelse(Random <= 500, 1, -1));
+		ontop: 0;
+		sprpriority: sprpriority - 1;
+		removetime: -2;
+		pausemovetime: 5;
+		supermovetime: 5;
+		ownpal: 1;
+		PalFx.Time: -1;
+		#PalFx.Mul: random%135, random%135, random%135;
+		PalFx.Add: 0, 120 + random%130, 120 + random%130;
+	}
+}
+
+if animTime = 0 {
+	changeState{value: 5110;}
+}
+
+
+#===============================================================================
+# Fake Dash State - Used only if a character can't normally run/dash
+#===============================================================================
+
+[StateDef 1615201910; type: S; physics: N; ctrl: 1; anim: ifelse(selfanimexist(100), 100, 20); sprpriority: 1;]
+
+velSet{x: max(const(velocity.run.fwd.x), 1.5 * const(velocity.walk.fwd.x))}
+
+assertSpecial{flag: noWalk; flag2: noAutoTurn}
+
+if time >= 20 {
+	selfstate{value: 0; ctrl: 1}
+}
+
+
+#===============================================================================
+# Negative states
+#===============================================================================
+
+[StateDef -4]
+
+ignorehitpause if !ishelper && (teamside = 1 || teamside = 2)  && gamemode = "fightchallenge"  || gamemode =  "fightchallengevs"  {
+
+	# Initialize
+	if roundstate = 0 && time = 0 {
+		# Run config
+		call F_PotS_Dash_Config();
+		# Reset variables
+		mapset{map: "_pots_dash_firstctrl"; value: 0}
+		mapset{map: "_pots_dash_gauge"; value: 1000}
+		mapset{map: "_pots_dash_burnout"; value: 0}
+		mapset{map: "_pots_dash_prevlife"; value: lifemax}
+		mapset{map: "_pots_dash_prevdizzy"; value: dizzypointsmax}
+		mapset{map: "_pots_dash_prevguard"; value: guardpointsmax}
+		mapset{map: "_vnix_dash_hitspark"; value: 0}
+		mapset{map: "_vnix_burnout_anim"; value: 0}
+		mapset{map: "_vnix_rush_count"; value: 0}
+	}
+
+	# Decrease input timers
+	# Some chars may have an inappropriate FF command or lack one at all, so we'll make out own instead
+	if map(_pots_dash_cmd_66) > 0 && hitpausetime <= 0 {
+		mapadd{map: "_pots_dash_cmd_66"; value: -1}
+	}
+	if map(_pots_dash_cmd_6) > 0 {
+		mapadd{map: "_pots_dash_cmd_6"; value: -1}
+	}
+
+	# Construct fake dash input
+	# Directions are not flipped because most dashes don't autocorrect
+	if inputtime(F) = 1 && cond(teamMode = Tag, playerNo = teamleader, 1) {
+		if map(_pots_dash_cmd_6) > 0 {
+			mapset{map: "_pots_dash_cmd_66"; value: 5}
+		}
+		mapset{map: "_pots_dash_cmd_6"; value: 15}
+	}
+
+	# Only F is allowed
+	if inputtime(B) > 0 || inputtime(D) > 0 || inputtime(U) > 0 {
+		mapset{map: "_pots_dash_cmd_6"; value: 0}
+	}
+
+	# Check if current attack is a super or a guard
+	if stateno = [3000, 4999] || stateno = [150,152]
+	|| hitdefattr = SCA, HA, HT, HP
+	|| p2, gethitvar(attr) = SCA, HA, HT, HP {
+		mapset{map: "_pots_dash_superflag"; value: 1}
+	} else {
+		mapset{map: "_pots_dash_superflag"; value: 0}
+	}
+
+	# AI fake dash input
+	if AIlevel && !hitpausetime {
+		# Check if cancelling is a good idea
+		if p2stateno != [120, 149] {
+			let notdumb = (p2, gethitvar(hitshaketime) + p2, gethitvar(hittime)) >= (5 - animtime);
+		} else {
+			let notdumb = (p2, gethitvar(hitshaketime) + p2, gethitvar(hittime)) < (5 - animtime);
+		}
+		if $notdumb
+		&& movecontact != 1 # Let regular combos play out first
+		&& (p2statetype = S || p2statetype = C)
+		&& p2, hitfall = 0
+		&& (map(_pots_dash_superflag) = 0 || p2stateno = [120, 155]) # Only cancel most supers on block
+		&& random < (200 * (AIlevel ** 2 / 64.0))
+		&& (map(_pots_dash_gauge) > map(_pots_dash_cfg_cost_cancel) || p2life = [1, 150] || p2, dizzypoints = [1, 150] || p2, guardpoints = [1, 150]) {
+			mapset{map: "_pots_dash_cmd_66"; value: 5}
+		}
+	}
+	
+	if Roundstate = 2 && playerNo < 9 && map(_vnix_dash_cfg_impact) {
+	
+		# ===================================================================================
+		# Rush Impact
+		# ===================================================================================
+		
+		# Input handling
+		if map(_vnix_rush_break) > 0 {
+			mapadd{map: "_vnix_rush_break"; value: -1}
+		}
+		
+		let buffertime = 1;
+		if AIlevel {
+			if stateno != [420700,420710]
+			&& enemy, stateno != 420710
+			&& cond((enemy, stateno = 420700 || enemy, stateno = [120, 155]), 1, (random < 100 && random < 550 && random < ((250 + 500) * AIlevel / 8.0)))
+			&& enemy, map(ikarmor_assertarmor) = 0
+			&& enemy, map(ikarmor_assertarmor2) = 0
+			&& map(_vnix_meta_active) = 0
+			&& enemy, map(_vnix_meta_active) = 0
+			&& map(_vnix_rushdrive_active) = 0
+			&& enemy, map(_vnix_rushdrive_active) = 0
+			&& playerNo = teamLeader
+			&& p2, stateType != A
+			&& stateType != A
+			&& moveType = I
+			&& moveType != H
+			&& p2BodyDist X < 60
+			&& p2BodyDist Y = [-20,20]
+			&& enemy, stateType != L
+			&& enemy, getHitVar(isbound) = 0
+			&& facing = enemy, facing * -1.0
+			&& random < cond(map(_pots_dash_gauge) <= 500, 150, 400)
+			&& map(_pots_dash_gauge) >= 200
+			&& map(_pots_dash_burnout) = 0
+			&& (statetype != L || stateno = 5120) { # Let AI use Rush Impact
+				mapset{map: "_vnix_rush_break"; value: $buffertime}
+			}
+		} else {
+			# Hold Forward & press Z+C
+			if inputtime(F) > 0 && inputtime(z) = 1 && inputtime(c) = 1 {
+				mapset{map: "_vnix_rush_break"; value: $buffertime}
+			}
+		}
+		
+		if map(_vnix_rush_break)
+		&& stateno != [420700,420710]
+		&& stateno != [1915201910,1915201930] # Combo Breaker States
+		&& map(_vnix_meta_active) = 0
+		&& enemy, map(_vnix_meta_active) = 0
+		&& map(_vnix_rushdrive_active) = 0
+		&& playerNo = teamLeader
+		&& stateType != A
+		&& moveType != H
+		&& moveType = I
+		&& enemy, stateno != 420710
+		&& map(_pots_dash_gauge) >= 200
+		&& map(_pots_dash_burnout) = 0
+		&& !pausetime
+		{
+			selfstate{value: 420700; ctrl: 0;}
+		}
+	}
+}
+
+
+[StateDef -2]
+
+ignorehitpause if roundstate = 2 && (teamside = 1 || teamside = 2) && !isHelper   && gamemode = "fightchallenge" || gamemode =  "fightchallengevs"  {
+				
+	# Prevents cancels before round actually starts as roundstate 2 starts too early
+	if !map(_pots_dash_firstctrl) && ctrl {
+		mapset{map: "_pots_dash_firstctrl"; value: 1}
+	}
+
+	# Reset cancel timer
+	if map(_pots_dash_movehit) > 0
+	&& (ctrl || movetype = H) {
+		mapset{map: "_pots_dash_movehit"; value: 0}
+	}
+
+	# Decrease cancel timer
+	if map(_pots_dash_movehit) > 0
+	&& hitpausetime <= 0 {
+		mapadd{map: "_pots_dash_movehit"; value: -1}
+	}
+
+	# Start cancel timer
+	if p2, gethitvar(frame)
+	&& p2, gethitvar(playerno) = playerno
+	&& cond(map(_pots_dash_cfg_allow_fireball) = 0, movecontact = 1, 1)
+	&& p2, gethitvar(attr) != SCA, AT {
+		mapset{map: "_pots_dash_movehit"; value: max(15, hitpausetime)}
+	}
+
+	# Force cancel into dash
+	if (map(_pots_dash_movehit) > 0
+	&& (map(_pots_dash_burnout) = 0 || (map(_pots_dash_burnout) != 0 && map(_vnix_mercury_buff)))
+	&& map(_vnix_dcounter) = 0 # Dont allow Rush Cancel from Dramatic Counters
+	&& stateno != [100, 119]
+	&& roundstate = 2
+	&& map(_pots_dash_firstctrl)
+	&& stateno != 420700 # Cannot dash from Rush Impact
+	&& ctrl = 0
+	&& time > 0
+	&& movetype != H
+	&& stateno != [5000, 5999]
+	&& hitpausetime = 0 # Dash command is buffered
+	&& p2, pausetime = 0
+	&& random < cond(map(_pots_dash_gauge) <= 500, 250, 400)
+	&& (map(_pots_dash_superflag) = 0 || map(_pots_dash_cfg_allow_super) != 0)
+	&& cond(numtarget, target, gethitvar(isbound) = 0 || target, incustomstate = 0, 1))
+	|| (stateno = [150,152]
+	&& (map(_pots_dash_burnout) = 0 || (map(_pots_dash_burnout) != 0 && map(_vnix_mercury_buff)))
+	&& roundstate = 2
+	&& map(_pots_dash_firstctrl)
+	&& random < cond(map(_pots_dash_gauge) <= 500, 150, 300)
+	&& ctrl = 0
+	&& time > 0
+	# && p2, movetype = A
+	&& (map(_pots_dash_superflag) = 0 || map(_pots_dash_cfg_allow_super) != 0)
+	&& cond(numtarget, target, gethitvar(isbound) = 0 || target, incustomstate = 0, 1)) { # Minimize bugs
+		if map(_pots_dash_cmd_66) > 0 {
+			# Ground dash
+			# Allow back dashes?
+			# Allow air dashes?
+			if statetype = S || statetype = C {
+				# Rush Counter Invulnerability
+				if prevstateno = [150,152] {
+					notHitBy{value: SCA; time: 30}
+				}
+				# Clear inputs
+				mapset{map: "_pots_dash_cmd_66"; value: 0}
+				if mugenversion >= 1.0 { # Otherwise might mess with AI activation codes
+					assertcommand{name: "a"; buffer.time: 0}
+					assertcommand{name: "b"; buffer.time: 0}
+					assertcommand{name: "c"; buffer.time: 0}
+					assertcommand{name: "x"; buffer.time: 0}
+					assertcommand{name: "y"; buffer.time: 0}
+					assertcommand{name: "z"; buffer.time: 0}
+					assertcommand{name: "start"; buffer.time: 0}
+				}
+				removeexplod{} # Just in case. More harm than good in having this?
+				# Change to dashing state
+				if selfanimexist(100) && const(velocity.run.fwd.x) > 0 {
+					selfstate{value: 100; continue: 1} # Chars that can cancel this state can act instantly after dashing
+				} else {
+					selfstate{value: 1615201910; continue: 1}
+				}
+				# Reset cancel timer immediately
+				mapset{map: "_pots_dash_movehit"; value: 0}
+				# Spend gauge
+				if map(_pots_dash_superflag) {
+					mapadd{map: "_pots_dash_gauge"; value: cond(map(_vnix_mercury_buff), 0, -abs(map(_pots_dash_cfg_cost_super)))}
+				} else {
+					# Regular cost
+					mapadd{map: "_pots_dash_gauge"; value: cond(map(_vnix_mercury_buff), 0, -abs(map(_pots_dash_cfg_cost_cancel)))}
+				}
+				mapset{map: "_pots_dash_gauge_cooldown"; value: 120}
+				mapadd{map: "_vnix_rush_count"; value: 1}
+				# Visual cue
+				if map(_pots_dash_gauge) > 0 {
+					mapset{map: "_vnix_dash_hitspark"; value: 1}
+					palfx{time: 15; add: 128, 128, 128; sinadd: -128, -128, -128, 60} # OK
+					playsnd{value: VP 100, 21; volumescale:200; freqmul: 1.0}
+					if StageConst(Vnix_No_Dust) != 1 {
+						explod{anim: VP 4048; pos: 10,0; scale: .5, .5; postype: p1; removetime: -2; sprpriority: 2; superMoveTime: -1; pauseMoveTime: -1}
+					}
+					if map(_pots_dash_superflag) {
+						if prevstateno = [150,152] {
+							lifebaraction{text: "Rush Counter"; top: 1}
+							explod{
+								anim: VP 10003;
+								posType: p1;
+								pos: 20, const(size.mid.pos.y);
+								velocity: -3, 0;
+								sprPriority: 5;
+								ownPal: 1;
+								facing: 1;
+								scale: .45, .6;
+								bindTime: 0;
+								superMoveTime: -1;
+								pauseMoveTime: -1;
+								removeOnGetHit: 0;
+								ignoreHitPause: 1;
+								PalFx.Time: 23;
+								PalFx.Mul: 30, 144, 255;
+								PalFx.Add: 0, 200, 200
+							}
+							# Streaks
+							explod{
+								anim: VP 10004;
+								posType: p1;
+								pos: 0, const(size.mid.pos.y);
+								velocity: 0, 0;
+								sprPriority: 5;
+								ownPal: 1;
+								facing: 1;
+								scale: 1, 1;
+								trans: Add;
+								bindTime: 0;
+								superMoveTime: -1;
+								pauseMoveTime: -1;
+								removeOnGetHit: 0;
+								ignoreHitPause: 1;
+								PalFx.Time: 23;
+								PalFx.Mul: 30, 144, 255;
+								PalFx.Add: 0, 200, 200
+							}
+							afterImage{
+								length: 6;
+								palbright: 0, 100, 100;
+								palcontrast: 0, 40, 155;
+								paladd: 0, 0, 0;
+								palmul: 1, 1, 1;
+								timegap: 2;
+								framegap: 1;
+								trans: Add;
+								time: 10;
+							}
+							# BG Spark
+							explod {
+								anim: VP 6030;
+								postype: left;
+								pos: const240p(160), const240p(140);
+								velocity: 0, 0;
+								scale: 1, 1;
+								sprpriority: -5;
+								angle: 0;
+								facing: ifelse(facing=1, 1, -1);
+								trans: addalpha;
+								alpha: 256, 256;
+								ontop: 0;
+								bindtime: -1;
+								removetime: 20;
+								pausemovetime: -1;
+								supermovetime: -1;
+								ownpal: 1;
+								PalFx.Time: 23;
+								PalFx.Mul: 30, 144, 255;
+								PalFx.Add: 0, 200, 200
+							}
+							bgpalfx{
+								time: 10;
+								mul: 45, 82, 160;
+							}
+							playsnd{value: VP 100, 26; volumescale:100; freqmul: 1.0}
+						} else {
+							lifebaraction{text: "Rush Cancel EX"; top: 1}
+							# Ring
+							explod{
+								anim: VP 10003;
+								posType: p1;
+								pos: 20, const(size.mid.pos.y);
+								velocity: -3, 0;
+								sprPriority: 5;
+								ownPal: 1;
+								facing: 1;
+								scale: .45, .6;
+								bindTime: 0;
+								superMoveTime: -1;
+								pauseMoveTime: -1;
+								removeOnGetHit: 0;
+								ignoreHitPause: 1;
+								PalFx.Time: 23;
+								PalFx.Mul: 255, 215, 0;
+								PalFx.Add: 200, 200, 0
+							}
+							# Streaks
+							explod{
+								anim: VP 10004;
+								posType: p1;
+								pos: 0, const(size.mid.pos.y);
+								velocity: 0, 0;
+								sprPriority: 5;
+								ownPal: 1;
+								facing: 1;
+								scale: 1, 1;
+								trans: Add;
+								bindTime: 0;
+								superMoveTime: -1;
+								pauseMoveTime: -1;
+								removeOnGetHit: 0;
+								ignoreHitPause: 1;
+								PalFx.Time: 23;
+								PalFx.Mul: 255, 215, 0;
+								PalFx.Add: 200, 200, 0
+							}
+							afterImage{
+								length: 6;
+								palbright: 100, 100, 0;
+								palcontrast: 155, 40, 0;
+								paladd: 0, 0, 0;
+								palmul: 1, 1, 1;
+								timegap: 2;
+								framegap: 1;
+								trans: Add;
+								time: 10;
+							}
+							# BG Spark
+							explod {
+								anim: VP 6030;
+								postype: left;
+								pos: const240p(160), const240p(140);
+								velocity: 0, 0;
+								scale: 1, 1;
+								sprpriority: -5;
+								angle: 0;
+								facing: ifelse(facing=1, 1, -1);
+								trans: addalpha;
+								alpha: 256, 256;
+								ontop: 0;
+								bindtime: -1;
+								removetime: 20;
+								pausemovetime: -1;
+								supermovetime: -1;
+								ownpal: 1;
+								PalFx.Time: 23;
+								PalFx.Mul: 255, 215, 0;
+								PalFx.Add: 200, 200, 0
+							}
+							bgpalfx{
+								time: 10;
+								mul: 160, 82, 45;
+							}
+							playsnd{value: VP 100, 33; volumescale:100; freqmul: 1.0}
+						}
+					} else {
+						lifebaraction{text: "Rush Cancel"; top: 1}
+						playsnd{value: VP 100, 29; volumescale:100; freqmul: 1.0}
+						bgpalfx{
+							time: 10;
+							mul: 0,100,0;
+							add: 32, 32, 32;
+						}
+						# Ring
+						explod{
+							anim: VP 10001;
+							posType: p1;
+							pos: 30, const(size.mid.pos.y);
+							velocity: -3, 0;
+							sprPriority: 5;
+							ownPal: 1;
+							facing: 1;
+							scale: .45, .45;
+							bindTime: 0;
+							superMoveTime: -1;
+							pauseMoveTime: -1;
+							removeOnGetHit: 0;
+							ignoreHitPause: 1;
+						}
+						# Streaks
+						explod{
+							anim: VP 10004;
+							posType: p1;
+							pos: 0, const(size.mid.pos.y);
+							velocity: 0, 0;
+							sprPriority: 5;
+							ownPal: 1;
+							facing: 1;
+							scale: 1, 1;
+							trans: Add;
+							bindTime: 0;
+							superMoveTime: -1;
+							pauseMoveTime: -1;
+							removeOnGetHit: 0;
+							ignoreHitPause: 1;
+							PalFx.Time: 23;
+							PalFx.Mul: 0, 255, 0;
+							PalFx.Add: 0, 200, 0
+						}
+						afterImage{
+							length: 6;
+							palbright: 100, 255, 100;
+							palcontrast: 52, 128, 52;
+							paladd: 0, 0, 0;
+							palmul: 1, 1, 1;
+							timegap: 2;
+							framegap: 1;
+							trans: Add;
+							time: 10;
+						}
+						# BG Spark
+						explod {
+							anim: VP 6030;
+							postype: left;
+							pos: const240p(160), const240p(140);
+							velocity: 0, 0;
+							scale: 1, 1;
+							sprpriority: -5;
+							angle: 0;
+							facing: ifelse(facing=1, 1, -1);
+							trans: addalpha;
+							alpha: 256, 256;
+							ontop: 0;
+							bindtime: -1;
+							removetime: 20;
+							pausemovetime: -1;
+							supermovetime: -1;
+							ownpal: 1;
+							PalFx.Time: 23;
+							PalFx.Mul: 0, 255, 0;
+							PalFx.Add: 0, 200, 0
+						}
+					}
+				}			
+				# Check if dashing during combo
+				if p2movetype = H || p2, dizzy {
+					mapset{map: "_pots_dash_combo"; value: 1}
+				}
+				# Damage scaling
+				if pausetime = 0 && p2, pausetime = 0 { # Prevent overriding other pauses
+					#superpause{time: p2, pausetime; anim: -1; darken: 0; p2defmul: 1.25}
+					superpause{
+						time: p2, pausetime;
+						anim: -1; darken: 0;
+						# Calculate scaling based on combo damage and current P2 defense
+						p2defmul: (p2, receiveddamage + map(_pots_dash_cfg_scaling)) / map(_pots_dash_cfg_scaling) * (1.0 * p2, const(data.defence) / p2, defence);
+					}
+				}
+			}
+		}
+		# Pseudo hitpause extension
+		if stateno = [100,119] || stateno = 1615201910 {
+			if map(_pots_dash_superflag) {
+				superpause{time: 40; movetime: 40; anim:-1; darken: 0; p2defmul: 1;}
+				if prevstateno = [150,152] {
+					explod{
+						postype: p1;
+						pos: 0, 0;
+						vel: 0, 0;
+						facing: 1;
+						anim: anim;
+						animfreeze: 1;
+						animelem: animelemno(0);
+						sprpriority: sprpriority - 5;
+						removetime: 40;
+						pausemovetime: -1;
+						supermovetime: -1;
+						trans: addalpha;
+						alpha: 256, 32;
+						scale: const(size.xscale), const(size.yscale);
+						PalFx.Time: 40;
+						PalFx.Mul: 30, 144, 255;
+						PalFx.Add: 0, 50, 50;
+						interpolation.time: 40;
+						interpolation.alpha: 0, 256;
+						# interpolation.scale: 1.10 * const(size.xscale), 1.10 * const(size.yscale);
+						ownpal: 1;
+					}
+				} else {
+					explod{
+						postype: p1;
+						pos: 0, 0;
+						vel: 0, 0;
+						facing: 1;
+						anim: anim;
+						animfreeze: 1;
+						animelem: animelemno(0);
+						sprpriority: sprpriority - 5;
+						removetime: 40;
+						pausemovetime: -1;
+						supermovetime: -1;
+						trans: addalpha;
+						alpha: 256, 32;
+						scale: const(size.xscale), const(size.yscale);
+						PalFx.Time: 40;
+						PalFx.Mul: 255, 215, 30;
+						PalFx.Add: 50, 50, 0;
+						interpolation.time: 40;
+						interpolation.alpha: 0, 256;
+						# interpolation.scale: 1.10 * const(size.xscale), 1.10 * const(size.yscale);
+						ownpal: 1;
+					}
+				}
+			} else {
+				superpause{time: 20; movetime: 20; anim:-1; darken: 0; p2defmul: 1;}
+				explod{
+					postype: p1;
+					pos: 0, 0;
+					vel: 0, 0;
+					facing: 1;
+					anim: anim;
+					animfreeze: 1;
+					animelem: animelemno(0);
+					sprpriority: sprpriority - 5;
+					removetime: 40;
+					pausemovetime: -1;
+					supermovetime: -1;
+					trans: addalpha;
+					alpha: 256, 32;
+					scale: const(size.xscale), const(size.yscale);
+					PalFx.Time: 40;
+					PalFx.Mul: 30, 255, 30;
+					PalFx.Add: 0, 50, 0;
+					interpolation.time: 40;
+					interpolation.alpha: 0, 256;
+					# interpolation.scale: 1.10 * const(size.xscale), 1.10 * const(size.yscale);
+					ownpal: 1;
+				}
+			}
+		}
+	}
+
+	# Reset dash buffs
+	if map(_pots_dash_dash) {
+		if map(_pots_dash_burnout) > 0
+		|| abs(map(_pots_dash_dash_velx)) < const240p(1)
+		|| movetype = H || stateno = [5000, 5999]
+		|| stateno = 0 || stateno = 11 || stateno = 20
+		|| p2, pausetime > 0 # Super freeze
+		|| cond(numtarget, target, gethitvar(isbound) = 1, 0) { # Throws
+			mapset{map: "_pots_dash_dash"; value: 0}
+			mapset{map: "_pots_dash_dash_velx"; value: 0}
+		}
+	}
+
+	# Dashing momentum
+	# Only activates once the char actually moves and hits a button
+	if stateno = [100, 119]
+	&& map(_pots_dash_burnout) <= 0 {
+		if vel x > const240p(1) {
+			if (!AIlevel && (command = "a" || command = "b" || command = "c" || command = "x" || command = "y" || command = "z" || command = "start"))
+			|| (AIlevel && (p2bodydist x / vel x) <= 5) {
+				# Spend gauge
+				mapadd{map: "_pots_dash_gauge"; value: -abs(map(_pots_dash_cfg_cost_momentum))}
+				mapset{map: "_pots_dash_gauge_cooldown"; value: 120}
+				# Flag the dash
+				mapset{map: "_pots_dash_dash"; value: 1}
+				mapset{map: "_pots_dash_dash_velx"; value: vel x * facing}
+			}
+		} else {
+			mapset{map: "_pots_dash_dash"; value: 0}
+			mapset{map: "_pots_dash_dash_velx"; value: 0}
+		}
+	}
+
+	# Enhance dashes
+	if map(_pots_dash_dash) {
+		# No walking
+		assertspecial{flag: nowalk} # nocrouch and nojump get in the way with chars who can normally do it
+		#assertspecial{flag: nostandguard; flag2: nocrouchguard; flag3: noairguard}
+		# Force control
+		if stateno = [100, 119] {
+			ctrlset{value: 1}
+			# Remove any invincibility
+			#hitby{value: SCA, AA, AT, AP; time: 1}
+		} else {
+			# Dashing momentum
+			if vel x = 0 && hitpausetime = 0 {
+				posadd{x: map(_pots_dash_dash_velx) * facing}
+			}
+		}
+		# Momentum friction
+		if hitpausetime = 0 {
+			mapset{map: "_pots_dash_dash_velx"; value: map(_pots_dash_cfg_friction) * map(_pots_dash_dash_velx)}
+		}
+		# Force knockdown
+		if p2, gethitvar(frame)
+		&& p2, gethitvar(guarded) = 0
+		&& p2, gethitvar(playerno) = playerno
+		&& p2statetype = A {
+			hitfallset{value: 1; redirectID: p2, ID}
+		}
+	}
+
+	# Fix disabled dashes
+	# Chars that can't dash but did not override the common dashing state may return to state 0 without ctrl
+	if stateno = 0 && prevstateno = 100 && ctrl = 0 {
+		ctrlset{value: 1}
+	}
+
+	# Antifreeze
+	if ctrl
+	&& numtarget
+	&& p2, time >= 300
+	&& p2, incustomstate
+	&& p2, gethitvar(playerno) = playerno {
+		selfstate{value: 5040; redirectID: p2, ID}
+	}
+
+	# Deplete Gauge - Disabled
+	#if roundstate = 2 && map(_pots_dash_burnout) = 0 {
+		# Blocking or hit by super
+	#	if (life < map(_pots_dash_prevlife))
+	#	|| (gethitvar(guarded) && gethitvar(hitdamage)) { # Because of moves that cause no chip
+	#		let gauge_damage = min(-gethitvar(hitdamage), life - map(_pots_dash_prevlife));
+	#		if gethitvar(guarded) {
+	#			mapadd{map: "_pots_dash_gauge"; value: 0.25 * $gauge_damage}
+	#			mapset{map: "_pots_dash_gauge_cooldown"; value: 90}
+	#		} else if gethitvar(attr) = SCA, HA, HT, HP {
+	#			mapadd{map: "_pots_dash_gauge"; value: $gauge_damage}
+	#			mapset{map: "_pots_dash_gauge_cooldown"; value: 90}
+	#		}
+	#	}
+	#}
+
+	# Enter burnout
+	if map(_pots_dash_gauge) <= 0
+	&& map(_pots_dash_burnout) <= 0 {
+		mapset{map: "_vnix_dash_hitspark"; value: 1}
+		mapset{map: "_pots_dash_burnout"; value: 1}
+		palfx{time: 15; add: 255, -128, -128; sinadd: -255, 128, 128, 60}
+		lifebaraction{text: "Rush Burnout"; top: 1}
+		playsnd{value: VP 100, 22; volumescale:200; freqmul: 1.0}
+		if StageConst(Vnix_No_Dust) != 1 {
+			explod{anim: VP 4048; pos: 10,0; scale: .5, .5; postype: p1; removetime: -2; sprpriority: 2; superMoveTime: -1; pauseMoveTime: -1}
+		}
+		# Ring
+		explod{
+			anim: VP 10002;
+			posType: p1;
+			pos: 30, const(size.mid.pos.y);
+			velocity: -3, 0;
+			sprPriority: 5;
+			ownPal: 1;
+			facing: 1;
+			scale: .45, .45;
+			bindTime: 0;
+			superMoveTime: -1;
+			pauseMoveTime: -1;
+			removeOnGetHit: 0;
+			ignoreHitPause: 1;
+		}
+		# Steam
+		explod{
+			anim: VP 10000;
+			posType: p1;
+			pos: 0, 36;
+			sprPriority: 5;
+			ownPal: 1;
+			facing: 1;
+			scale: .75, 1.25;
+			trans: Add;
+			bindTime: -1;
+			superMoveTime: -1;
+			pauseMoveTime: -1;
+			removeOnGetHit: 0;
+			ignoreHitPause: 1;
+		}
+		# Streaks
+		explod{
+			anim: VP 10004;
+			posType: p1;
+			pos: 0, const(size.mid.pos.y);
+			velocity: 0, 0;
+			sprPriority: 5;
+			ownPal: 1;
+			facing: 1;
+			scale: 1, 1;
+			trans: Add;
+			bindTime: 0;
+			superMoveTime: -1;
+			pauseMoveTime: -1;
+			removeOnGetHit: 0;
+			ignoreHitPause: 1;
+		}
+		# BG Spark
+		explod {
+			anim: VP 6030;
+			postype: left;
+			pos: const240p(160), const240p(140);
+			velocity: 0, 0;
+			scale: 1, 1;
+			trans: Add;
+			sprpriority: -5;
+			angle: 0;
+			facing: ifelse(facing=1, 1, -1);
+			#trans: addalpha;
+			#alpha: 256, 256;
+			ontop: 0;
+			bindtime: -1;
+			removetime: 20;
+			pausemovetime: -1;
+			supermovetime: -1;
+			ownpal: 1;
+			PalFX.Time: 23;
+			PalFx.Add: 200, 0, 0
+		}
+		# Burnout Bar
+		if teamside = 1 &&  gamemode = "fightchallenge" || gamemode =  "fightchallengevs"   {
+			explod{
+				anim: VP 10025;
+				posType: left;
+				pos: const240p(40), const240p(17.5);
+				velocity: 0, 0;
+				sprPriority: -99;
+				facing: 1;
+				scale: 1, 1;
+				trans: addalpha;
+				alpha: 256,256;
+				removetime: 60;
+				bindTime: -1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				removeOnGetHit: 0;
+				ignoreHitPause: 1;
+				palfx.time: -1;
+				palfx.mul: 250,250,250;#200,55,40;
+				palfx.add: 250,250,250;
+				interpolation.time: 60;
+				interpolation.alpha: 0, 256;
+			}
+		} else {
+			explod{
+				anim: VP 10025;
+				posType: left;
+				pos: const240p(280), const240p(17.5);
+				velocity: 0, 0;
+				sprPriority: -99;
+				facing: -1;
+				scale: 1, 1;
+				trans: addalpha;
+				alpha: 256,256;
+				removetime: 60;
+				bindTime: -1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				removeOnGetHit: 0;
+				ignoreHitPause: 1;
+				palfx.time: -1;
+				palfx.mul: 250,250,250;#200,55,40;
+				palfx.add: 250,250,250;
+				interpolation.time: 60;
+				interpolation.alpha: 0, 256;
+			}
+		}
+		afterImage{
+			length: 6;
+			palbright: 255, 18, 255;
+			palcontrast: 52, 128, 52;
+			paladd: 155, 18, 213;
+			palmul: 1, 1, 1;
+			timegap: 2;
+			framegap: 1;
+			trans: Add;
+			time: 10;
+		}
+		#zoom{
+		#	scale: 1.1;
+		#	pos: (pos x + p2, pos x) / 2.0,
+		#		  max(stagevar(camera.boundhigh), (pos y + p2, pos y) / 4.0);
+		#	time: 10;
+		#	lag: 0.75; # 0.75
+		#	stagebound: 1;
+		#	camerabound: 1;
+		#}
+		bgpalfx{
+			time: 10;
+			mul: 120,0,10;
+			add: 64, 64, 64;
+		}
+	}
+
+	# Burnout penalty
+	# Increase stun damage, chip and frame disadvantage
+	if map(_pots_dash_burnout) > 0 {
+		#if dizzypoints < map(_pots_dash_prevdizzy) {
+		#	dizzypointsadd{value: 0.5 * (dizzypoints - map(_pots_dash_prevdizzy)); absolute: 1} # Extra stun damage
+		#}
+		mapset{map: "_iksys_dizzyPointsTimer"; value: 60} # Freeze stun recovery
+		mapset{map: "_iksys_guardPointsTimer"; value: 60} # Freeze guard crush recovery
+		if map(_vnix_rushdrive_active) = 0 {
+			palfx{
+				time: 1;
+				mul: 185,155,185;
+				color: 128;
+			}
+		}
+		defenceMulSet{value: 0.75; multype: 1; onhit: 0} # Defence Down
+		if gethitvar(frame)
+		&& gethitvar(guarded) {
+			lifeadd{value: -10; absolute: 1; kill: 0} # Extra chip
+			gethitvarset{hittime: gethitvar(hittime) + 4; ctrltime: gethitvar(ctrltime) + 4} # Extra guard stun
+		}
+		# Burnout Effects
+		if NumExplod(10069) = 0 {
+			explod{
+				anim: VP 10065;
+				ID: 10069;
+				postype: p1;
+				pos: const(size.mid.pos.x) + 3, const(size.mid.pos.y);
+				scale: .25,.5;
+				angle: 90;
+				facing: (ifelse(Random <= 500, 1, -1));
+				# vfacing: (ifelse(Random <= 500, 1, -1));
+				random: 0,0;
+				vel: 0, 0;
+				ontop: 0;
+				sprpriority: 3;
+				removetime: -2;
+				bindtime: -1;
+				#pausemovetime: 1000;
+				#supermovetime: 1000;
+				ownpal: 1;
+				trans: addAlpha;
+				alpha: 256,256;
+				palfx.time: -1;
+				palfx.mul: 75,0,130;
+				palfx.add: 100,0,200;
+				interpolation.time: 60;
+				interpolation.alpha: 0,256;
+			}
+		}
+		if NumExplod(10070) = 0 {
+			explod{
+				anim: VP 10008;
+				ID: 10070;
+				postype: p1;
+				pos: const(size.head.pos.x) + 5, const(size.head.pos.y);
+				scale: .33,.33;
+				facing: 1;
+				vfacing: -1;
+				random: 4,4;
+				vel: 0, 0;
+				ontop: 0;
+				sprpriority: 3;
+				removetime: -2;
+				bindtime: -1;
+				#pausemovetime: 1000;
+				#supermovetime: 1000;
+				ownpal: 1;
+				trans: addAlpha;
+				alpha: 256,256;
+			}
+		}
+	}
+
+	# Save bar values for damage calculation
+	mapset{map: "_pots_dash_prevlife"; value: life}
+	mapset{map: "_pots_dash_prevdizzy"; value: dizzypoints}
+	mapset{map: "_pots_dash_prevguard"; value: guardpoints}
+
+	# Recover Gauge
+	if p2, pausetime = 0
+	&& map(_pots_dash_gauge) < 1000
+	&& map(_pots_dash_gauge_cooldown) <= 0
+	&& map(_pots_dash_combo) = 0 {
+		let refillmul = 1.0;
+		if movetype = H || stateno = [5000, 5999] || dizzy || dizzypoints <= 0 {
+			let refillmul = 0.5;
+		} else if p2dist x > 0 && vel x > 0 {
+			let refillmul = 2.0;
+		} else {
+			let refillmul = 1.0;
+		}
+		let refillrate = $refillmul * map(_pots_dash_cfg_gauge_refill);
+		# Refill faster in Training mode
+		if gamemode = "training" && movetype != H && $refillrate < 20.0 {
+			let refillrate = 20.0;
+		}
+		mapadd{map: "_pots_dash_gauge"; value: $refillrate}
+	}
+
+	# Exit burnout
+	if map(_pots_dash_burnout) != 0
+	&& map(_pots_dash_gauge) >= 1000 {
+		mapset{map: "_pots_dash_burnout"; value: 0}
+		# Blue FX
+		explod{
+			anim: VP 10050;
+			postype: p1;
+			pos: const(size.mid.pos.x), const(size.mid.pos.y);
+			scale: .65, .65;
+			angle: 0;
+			facing: 1;
+			ontop: 0;
+			bindtime: -1;
+			sprpriority: 3;
+			pausemovetime: -1;
+			supermovetime: -1;
+			ownpal: 1
+		}
+		explod{
+			anim: VP 10009;
+			posType: left;
+			pos: const240p(cond(teamside = 1, 83, 237)), const240p(18.5);
+			velocity: 0, 0;
+			sprPriority: -99;
+			facing: cond(teamside = 1, 1, -1);
+			scale: 1.25, 1;
+			trans: addalpha;
+			alpha: 256,256;
+			removetime: 12;
+			bindTime: -1;
+			superMoveTime: -1;
+			pauseMoveTime: -1;
+			removeOnGetHit: 0;
+			ignoreHitPause: 1;
+		}
+		defenceMulSet{value: 1.0}
+		lifebaraction{text: "Rush Ready"; top: 1}
+		playsnd{value: VP 100, 34; volumescale:100; freqmul: 1.0}
+		palfx{time: 15; add: -128, 255, -128; sinadd: 128, -255, 128, 60}
+	}
+
+	# Reset combo flag
+	if p2movetype != H && p2, dizzy = 0
+	&& map(_pots_dash_combo) != 0 {
+		mapset{map: "_pots_dash_combo"; value: 0}
+	}
+
+	# Cooldown timer
+	if map(_pots_dash_gauge_cooldown) > 0 {
+		mapadd{map: "_pots_dash_gauge_cooldown"; value: -1}
+	}
+
+	# Gauge limits
+	if map(_pots_dash_gauge) < 0 { # Minimum
+		mapset{map: "_pots_dash_gauge"; value: 0}
+	}
+	if map(_pots_dash_gauge) > 1000 { # Maximum
+		mapset{map: "_pots_dash_gauge"; value: 1000}
+	}
+
+}
+
+[Statedef +1]
+
+# Check if lifebars are disabled
+# ignorehitpause if !ishelper {
+for i = 1; 8; 1 { # Ikemen supports up to 8 players
+	if playerIDexist(player($i), ID) {
+		if player($i), isasserted(nobardisplay) {
+			mapset{map: "_pots_dash_hidegauge"; value: 1; redirectID: player(teamleader), ID}
+			mapset{map: "_pots_dash_hidegauge"; value: 1; redirectID: player(enemy, teamleader), ID}
+			break;
+		}
+	}
+}
+# }
+
+# Rush Chain Hit Spark
+ignorehitpause if !ishelper && roundstate = 2 && (teamside = 1 || teamside = 2) && playerno < 9 {
+	if (prevstateno = [100, 119] || prevstateno = 1615201910) && map(_vnix_dash_hitspark) != 0 && movehit {
+		RemoveExplod{id: 30003}
+		#RemoveExplod{id: 30004}
+		lifebarAction{text: "Rush Chain"; top: 1}
+		# playsnd{value: VP 110, 36; volumescale: 200; freqmul: 1.0}
+		if power != powermax && Roundstate = 2 {
+			text{
+				font: F 4;
+				text: "+200";
+				removetime: 20;
+				layerno: 0;
+				velocity: ifelse(teamside = 1, .2, -.2),0;
+				align: ifelse(teamside = 1, 1, -1);
+				localcoord: 320, 240;
+				pos: ifelse(teamside = 1, 54, 266), 26.5;
+				scale: .25, .25;
+				color: 255,255,255;
+			}
+		}
+		explod{
+			anim: VP 30006;
+			ID: 30006;
+			postype: p2;
+			pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+			scale: .5, .5;
+			angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+			facing: 1;
+			vfacing: (ifelse(Random <= 500, 1, -1));
+			ontop: 0;
+			sprpriority: -3;
+			removetime: -2;
+			trans: addalpha;
+			alpha: 200, 32;
+			pausemovetime: 1000;
+			supermovetime: 1000;
+			ownpal: 1;
+			PalFx.Time: 15;
+			#PalFx.Mul: random%135, random%135, random%135;
+			PalFx.Add: 0, 120 + random%130, 120 + random%130;
+		}
+		if LocalCoord X < 321 {
+			explod{
+				anim: VP ifelse(TeamSide = 1, 30007, 30008);
+				ID: 30007;
+				postype: p1;
+				pos: const240p(MoveHitVar(SparkX)), const240p(MoveHitVar(SparkY));
+				scale: .75 + (Random%25/100), .75 + (Random%25/100);
+				angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+				facing: -1;
+				vfacing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				sprpriority: p2, sprpriority;
+				removetime: -2;
+				pausemovetime: 1;
+				supermovetime: 1;
+				ownpal: 1;
+				PalFx.Time: 15;
+				#PalFx.Mul: random%135, random%135, random%135;
+				PalFx.Add: 0, 120 + random%130, 120 + random%130;
+			}
+			if Random <= 500 {
+				explod{
+					anim: VP 20075;
+					ID: 20075;
+					postype: p1;
+					pos: const240p(MoveHitVar(SparkX)), const240p(MoveHitVar(SparkY));
+					scale: 1, 1;
+					angle: Random / 33;
+					facing: 1;
+					vfacing: 1;
+					ontop: 0;
+					sprpriority: sprpriority + 1;
+					removetime: -2;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1;
+					PalFx.Time: 31;
+					PalFx.Add: ifelse(Teamside = 1, 255, 0), ifelse(Teamside = 1, 140, 191), ifelse(Teamside = 1, 0, 255);
+				}
+				explod{
+					anim: VP 20075;
+					ID: 20075;
+					postype: p1;
+					pos: const240p(MoveHitVar(SparkX)) - 10, const240p(MoveHitVar(SparkY));
+					scale: 1, 1;
+					angle: Random / 33;
+					facing: 1;
+					vfacing: 1;
+					ontop: 0;
+					sprpriority: sprpriority + 1;
+					removetime: -2;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1;
+					PalFx.Time: 31;
+					PalFx.Add: ifelse(Teamside = 1, 255, 173), ifelse(Teamside = 1, 215, 255), ifelse(Teamside = 1, 0, 47);
+				}
+			} else {
+				explod{
+					anim: VP 20075;
+					ID: 20075;
+					postype: p1;
+					pos: const240p(MoveHitVar(SparkX)), const240p(MoveHitVar(SparkY));
+					scale: 1, 1;
+					angle: Random / 33;
+					facing: -1;
+					vfacing: 1;
+					ontop: 0;
+					sprpriority: sprpriority + 1;
+					removetime: -2;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1;
+					PalFx.Time: 31;
+					PalFx.Add: ifelse(Teamside = 1, 255, 0), ifelse(Teamside = 1, 140, 191), ifelse(Teamside = 1, 0, 255);
+				}
+				explod{
+					anim: VP 20075;
+					ID: 20075;
+					postype: p1;
+					pos: const240p(MoveHitVar(SparkX)) - 10, const240p(MoveHitVar(SparkY));
+					scale: 1, 1;
+					angle: Random / 33;
+					facing: -1;
+					vfacing: 1;
+					ontop: 0;
+					sprpriority: sprpriority + 1;
+					removetime: -2;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1;
+					PalFx.Time: 31;
+					PalFx.Add: ifelse(Teamside = 1, 255, 173), ifelse(Teamside = 1, 215, 255), ifelse(Teamside = 1, 0, 47);
+				}			
+			}
+		} else {
+			explod{
+				anim: VP ifelse(TeamSide = 1, 30007, 30008);
+				ID: 30007;
+				postype: p2;
+				pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+				scale: .75 + (Random%25/100), .75 + (Random%25/100);
+				angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+				facing: -1;
+				vfacing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				sprpriority: p2, sprpriority;
+				removetime: -2;
+				pausemovetime: 1;
+				supermovetime: 1;
+				ownpal: 1;
+				PalFx.Time: 15;
+				#PalFx.Mul: random%135, random%135, random%135;
+				PalFx.Add: 0, 120 + random%130, 120 + random%130;
+			}
+			if Random <= 500 {
+				explod{
+					anim: VP 20075;
+					ID: 20075;
+					postype: p2;
+					pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+					scale: 1, 1;
+					angle: Random / 33;
+					facing: 1;
+					vfacing: 1;
+					ontop: 0;
+					sprpriority: sprpriority + 1;
+					removetime: -2;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1;
+					PalFx.Time: 31;
+					PalFx.Add: ifelse(Teamside = 1, 255, 0), ifelse(Teamside = 1, 140, 191), ifelse(Teamside = 1, 0, 255);
+				}
+				explod{
+					anim: VP 20075;
+					ID: 20075;
+					postype: p2;
+					pos: p2,const(size.mid.pos.x) - 10, p2,const(size.mid.pos.y);
+					scale: 1, 1;
+					angle: Random / 33;
+					facing: 1;
+					vfacing: 1;
+					ontop: 0;
+					sprpriority: sprpriority + 1;
+					removetime: -2;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1;
+					PalFx.Time: 31;
+					PalFx.Add: ifelse(Teamside = 1, 255, 173), ifelse(Teamside = 1, 215, 255), ifelse(Teamside = 1, 0, 47);
+				}
+			} else {
+				explod{
+					anim: VP 20075;
+					ID: 20075;
+					postype: p2;
+					pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+					scale: 1, 1;
+					angle: Random / 33;
+					facing: -1;
+					vfacing: 1;
+					ontop: 0;
+					sprpriority: sprpriority + 1;
+					removetime: -2;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1;
+					PalFx.Time: 31;
+					PalFx.Add: ifelse(Teamside = 1, 255, 0), ifelse(Teamside = 1, 140, 191), ifelse(Teamside = 1, 0, 255);
+				}
+				explod{
+					anim: VP 20075;
+					ID: 20075;
+					postype: p2;
+					pos: p2,const(size.mid.pos.x) - 10, p2,const(size.mid.pos.y);
+					scale: 1, 1;
+					angle: Random / 33;
+					facing: -1;
+					vfacing: 1;
+					ontop: 0;
+					sprpriority: sprpriority + 1;
+					removetime: -2;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1;
+					PalFx.Time: 31;
+					PalFx.Add: ifelse(Teamside = 1, 255, 173), ifelse(Teamside = 1, 215, 255), ifelse(Teamside = 1, 0, 47);
+				}			
+			}
+		}
+		
+		#explod{
+		#	redirectID: p2, ID;
+		#	postype: p1;
+		#	pos: 0, 0;
+		#	vel: -3, 0;
+		#	facing: 1;
+		#	anim: p2, anim;
+		#	animfreeze: 1;
+		#	animelem: p2, animelemno(0) - 1;
+		#	sprpriority: p2, sprpriority - 1;
+		#	removetime: 15;
+		#	trans: addalpha;
+		#	alpha: 256, 32;
+		#	scale: p2, const(size.xscale), p2, const(size.yscale);
+		#	palfx.time: 30;
+		#	palfx.color: 0;
+		#	palfx.mul: 0, 120 + random%130, 120 + random%130;
+		#	interpolation.time: 30;
+		#	interpolation.alpha: 0, 256;
+		#	interpolation.scale: 1.10 * p2, const(size.xscale), 1.10 * p2, const(size.yscale);
+		#	ownpal: 1;
+		#}
+		#explod{
+		#	postype: p1;
+		#	pos: 0, 0;
+		#	vel: -2, 0;
+		#	facing: 1;
+		#	anim: anim;
+		#	animfreeze: 1;
+		#	animelem: animelemno(0);
+		#	sprpriority: sprpriority - 1;
+		#	removetime: 15;
+		#	trans: addalpha;
+		#	alpha: 256, 32;
+		#	scale: const(size.xscale), const(size.yscale);
+		#	palfx.time: 30;
+		#	palfx.color: 0;
+		#	palfx.mul: 120 + random%130, 120 + random%130, 0;
+		#	interpolation.time: 30;
+		#	interpolation.alpha: 0, 256;
+		#	interpolation.scale: 1.10 * const(size.xscale), 1.10 * const(size.yscale);
+		#	ownpal: 1;
+		#}
+		
+		Zoom{
+			scale: 1.1;
+			pos: (pos x + p2, pos x) / 2.0,
+				  max(stagevar(camera.boundhigh), (pos y + p2, pos y) / 4.0);
+			time: map(_vnix_dash_smash_pausetime);
+			lag: 0.75; # 0.75
+			stagebound: 1;
+			camerabound: 1;
+		}
+		
+		superpause{time: map(_vnix_dash_smash_pausetime); poweradd: 200; movetime: 0; anim: -1; p2defmul: 1; darken: 0; endcmdbuftime: -1}
+		
+		# Deplete enemy Flow Gauge & reset Cooldown
+		mapadd{map: "_pots_dash_gauge"; value: -200; redirectID: target, ID;}
+		mapset{map: "_pots_dash_gauge_cooldown"; value: 120; redirectID: target, ID;}
+		
+		# Increase opponent hit stun
+		gethitvarset{hitshaketime: enemy, gethitvar(hitshaketime) + 20; ctrltime: enemy, gethitvar(ctrltime) + 20; redirectID: target, ID;}
+		mapset{map: "_vnix_dash_hitspark"; value: 0}
+		
+	} else if (prevstateno = [100, 119] || prevstateno = 1615201910) && p2movetype != H {
+		mapset{map: "_vnix_dash_hitspark"; value: 0}
+	}
+}
+
+# ====================================================================================
+# Flow Gauge
+# ====================================================================================
+
+# Only the team leaders display their gauges
+ignorehitpause if !ishelper && playerno = teamleader {
+
+	# Display Gauge
+	# Uses debug font for compatibility purposes
+	if roundstate = 2 && map(_pots_dash_hidegauge) = 0 {
+
+		# Main Text
+		let drivegauge = map(_pots_dash_gauge);
+		if teamside = 1 {
+			# Burnout Refill
+			if map(_pots_dash_burnout) != 0 {
+				if $drivegauge >= 1 {
+					explod{
+						anim: VP 10020;
+						posType: left;
+						pos: const240p(44), const240p(17.5);
+						velocity: 0, 0;
+						sprPriority: -98;
+						facing: 1;
+						scale: 0 + cond($drivegauge = [1,199], $drivegauge * 0.005, 1), 1;
+						removetime: 1;
+						bindTime: -1;
+						superMoveTime: -1;
+						pauseMoveTime: -1;
+						removeOnGetHit: 0;
+						ignoreHitPause: 1;
+						xshear: 1.1;
+						palfx.time: -1;
+						palfx.mul: 153,55,204;
+						palfx.add: 100,0,200;
+					}
+				}
+				if $drivegauge >= 201 {
+					explod{
+						anim: VP 10020;
+						posType: left;
+						pos: const240p(61), const240p(17.5);
+						velocity: 0, 0;
+						sprPriority: -98;
+						facing: 1;
+						scale: 0 + cond($drivegauge = [201,399], ($drivegauge * 0.005) - 1.0, 1) , 1;
+						removetime: 1;
+						bindTime: -1;
+						superMoveTime: -1;
+						pauseMoveTime: -1;
+						removeOnGetHit: 0;
+						ignoreHitPause: 1;
+						xshear: 1.1;
+						palfx.time: -1;
+						palfx.mul: 153,55,204;
+						palfx.add: 100,0,200;
+					}
+				}
+				if $drivegauge >= 401 {
+					explod{
+						anim: VP 10020;
+						posType: left;
+						pos: const240p(78), const240p(17.5);
+						velocity: 0, 0;
+						sprPriority: -98;
+						facing: 1;
+						scale: 0 + cond($drivegauge = [401,599], ($drivegauge * 0.005) - 2.0, 1) , 1;
+						removetime: 1;
+						bindTime: -1;
+						superMoveTime: -1;
+						pauseMoveTime: -1;
+						removeOnGetHit: 0;
+						ignoreHitPause: 1;
+						xshear: 1.1;
+						palfx.time: -1;
+						palfx.mul: 153,55,204;
+						palfx.add: 100,0,200;
+					}
+				}
+				if $drivegauge >= 601 {
+					explod{
+						anim: VP 10020;
+						posType: left;
+						pos: const240p(95), const240p(17.5);
+						velocity: 0, 0;
+						sprPriority: -98;
+						facing: 1;
+						scale: 0 + cond($drivegauge = [601,799], ($drivegauge * 0.005) - 3.0, 1) , 1;
+						removetime: 1;
+						bindTime: -1;
+						superMoveTime: -1;
+						pauseMoveTime: -1;
+						removeOnGetHit: 0;
+						ignoreHitPause: 1;
+						xshear: 1.1;
+						palfx.time: -1;
+						palfx.mul: 153,55,204;
+						palfx.add: 100,0,200;
+					}
+				}
+				if $drivegauge >= 801 {
+					explod{
+						anim: VP 10020;
+						posType: left;
+						pos: const240p(112), const240p(17.5);
+						velocity: 0, 0;
+						sprPriority: -98;
+						facing: 1;
+						scale: 0 + cond($drivegauge = [801,999], ($drivegauge * 0.005) - 4.0, 1) , 1;
+						removetime: 1;
+						bindTime: -1;
+						superMoveTime: -1;
+						pauseMoveTime: -1;
+						removeOnGetHit: 0;
+						ignoreHitPause: 1;
+						xshear: 1.1;
+						palfx.time: -1;
+						palfx.mul: 153,55,204;
+						palfx.add: 100,0,200;
+					}
+				}
+				if $drivegauge >= 0 && gamemode = "fightchallenge" ||  gamemode = "fightchallengevs"   {
+					explod{
+						anim: VP 10025;
+						posType: left;
+						pos: const240p(40), const240p(17.5);
+						velocity: 0, 0;
+						sprPriority: -99;
+						facing: 1;
+						scale: 1, 1;
+						removetime: 1;
+						bindTime: -1;
+						superMoveTime: -1;
+						pauseMoveTime: -1;
+						removeOnGetHit: 0;
+						ignoreHitPause: 1;
+						palfx.time: -1;
+						palfx.mul: 153,55,204;
+						palfx.add: 50,0,100;
+					}
+				}
+			# Regural Refill
+			} else {
+				if $drivegauge >= 1 {
+					explod{
+						anim: VP 10020;
+						posType: left;
+						pos: const240p(44), const240p(17.5);
+						velocity: 0, 0;
+						sprPriority: -98;
+						facing: 1;
+						scale: 0 + cond($drivegauge = [1,199], $drivegauge * 0.005, 1), 1;
+						removetime: 1;
+						bindTime: -1;
+						superMoveTime: -1;
+						pauseMoveTime: -1;
+						removeOnGetHit: 0;
+						ignoreHitPause: 1;
+						xshear: 1.1;
+						palfx.time: cond($drivegauge = [1,199], -1, 0);
+						palfx.mul: 128,0,0;
+						palfx.add: 200,0,0;
+					}
+				}
+				if $drivegauge >= 201 {
+					explod{
+						anim: VP 10020;
+						posType: left;
+						pos: const240p(61), const240p(17.5);
+						velocity: 0, 0;
+						sprPriority: -98;
+						facing: 1;
+						scale: 0 + cond($drivegauge = [201,399], ($drivegauge * 0.005) - 1.0, 1) , 1;
+						removetime: 1;
+						bindTime: -1;
+						superMoveTime: -1;
+						pauseMoveTime: -1;
+						removeOnGetHit: 0;
+						ignoreHitPause: 1;
+						xshear: 1.1;
+						palfx.time: cond($drivegauge = [201,399], -1, 0);
+						palfx.mul: 128,0,0;
+						palfx.add: 200,0,0;
+					}
+				}
+				if $drivegauge >= 401 {
+					explod{
+						anim: VP 10020;
+						posType: left;
+						pos: const240p(78), const240p(17.5);
+						velocity: 0, 0;
+						sprPriority: -98;
+						facing: 1;
+						scale: 0 + cond($drivegauge = [401,599], ($drivegauge * 0.005) - 2.0, 1) , 1;
+						removetime: 1;
+						bindTime: -1;
+						superMoveTime: -1;
+						pauseMoveTime: -1;
+						removeOnGetHit: 0;
+						ignoreHitPause: 1;
+						xshear: 1.1;
+						palfx.time: cond($drivegauge = [401,599], -1, 0);
+						palfx.mul: 128,0,0;
+						palfx.add: 200,0,0;
+					}
+				}
+				if $drivegauge >= 601 {
+					explod{
+						anim: VP 10020;
+						posType: left;
+						pos: const240p(95), const240p(17.5);
+						velocity: 0, 0;
+						sprPriority: -98;
+						facing: 1;
+						scale: 0 + cond($drivegauge = [601,799], ($drivegauge * 0.005) - 3.0, 1) , 1;
+						removetime: 1;
+						bindTime: -1;
+						superMoveTime: -1;
+						pauseMoveTime: -1;
+						removeOnGetHit: 0;
+						ignoreHitPause: 1;
+						xshear: 1.1;
+						palfx.time: cond($drivegauge = [601,799], -1, 0);
+						palfx.mul: 128,0,0;
+						palfx.add: 200,0,0;
+					}
+				}
+				if $drivegauge >= 801 {
+					explod{
+						anim: VP 10020;
+						posType: left;
+						pos: const240p(112), const240p(17.5);
+						velocity: 0, 0;
+						sprPriority: -98;
+						facing: 1;
+						scale: 0 + cond($drivegauge = [801,999], ($drivegauge * 0.005) - 4.0, 1) , 1;
+						removetime: 1;
+						bindTime: -1;
+						superMoveTime: -1;
+						pauseMoveTime: -1;
+						removeOnGetHit: 0;
+						ignoreHitPause: 1;
+						xshear: 1.1;
+						palfx.time: cond($drivegauge = [801,999], -1, 0);
+						palfx.mul: 128,0,0;
+						palfx.add: 200,0,0;
+					}
+				}
+				if $drivegauge >= 0 && gamemode = "fightchallenge" || gamemode =  "fightchallengevs"  {
+					explod{
+						anim: VP 10025;
+						posType: left;
+						pos: const240p(40), const240p(17.5);
+						velocity: 0, 0;
+						sprPriority: -99;
+						facing: 1;
+						scale: 1, 1;
+						removetime: 1;
+						bindTime: -1;
+						superMoveTime: -1;
+						pauseMoveTime: -1;
+						removeOnGetHit: 0;
+						ignoreHitPause: 1;
+					}
+				}
+			}			
+		} else {
+			# Burnout Refill
+			if map(_pots_dash_burnout) != 0 {
+				if $drivegauge >= 1 {
+					explod{
+						anim: VP 10020;
+						posType: left;
+						pos: const240p(276), const240p(17.5);
+						velocity: 0, 0;
+						sprPriority: -98;
+						facing: -1;
+						scale: 0 + cond($drivegauge = [1,199], $drivegauge * 0.005, 1), 1;
+						removetime: 1;
+						bindTime: -1;
+						superMoveTime: -1;
+						pauseMoveTime: -1;
+						removeOnGetHit: 0;
+						ignoreHitPause: 1;
+						xshear: -1.1;
+						palfx.time: -1;
+						palfx.mul: 153,55,204;
+						palfx.add: 100,0,200;
+					}
+				}
+				if $drivegauge >= 201 {
+					explod{
+						anim: VP 10020;
+						posType: left;
+						pos: const240p(259), const240p(17.5);
+						velocity: 0, 0;
+						sprPriority: -98;
+						facing: -1;
+						scale: 0 + cond($drivegauge = [201,399], ($drivegauge * 0.005) - 1.0, 1) , 1;
+						removetime: 1;
+						bindTime: -1;
+						superMoveTime: -1;
+						pauseMoveTime: -1;
+						removeOnGetHit: 0;
+						ignoreHitPause: 1;
+						xshear: -1.1;
+						palfx.time: -1;
+						palfx.mul: 153,55,204;
+						palfx.add: 100,0,200;
+					}
+				}
+				if $drivegauge >= 401 {
+					explod{
+						anim: VP 10020;
+						posType: left;
+						pos: const240p(242), const240p(17.5);
+						velocity: 0, 0;
+						sprPriority: -98;
+						facing: -1;
+						scale: 0 + cond($drivegauge = [401,599], ($drivegauge * 0.005) - 2.0, 1) , 1;
+						removetime: 1;
+						bindTime: -1;
+						superMoveTime: -1;
+						pauseMoveTime: -1;
+						removeOnGetHit: 0;
+						ignoreHitPause: 1;
+						xshear: -1.1;
+						palfx.time: -1;
+						palfx.mul: 153,55,204;
+						palfx.add: 100,0,200;
+					}
+				}
+				if $drivegauge >= 601 {
+					explod{
+						anim: VP 10020;
+						posType: left;
+						pos: const240p(225), const240p(17.5);
+						velocity: 0, 0;
+						sprPriority: -98;
+						facing: -1;
+						scale: 0 + cond($drivegauge = [601,799], ($drivegauge * 0.005) - 3.0, 1) , 1;
+						removetime: 1;
+						bindTime: -1;
+						superMoveTime: -1;
+						pauseMoveTime: -1;
+						removeOnGetHit: 0;
+						ignoreHitPause: 1;
+						xshear: -1.1;
+						palfx.time: -1;
+						palfx.mul: 153,55,204;
+						palfx.add: 100,0,200;
+					}
+				}
+				if $drivegauge >= 801 {
+					explod{
+						anim: VP 10020;
+						posType: left;
+						pos: const240p(208), const240p(17.5);
+						velocity: 0, 0;
+						sprPriority: -98;
+						facing: -1;
+						scale: 0 + cond($drivegauge = [801,999], ($drivegauge * 0.005) - 4.0, 1) , 1;
+						removetime: 1;
+						bindTime: -1;
+						superMoveTime: -1;
+						pauseMoveTime: -1;
+						removeOnGetHit: 0;
+						ignoreHitPause: 1;
+						xshear: -1.1;
+						palfx.time: -1;
+						palfx.mul: 153,55,204;
+						palfx.add: 100,0,200;
+					}
+				}
+				if $drivegauge >= 0 && gamemode = "fightchallenge"  || gamemode =  "fightchallengevs"  {
+					explod{
+						anim: VP 10025;
+						posType: left;
+						pos: const240p(280), const240p(17.5);
+						velocity: 0, 0;
+						sprPriority: -99;
+						facing: -1;
+						scale: 1, 1;
+						removetime: 1;
+						bindTime: -1;
+						superMoveTime: -1;
+						pauseMoveTime: -1;
+						removeOnGetHit: 0;
+						ignoreHitPause: 1;
+						palfx.time: -1;
+						palfx.mul: 153,55,204;
+						palfx.add: 50,0,100;
+					}
+				}
+			# Regular Refill
+			} else {
+				if $drivegauge >= 1 {
+					explod{
+						anim: VP 10020;
+						posType: left;
+						pos: const240p(276), const240p(17.5);
+						velocity: 0, 0;
+						sprPriority: -98;
+						facing: -1;
+						scale: 0 + cond($drivegauge = [1,199], $drivegauge * 0.005, 1), 1;
+						removetime: 1;
+						bindTime: -1;
+						superMoveTime: -1;
+						pauseMoveTime: -1;
+						removeOnGetHit: 0;
+						ignoreHitPause: 1;
+						xshear: -1.1;
+						palfx.time: cond($drivegauge = [1,199], -1, 0);
+						palfx.mul: 128,0,0;
+						palfx.add: 200,0,0;
+					}
+				}
+				if $drivegauge >= 201 {
+					explod{
+						anim: VP 10020;
+						posType: left;
+						pos: const240p(259), const240p(17.5);
+						velocity: 0, 0;
+						sprPriority: -98;
+						facing: -1;
+						scale: 0 + cond($drivegauge = [201,399], ($drivegauge * 0.005) - 1.0, 1) , 1;
+						removetime: 1;
+						bindTime: -1;
+						superMoveTime: -1;
+						pauseMoveTime: -1;
+						removeOnGetHit: 0;
+						ignoreHitPause: 1;
+						xshear: -1.1;
+						palfx.time: cond($drivegauge = [201,399], -1, 0);
+						palfx.mul: 128,0,0;
+						palfx.add: 200,0,0;
+					}
+				}
+				if $drivegauge >= 401 {
+					explod{
+						anim: VP 10020;
+						posType: left;
+						pos: const240p(242), const240p(17.5);
+						velocity: 0, 0;
+						sprPriority: -98;
+						facing: -1;
+						scale: 0 + cond($drivegauge = [401,599], ($drivegauge * 0.005) - 2.0, 1) , 1;
+						removetime: 1;
+						bindTime: -1;
+						superMoveTime: -1;
+						pauseMoveTime: -1;
+						removeOnGetHit: 0;
+						ignoreHitPause: 1;
+						xshear: -1.1;
+						palfx.time: cond($drivegauge = [401,599], -1, 0);
+						palfx.mul: 128,0,0;
+						palfx.add: 200,0,0;
+					}
+				}
+				if $drivegauge >= 601 {
+					explod{
+						anim: VP 10020;
+						posType: left;
+						pos: const240p(225), const240p(17.5);
+						velocity: 0, 0;
+						sprPriority: -98;
+						facing: -1;
+						scale: 0 + cond($drivegauge = [601,799], ($drivegauge * 0.005) - 3.0, 1) , 1;
+						removetime: 1;
+						bindTime: -1;
+						superMoveTime: -1;
+						pauseMoveTime: -1;
+						removeOnGetHit: 0;
+						ignoreHitPause: 1;
+						xshear: -1.1;
+						palfx.time: cond($drivegauge = [601,799], -1, 0);
+						palfx.mul: 128,0,0;
+						palfx.add: 200,0,0;
+					}
+				}
+				if $drivegauge >= 801 {
+					explod{
+						anim: VP 10020;
+						posType: left;
+						pos: const240p(208), const240p(17.5);
+						velocity: 0, 0;
+						sprPriority: -98;
+						facing: -1;
+						scale: 0 + cond($drivegauge = [801,999], ($drivegauge * 0.005) - 4.0, 1) , 1;
+						removetime: 1;
+						bindTime: -1;
+						superMoveTime: -1;
+						pauseMoveTime: -1;
+						removeOnGetHit: 0;
+						ignoreHitPause: 1;
+						xshear: -1.1;
+						palfx.time: cond($drivegauge = [801,999], -1, 0);
+						palfx.mul: 128,0,0;
+						palfx.add: 200,0,0;
+					}
+				}
+				if $drivegauge >= 0 && gamemode = "fightchallenge" || gamemode = "fightchallengevs"   {
+					explod{
+						anim: VP 10025;
+						posType: left;
+						pos: const240p(280), const240p(17.5);
+						velocity: 0, 0;
+						sprPriority: -99;
+						facing: -1;
+						scale: 1, 1;
+						removetime: 1;
+						bindTime: -1;
+						superMoveTime: -1;
+						pauseMoveTime: -1;
+						removeOnGetHit: 0;
+						ignoreHitPause: 1;
+					}
+				}
+			}
+		}
+	}
+	# Reset gauge hidden flag
+	mapset{map: "_pots_dash_hidegauge"; value: 0}
+
+	# Debug
+	#displaytoclipboard{
+	#	text: "Movehit = %d, Dash = %d, Momentum = %.2f, FF = %d";
+	#	params: ceil(map(_pots_dash_movehit)), ceil(map(_pots_dash_dash)), map(_pots_dash_dash_velx), ceil(map(_pots_dash_cmd_66));
+	#}
+
+}

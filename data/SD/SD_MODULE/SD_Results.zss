@@ -1,0 +1,802 @@
+
+#===============================================================================
+# Configuration
+#===============================================================================
+
+[Function F_Vnix_Results_Config()]
+
+# Match Results
+mapset{map: "_vnix_result_cfg_enable"; value: 1} 		# Enable Match Results, 0 to disable
+
+
+[StateDef -4]
+
+ignorehitpause if !ishelper && (teamside = 1 || teamside = 2) {
+
+	# Initialize
+	if roundstate = 0 {
+		if time = 0 {
+			# Run config
+			call F_Vnix_Results_Config();
+		}
+	}
+	
+	# Reset Maps
+	if fightScreenState(RoundDisplay) {
+		mapset{map: "_vnix_combo_count_new"; value: 0}
+		mapset{map: "_vnix_max_damage_new"; value: 0}
+		mapset{map: "_vnix_counter_count"; value: 0}
+		mapset{map: "_vnix_critical_count"; value: 0}
+		mapset{map: "_vnix_rushdrive_dmg"; value: 0}
+		mapset{map: "_vnix_break_out"; value: 0}
+		mapset{map: "_vnix_result_screen"; value: 0;}
+		mapset{map: "_vnix_hyperko"; value: 0;}
+		mapset{map: "_vnix_superko"; value: 0;}
+	}
+}
+
+
+# ========================================================================================================================================
+# V-Nix - Match Results
+# ========================================================================================================================================
+
+# Save previous frame's combo and damage - PotS
+mapset{map: "_vnix_combo_count"; value: map(_vnix_combo_count_new)}
+mapset{map: "_vnix_max_damage"; value: map(_vnix_max_damage_new)}
+
+# Check if combo or damage has gone up - PotS
+let maxcombo = map(_vnix_combo_count);
+let maxdamage = map(_vnix_max_damage);
+
+for i = 1; 8; 1 { # Ikemen supports up to 8 players
+	if playerIDexist(player($i), ID) {
+		if player($i), alive && player($i), standby = 0 && player($i), playerno = teamleader {
+			if player($i), combocount > $maxcombo {
+				let maxcombo = player($i), combocount;
+			}
+			if player($i), p2, receiveddamage > $maxdamage {
+				let maxdamage = player($i), p2, receiveddamage;
+			}
+		}
+	}
+}
+
+mapset{map: "_vnix_combo_count_new"; value: $maxcombo}
+mapset{map: "_vnix_max_damage_new"; value: $maxdamage}
+
+# Test
+if teamside = 1 && playerno = teamleader {
+	text{
+		id: 90011;
+		font: F 1;
+		text: "Heat Drive %d";
+		params: ceil(map(_vnix_rushdrive_dmg) * 1.0);
+		removetime: 1;
+		layerno: 2;
+		align: cond(teamSide = 1, 1, -1);
+		localcoord: 320, 240;
+		pos: cond(teamSide = 1, 175, 245), 1152;
+		scale: 1, 1;
+		color: 255, 255, 255;
+	}
+
+	text{
+		id: 90021;
+		font: F 1;
+		text: "Max DMG %d";
+		params: ceil(map(_vnix_max_damage) * 1.0);
+		removetime: 1;
+		layerno: 2;
+		align: cond(teamSide = 1, 1, -1);
+		localcoord: 320, 240;
+		pos: cond(teamSide = 1, 175, 245), 1167;
+		scale: 1, 1;
+		color: 255, 255, 255;
+	}
+}
+
+
+ignorehitpause if !ishelper && playerNo = teamLeader && map(_vnix_result_cfg_enable) != 0 {
+	if outroState = 4 && playerno < 9 && win && map(_vnix_result_screen) >= 0 {
+		mapadd{map: "_vnix_result_screen"; value: 1;}
+		if map(_vnix_result_screen) = [0,600] {
+			assertSpecial{flag: roundnotover}
+		}
+		# ;--------------------------------------------------------
+		# Effects & Sounds
+		if map(_vnix_result_screen) = 15 {
+			if teamside = 1 {
+				explod{
+					anim: VP cond(winPerfect, 20500, 20510);
+					id: 20500;
+					postype: left;
+					pos: const240p(160), const240p(-20);
+					scale: 1,1;
+					angle: 0;
+					facing: 1;
+					ontop: 1;
+					layerno: 2;
+					sprpriority: 5;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1;
+					palfx.time: -1;
+					palfx.add: 255,255,255;
+					interpolation.time: 10;
+					interpolation.palfx.add: 0,0,0;
+					interpolation.offset: const240p(0), const240p(20);
+				}
+			} else {
+				explod{
+					anim: VP cond(winPerfect, 20501, 20511);
+					id: 20500;
+					postype: left;
+					pos: const240p(160), const240p(-20);
+					scale: 1,1;
+					angle: 0;
+					facing: 1;
+					ontop: 1;
+					layerno: 2;
+					sprpriority: 5;
+					pausemovetime: -1;
+					supermovetime: -1;
+					ownpal: 1;
+					palfx.time: -1;
+					palfx.add: 255,255,255;
+					interpolation.time: 10;
+					interpolation.palfx.add: 0,0,0;
+					interpolation.offset: const240p(0), const240p(20);
+				}
+			}
+		}
+		if map(_vnix_result_screen) = 25 {
+			explod{
+				anim: VP 9300;
+				postype: left;
+				pos: const240p(cond(teamside = 1, 0, 320)), const240p(33);
+				scale: 1,1;
+				vel: 0,0;
+				angle: cond(teamside = 1, -90, 90);
+				facing: 1;
+				ontop: 1;
+				layerno: 2;
+				removetime: -2;
+				sprpriority: 99;
+				pausemovetime: -1;
+				supermovetime: -1;
+			}
+			playSnd{value: VP 100, 46; channel: 3; volume: 200}
+		}
+		if map(_vnix_result_screen) = 40 {
+			explod{
+				anim: VP 9300;
+				postype: left;
+				pos: const240p(cond(teamside = 1, 0, 320)), const240p(48);
+				scale: 1,1;
+				vel: 0,0;
+				angle: cond(teamside = 1, -90, 90);
+				facing: 1;
+				ontop: 1;
+				layerno: 2;
+				removetime: -2;
+				sprpriority: 99;
+				pausemovetime: -1;
+				supermovetime: -1;
+			}
+			playSnd{value: VP 100, 46; channel: 3; volume: 200}
+		}
+		if map(_vnix_result_screen) = 55 {
+			explod{
+				anim: VP 9300;
+				postype: left;
+				pos: const240p(cond(teamside = 1, 0, 320)), const240p(63);
+				scale: 1,1;
+				vel: 0,0;
+				angle: cond(teamside = 1, -90, 90);
+				facing: 1;
+				ontop: 1;
+				layerno: 2;
+				removetime: -2;
+				sprpriority: 99;
+				pausemovetime: -1;
+				supermovetime: -1;
+			}
+			playSnd{value: VP 100, 46; channel: 3; volume: 200}
+		}
+		if map(_vnix_result_screen) = 70 {
+			explod{
+				anim: VP 9300;
+				postype: left;
+				pos: const240p(cond(teamside = 1, 0, 320)), const240p(78);
+				scale: 1,1;
+				vel: 0,0;
+				angle: cond(teamside = 1, -90, 90);
+				facing: 1;
+				ontop: 1;
+				layerno: 2;
+				removetime: -2;
+				sprpriority: 99;
+				pausemovetime: -1;
+				supermovetime: -1;
+			}
+			playSnd{value: VP 100, 46; channel: 3; volume: 200}
+		}
+		if map(_vnix_result_screen) = 85 && map(_vnix_critical_cfg_enable) {
+			explod{
+				anim: VP 9300;
+				postype: left;
+				pos: const240p(cond(teamside = 1, 0, 320)), const240p(93);
+				scale: 1,1;
+				vel: 0,0;
+				angle: cond(teamside = 1, -90, 90);
+				facing: 1;
+				ontop: 1;
+				layerno: 2;
+				removetime: -2;
+				sprpriority: 99;
+				pausemovetime: -1;
+				supermovetime: -1;
+			}
+			playSnd{value: VP 100, 46; channel: 3; volume: 200}
+		}
+		if map(_vnix_result_screen) = 100 {
+			# Badges Base
+			explod{
+				anim: VP 20600;
+				id: 20600;
+				postype: left;
+				pos: const240p(cond(teamside = 1, 58, 262)), const240p(110);
+				sprpriority: 5;
+				ontop: 1;
+				layerno: 2;
+				scale: .7, .7;
+				removetime: -1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				palfx.time: -1;
+				palfx.add: 255,255,255;
+				interpolation.time: 20;
+				interpolation.palfx.add: 0,0,0;
+			}
+			playSnd{value: VP 100, 46; channel: 3; volume: 200}
+		}
+		if map(_vnix_result_screen) = 115 {
+			# Badges Base
+			explod{
+				anim: VP 20600;
+				id: 20600;
+				postype: left;
+				pos: const240p(cond(teamside = 1, 58, 262)), const240p(135);
+				sprpriority: 5;
+				ontop: 1;
+				layerno: 2;
+				scale: .7, .7;
+				removetime: -1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				palfx.time: -1;
+				palfx.add: 255,255,255;
+				interpolation.time: 20;
+				interpolation.palfx.add: 0,0,0;
+			}
+			playSnd{value: VP 100, 46; channel: 3; volume: 200}
+		}
+		if map(_vnix_result_screen) = 130 {
+			# Badges Base
+			explod{
+				anim: VP 20600;
+				id: 20600;
+				postype: left;
+				pos: const240p(cond(teamside = 1, 58, 262)), const240p(160);
+				sprpriority: 5;
+				ontop: 1;
+				layerno: 2;
+				scale: .7, .7;
+				removetime: -1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				palfx.time: -1;
+				palfx.add: 255,255,255;
+				interpolation.time: 20;
+				interpolation.palfx.add: 0,0,0;
+			}
+			playSnd{value: VP 100, 46; channel: 3; volume: 200}
+		}
+		# ;--------------------------------------------------------
+		if map(_vnix_result_screen) = 30 {
+			# Remaining Health
+			explod{
+				anim: VP cond(teamSide = 1, 9100, 9110);
+				postype: left;
+				pos: const240p(cond(teamside = 1, 150, 170)), const240p(-95);
+				scale: 1,1;
+				vel: 0,0;
+				facing: 1;
+				ontop: 1;
+				layerno: 2;
+				removetime: -1;
+				sprpriority: -1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				window: const240p(0), const240p(125) ,cond(teamSide = 1, const240p(-320), const240p(320)), const240p(134)
+			}
+			text{
+				id: 90000;
+				font: F 1;
+				text: "Health";
+				removetime: -1;
+				layerno: 2;
+				align: cond(teamSide = 1, 1, -1);
+				localcoord: 320, 240;
+				pos: cond(teamSide = 1, 10, 310), 33;
+				scale: 1, 1;
+				color: 255, 255, 255;
+			}
+			if TeamSize = 3 && teamMode = Tag {
+				text{
+					id: 90001;
+					font: F 1;
+					text: "%d%%";
+					params: floor(((100 * life / lifemax) + (100 * partner(0), life / partner(0), lifemax) + (100 * partner(1), life / partner(1), lifemax)) / 3);
+					removetime: -1;
+					layerno: 2;
+					align: cond(teamSide = 1, 1, -1);
+					localcoord: 320, 240;
+					pos: cond(teamSide = 1, 75, 245), 33;
+					scale: 1, 1;
+					color: 255, 255, 255;
+				}
+			} else if TeamSize = 2 && teamMode = Tag {
+				text{
+					id: 90001;
+					font: F 1;
+					text: "%d%%";
+					params: floor(((100 * life / lifemax) + (100 * partner(0), life / partner(0), lifemax)) / 2);
+					removetime: -1;
+					layerno: 2;
+					align: cond(teamSide = 1, 1, -1);
+					localcoord: 320, 240;
+					pos: cond(teamSide = 1, 75, 245), 33;
+					scale: 1, 1;
+					color: 255, 255, 255;
+				}
+			} else {
+				text{
+					id: 90001;
+					font: F 1;
+					text: "%d%%";
+					params: floor(100 * life / lifemax);
+					removetime: -1;
+					layerno: 2;
+					align: cond(teamSide = 1, 1, -1);
+					localcoord: 320, 240;
+					pos: cond(teamSide = 1, 75, 245), 33;
+					scale: 1, 1;
+					color: 255, 255, 255;
+				}
+			}
+		}
+		if map(_vnix_result_screen) = 45 {
+			# Max Combo
+			explod{
+				anim: VP cond(teamSide = 1, 9100, 9110);
+				postype: left;
+				pos: const240p(cond(teamside = 1, 150, 170)), const240p(-80);
+				scale: 1,1;
+				vel: 0,0;
+				facing: 1;
+				ontop: 1;
+				layerno: 2;
+				removetime: -1;
+				sprpriority: -1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				window: const240p(0), const240p(125) ,cond(teamSide = 1, const240p(-320), const240p(320)), const240p(134)
+			}
+			text{
+				id: 90010;
+				font: F 1;
+				text: "Max Combo";
+				removetime: -1;
+				layerno: 2;
+				align: cond(teamSide = 1, 1, -1);
+				localcoord: 320, 240;
+				pos: cond(teamSide = 1, 10, 310), 47;
+				scale: 1, 1;
+				color: 255, 255, 255;
+			}
+			text{
+				id: 90011;
+				font: F 1;
+				text: "%d";
+				params: ceil(map(_vnix_combo_count) * 1.0);
+				removetime: -1;
+				layerno: 2;
+				align: cond(teamSide = 1, 1, -1);
+				localcoord: 320, 240;
+				pos: cond(teamSide = 1, 75, 245), 47;
+				scale: 1, 1;
+				color: 255, 255, 255;
+			}
+		}
+		if map(_vnix_result_screen) = 60 {
+			# Max Damage
+			explod{
+				anim: VP cond(teamSide = 1, 9100, 9110);
+				postype: left;
+				pos: const240p(cond(teamside = 1, 150, 170)), const240p(-65);
+				scale: 1,1;
+				vel: 0,0;
+				facing: 1;
+				ontop: 1;
+				layerno: 2;
+				removetime: -1;
+				sprpriority: -1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				window: const240p(0), const240p(125) ,cond(teamSide = 1, const240p(-320), const240p(320)), const240p(134)
+			}
+			text{
+				id: 90020;
+				font: F 1;
+				text: "Max Damage";
+				removetime: -1;
+				layerno: 2;
+				align: cond(teamSide = 1, 1, -1);
+				localcoord: 320, 240;
+				pos: cond(teamSide = 1, 10, 310), 62;
+				scale: 1, 1;
+				color: 255, 255, 255;
+			}
+			text{
+				id: 90021;
+				font: F 1;
+				text: "%d";
+				params: ceil(map(_vnix_max_damage) * 1.0);
+				removetime: -1;
+				layerno: 2;
+				align: cond(teamSide = 1, 1, -1);
+				localcoord: 320, 240;
+				pos: cond(teamSide = 1, 75, 245), 62;
+				scale: 1, 1;
+				color: 255, 255, 255;
+			}
+		}
+		if map(_vnix_result_screen) = 75 {
+			# Counter Hit Count
+			explod{
+				anim: VP cond(teamSide = 1, 9100, 9110);
+				postype: left;
+				pos: const240p(cond(teamside = 1, 150, 170)), const240p(-50);
+				scale: 1,1;
+				vel: 0,0;
+				facing: 1;
+				ontop: 1;
+				layerno: 2;
+				removetime: -1;
+				sprpriority: -1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				window: const240p(0), const240p(125) ,cond(teamSide = 1, const240p(-320), const240p(320)), const240p(134)
+			}
+			text{
+				id: 90030;
+				font: F 1;
+				text: "Counter Hits";
+				removetime: -1;
+				layerno: 2;
+				align: cond(teamSide = 1, 1, -1);
+				localcoord: 320, 240;
+				pos: cond(teamSide = 1, 10, 310), 77;
+				scale: 1, 1;
+				color: 255, 255, 255;
+			}
+			text{
+				id: 90031;
+				font: F 1;
+				text: "%d";
+				params: ceil(map(_vnix_counter_count) + partner(0), map(_vnix_counter_count) + partner(1), map(_vnix_counter_count));
+				removetime: -1;
+				layerno: 2;
+				align: cond(teamSide = 1, 1, -1);
+				localcoord: 320, 240;
+				pos: cond(teamSide = 1, 75, 245), 77;
+				scale: 1, 1;
+				color: 255, 255, 255;
+			}
+		}
+		if map(_vnix_result_screen) = 90 && map(_vnix_critical_cfg_enable) {
+			# Crit Hit Count
+			explod{
+				anim: VP cond(teamSide = 1, 9100, 9110);
+				postype: left;
+				pos: const240p(cond(teamside = 1, 150, 170)), const240p(-35);
+				scale: 1,1;
+				vel: 0,0;
+				facing: 1;
+				ontop: 1;
+				layerno: 2;
+				removetime: -1;
+				sprpriority: -1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				window: const240p(0), const240p(125) ,cond(teamSide = 1, const240p(-320), const240p(320)), const240p(134)
+			}
+			text{
+				id: 90030;
+				font: F 1;
+				text: "Critical Hits";
+				removetime: -1;
+				layerno: 2;
+				align: cond(teamSide = 1, 1, -1);
+				localcoord: 320, 240;
+				pos: cond(teamSide = 1, 10, 310), 92;
+				scale: 1, 1;
+				color: 255, 255, 255;
+			}
+			text{
+				id: 90031;
+				font: F 1;
+				text: "%d";
+				params: ceil(map(_vnix_critical_count) + partner(0), map(_vnix_critical_count) + partner(1), map(_vnix_critical_count));
+				removetime: -1;
+				layerno: 2;
+				align: cond(teamSide = 1, 1, -1);
+				localcoord: 320, 240;
+				pos: cond(teamSide = 1, 75, 245), 92;
+				scale: 1, 1;
+				color: 255, 255, 255;
+			}
+		}
+		if map(_vnix_result_screen) = 150 && ceil(map(_vnix_combo_count) * 1.0) >= 15 {
+			# Combo Badge
+			explod{
+				anim: VP 20610;
+				id: 20610;
+				postype: left;
+				pos: const240p(cond(teamside = 1,  33.5, 287.5)), const240p(110);
+				sprpriority: 5;
+				ontop: 1;
+				layerno: 2;
+				scale: 0.9, 0.9;
+				removetime: -1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				palfx.time: -1;
+				palfx.add: 255,255,255;
+				interpolation.time: 20;
+				interpolation.palfx.add: 0,0,0;
+				interpolation.scale: 0.8,0.8;
+			}
+			playSnd{value: VP 100, 50; channel: 3; volume: 200}
+		}
+		if map(_vnix_result_screen) = 160 && ceil(map(_vnix_max_damage) * 1.5) >= 300 {
+			# Damage Badge
+			explod{
+				anim: VP 20620;
+				id: 20620;
+				postype: left;
+				pos: const240p(cond(teamside = 1, 58.5, 262.5)), const240p(110);
+				sprpriority: 5;
+				ontop: 1;
+				layerno: 2;
+				scale: 0.9, 0.9;
+				removetime: -1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				palfx.time: -1;
+				palfx.add: 255,255,255;
+				interpolation.time: 20;
+				interpolation.palfx.add: 0,0,0;
+				interpolation.scale: 0.8,0.8;
+			}
+			playSnd{value: VP 100, 50; channel: 3; volume: 200}
+		}
+		if map(_vnix_result_screen) = 170
+		&& ((TeamSize = 3 && teamMode = Tag && ceil(map(_vnix_superko) + partner(0), map(_vnix_superko) + partner(1), map(_vnix_superko)) / 3)
+		|| (TeamSize = 2 && teamMode = Tag && ceil(map(_vnix_superko) + partner(0), map(_vnix_superko)) / 2)
+		|| ((teamMode = Single || teamMode = Turns) && ceil(map(_vnix_superko)))) >= 1
+		{
+			# Rush Badge
+			explod{
+				anim: VP 20630;
+				id: 20630;
+				postype: left;
+				pos: const240p(cond(teamside = 1,  83.5, 237.5)), const240p(110);
+				sprpriority: 5;
+				ontop: 1;
+				layerno: 2;
+				scale: 0.9, 0.9;
+				removetime: -1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				palfx.time: -1;
+				palfx.add: 255,255,255;
+				interpolation.time: 20;
+				interpolation.palfx.add: 0,0,0;
+				interpolation.scale: 0.8,0.8;
+			}
+			playSnd{value: VP 100, 50; channel: 3; volume: 200}
+		}
+		if map(_vnix_result_screen) = 180
+		&& ((TeamSize = 3 && teamMode = Tag && floor(((100 * life / lifemax) + (100 * partner(0), life / partner(0), lifemax) + (100 * partner(1), life / partner(1), lifemax)) / 3))
+		|| (TeamSize = 2 && teamMode = Tag && floor(((100 * life / lifemax) + (100 * partner(0), life / partner(0), lifemax)) / 2))
+		|| ((teamMode = Single || teamMode = Turns) && floor(100 * life / lifemax))) <= 90
+		{
+			# Low Health
+			explod{
+				anim: VP 20640;
+				id: 20610;
+				postype: left;
+				pos: const240p(cond(teamside = 1, 33.5, 287.5)), const240p(135);
+				sprpriority: 5;
+				ontop: 1;
+				layerno: 2;
+				scale: 0.9, 0.9;
+				removetime: -1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				palfx.time: -1;
+				palfx.add: 255,255,255;
+				interpolation.time: 20;
+				interpolation.palfx.add: 0,0,0;
+				interpolation.scale: 0.8,0.8;
+			}
+			playSnd{value: VP 100, 50; channel: 3; volume: 200}
+		}
+		if map(_vnix_result_screen) = 190
+		&& ((TeamSize = 3 && teamMode = Tag && ceil(map(_vnix_hyperko) + partner(0), map(_vnix_hyperko) + partner(1), map(_vnix_hyperko)) / 3)
+		|| (TeamSize = 2 && teamMode = Tag && ceil(map(_vnix_hyperko) + partner(0), map(_vnix_hyperko)) / 2)
+		|| ((teamMode = Single || teamMode = Turns) && ceil(map(_vnix_hyperko)))) >= 1		
+		{
+			# Echo Master
+			explod{
+				anim: VP 20650;
+				id: 20620;
+				postype: left;
+				pos: const240p(cond(teamside = 1, 58.5, 262.5)), const240p(135);
+				sprpriority: 5;
+				ontop: 1;
+				layerno: 2;
+				scale: 0.9, 0.9;
+				removetime: -1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				palfx.time: -1;
+				palfx.add: 255,255,255;
+				interpolation.time: 20;
+				interpolation.palfx.add: 0,0,0;
+				interpolation.scale: 0.8,0.8;
+			}
+			playSnd{value: VP 100, 50; channel: 3; volume: 200}
+		}
+		if map(_vnix_result_screen) = 200
+		&& ((TeamSize = 3 && teamMode = Tag && ceil(map(_iksys_firstAttackFlag) + partner(0), map(_iksys_firstAttackFlag) + partner(1), map(_iksys_firstAttackFlag)) / 3)
+		|| (TeamSize = 2 && teamMode = Tag && ceil(map(_iksys_firstAttackFlag) + partner(0), map(_iksys_firstAttackFlag)) / 2)
+		|| ((teamMode = Single || teamMode = Turns) && ceil(map(_iksys_firstAttackFlag)))) >= 1		
+		{
+			# Quick Feet
+			explod{
+				anim: VP 20660;
+				id: 20630;
+				postype: left;
+				pos: const240p(cond(teamside = 1, 33.5, 287.5)), const240p(160);
+				sprpriority: 5;
+				ontop: 1;
+				layerno: 2;
+				scale: 0.9, 0.9;
+				removetime: -1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				palfx.time: -1;
+				palfx.add: 255,255,255;
+				interpolation.time: 20;
+				interpolation.palfx.add: 0,0,0;
+				interpolation.scale: 0.8,0.8;
+			}
+			playSnd{value: VP 100, 50; channel: 3; volume: 200}
+		}
+		if map(_vnix_result_screen) = 210
+		&& ((TeamSize = 3 && teamMode = Tag && ceil(map(_iksys_counterHitFlag) + partner(0), map(_iksys_counterHitFlag) + partner(1), map(_iksys_counterHitFlag)) / 3)
+		|| (TeamSize = 2 && teamMode = Tag && ceil(map(_iksys_counterHitFlag) + partner(0), map(_iksys_counterHitFlag)) / 2)
+		|| ((teamMode = Single || teamMode = Turns) &&  (root, stateno = 99685))) >= 1
+		{
+			# Pay Back Badge
+			explod{
+				anim: VP 20670;
+				id: 20670;
+				postype: left;
+				pos: const240p(cond(teamside = 1, 33.5, 287.5)), const240p(160);
+				sprpriority: 5;
+				ontop: 1;
+				layerno: 2;
+				scale: 0.9, 0.9;
+				removetime: -1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				palfx.time: -1;
+				palfx.add: 255,255,255;
+				interpolation.time: 20;
+				interpolation.palfx.add: 0,0,0;
+				interpolation.scale: 0.8,0.8;
+			}
+			playSnd{value: VP 100, 50; channel: 3; volume: 200}
+		}
+		if map(_vnix_result_screen) = 220
+		&& ((TeamSize = 3 && teamMode = Tag && floor(((100 * life / lifemax) + (100 * partner(0), life / partner(0), lifemax) + (100 * partner(1), life / partner(1), lifemax)) / 3))
+		|| (TeamSize = 2 && teamMode = Tag && floor(((100 * life / lifemax) + (100 * partner(0), life / partner(0), lifemax)) / 2))
+		|| ((teamMode = Single || teamMode = Turns) && (life))) >= 400
+		{
+			# High Risk Badge
+			explod{
+				anim: VP 20680;
+				id: 20680;
+				postype: left;
+				pos: const240p(cond(teamside = 1, 58.5, 262.5)), const240p(160);
+				sprpriority: 5;
+				ontop: 1;
+				layerno: 2;
+				scale: 0.9, 0.9;
+				removetime: -1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				palfx.time: -1;
+				palfx.add: 255,255,255;
+				interpolation.time: 20;
+				interpolation.palfx.add: 0,0,0;
+				interpolation.scale: 0.8,0.8;
+			}
+			playSnd{value: VP 100, 50; channel: 3; volume: 200}
+		}
+		if map(_vnix_result_screen) = 230
+		&& ((TeamSize = 3 && teamMode = Tag && ceil(map(_vnix_break_out) + partner(0), map(_vnix_break_out) + partner(1), map(_vnix_break_out)) / 3)
+		|| (TeamSize = 2 && teamMode = Tag && ceil(map(_vnix_break_out) + partner(0), map(_vnix_break_out)) / 2)
+		|| ((teamMode = Single || teamMode = Turns) && ceil(map(_vnix_break_out)))) >= 1			
+		{
+			# Break Out Badge
+			explod{
+				anim: VP 20690;
+				id: 20690;
+				postype: left;
+				pos: const240p(cond(teamside = 1, 83.5, 237.5)), const240p(160);
+				sprpriority: 5;
+				ontop: 1;
+				layerno: 2;
+				scale: 0.9, 0.9;
+				removetime: -1;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				palfx.time: -1;
+				palfx.add: 255,255,255;
+				interpolation.time: 20;
+				interpolation.palfx.add: 0,0,0;
+				interpolation.scale: 0.8,0.8;
+			}
+			playSnd{value: VP 100, 50; channel: 3; volume: 200}
+		}
+	}
+	else {
+		removeText{id: 90000;}
+		removeText{id: 90001;}
+		removeText{id: 90010;}
+		removeText{id: 90011;}
+		removeText{id: 90020;}
+		removeText{id: 90021;}
+		removeText{id: 90030;}
+		removeText{id: 90031;}
+		removeText{id: 90040;}
+		removeText{id: 90041;}
+	}
+}

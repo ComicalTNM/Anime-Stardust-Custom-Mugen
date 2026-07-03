@@ -1,0 +1,562 @@
+
+# ========================================================================================================================================
+# Stage Config
+# ========================================================================================================================================
+
+[Function F_Vnix_Stage_Config()]
+
+# Stage Effects - 
+mapset{map: "_vnix_training_envshake_cfg_enable"; value: 1} 	# Enable Floor Shake
+mapset{map: "_vnix_training_shockeffect_cfg_enable"; value: 1}  # Enable Shock Effects
+mapset{map: "_vnix_training_shockdamage_cfg"; value: -30} 	    # Configure Shock Damage, positive means affected player gains life
+
+# ========================================================================================================================================
+# Stage States
+# ========================================================================================================================================
+
+[StateDef 0; anim: -2;]
+
+# Floor Shake Helper
+persistent(0) if numHelper(1) = 0 && stagevar(info.name) = "Training Stage V" {
+	helper{id: 1; stateno: 1;}
+}
+
+# Winner Text Helper
+persistent(0) if numHelper(2) = 0 && stagevar(info.name) = "Training Stage V" {
+	helper{id: 2; stateno: 2;}
+}
+
+# P1 Danger Text
+if Roundstate = 2 && ((player(1), life <= player(1), lifeMax * 0.25 && player(1), alive = 1 && player(1), standby = 0)
+|| (player(3), life <= player(3), lifeMax * 0.25 && player(3), alive = 1 && player(3), standby = 0)
+|| (player(5), life <= player(5), lifeMax * 0.25 && player(5), alive = 1 && player(5), standby = 0)
+|| (player(7), life <= player(7), lifeMax * 0.25 && player(7), alive = 1 && player(7), standby = 0))
+{
+	modifyBGCtrl{
+		id: 3;
+		time: 0,0;
+		value: 1;
+	}
+} else {
+	modifyBGCtrl{
+		id: 3;
+		time: 0,0;
+		value: 0;
+	}
+}
+
+# P2 Danger Text
+if Roundstate = 2 && ((player(2), life <= player(2), lifeMax * 0.25 && player(2), alive = 1 && player(2), standby = 0)
+|| (player(4), life <= player(4), lifeMax * 0.25 && player(4), alive = 1 && player(4), standby = 0)
+|| (player(6), life <= player(6), lifeMax * 0.25 && player(6), alive = 1 && player(6), standby = 0)
+|| (player(8), life <= player(8), lifeMax * 0.25 && player(8), alive = 1 && player(8), standby = 0))
+{
+	modifyBGCtrl{
+		id: 4;
+		time: 0,0;
+		value: 1;
+	}
+} else {
+	modifyBGCtrl{
+		id: 4;
+		time: 0,0;
+		value: 0;
+	}
+}
+
+if map(_vnix_wall_hp) = 110 {
+	for s = 1; 8; 2 {
+		if player($s), roundState = 4 && player($s), win && map(_vnix_secret_factor) = 0 {
+			explod{
+				anim: 20;
+				postype: left;
+				pos: 160,0;
+				scale: .5,.5;
+				angle: 0;
+				facing: 1;
+				ontop: 1;
+				random: 0,0;
+				bindtime: 1;
+				removetime: -1;
+				sprpriority: 5;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				palfx.time: -1;
+				palfx.add: 255,255,255;
+				interpolation.time: 60;
+				interpolation.palfx.add: 0,0,0;
+			}
+			playsnd{value: 1, 2; volumescale: 200; freqmul: 1.0}
+			mapset{map: "_vnix_secret_factor"; value: 1;}
+		}
+	}
+	for t = 2; 8; 2 {
+		if player($t), roundState = 4 && player($t), win && map(_vnix_secret_factor) = 0 {
+			explod{
+				anim: 21;
+				postype: left;
+				pos: 160,0;
+				scale: .5,.5;
+				angle: 0;
+				facing: 1;
+				ontop: 1;
+				random: 0,0;
+				bindtime: 1;
+				removetime: -1;
+				sprpriority: 5;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				palfx.time: -1;
+				palfx.add: 255,255,255;
+				interpolation.time: 60;
+				interpolation.palfx.add: 0,0,0;
+			}
+			playsnd{value: 1, 2; volumescale: 200; freqmul: 1.0}
+			mapset{map: "_vnix_secret_factor"; value: 1;}
+		}
+	}
+}
+
+
+# ========================================================================================================================================
+# Floor Shake Helper
+[StateDef 1; anim: -2;]
+
+modifyBGCtrl{
+	id: 2;
+	time: 0,0;
+	y: 0 - root, map(_vnix_wall_hp);
+}
+
+if ((player(1), stateno = 5100 || player(1), stateno = 5110) && player(1), time = 1)
+|| ((player(2), stateno = 5100 || player(2), stateno = 5110) && player(2), time = 1)
+|| ((player(3), stateno = 5100 || player(3), stateno = 5110) && player(3), time = 1)
+|| ((player(4), stateno = 5100 || player(4), stateno = 5110) && player(4), time = 1)
+|| ((player(5), stateno = 5100 || player(5), stateno = 5110) && player(5), time = 1)
+|| ((player(6), stateno = 5100 || player(6), stateno = 5110) && player(6), time = 1)
+|| ((player(7), stateno = 5100 || player(7), stateno = 5110) && player(7), time = 1)
+|| ((player(8), stateno = 5100 || player(8), stateno = 5110) && player(8), time = 1)
+{
+	changestate{value: 6}
+}
+
+# ========================================================================================================================================
+# Winner Text Helper
+[StateDef 2; anim: -2;]
+
+# Winner Text
+for i = 0; 7; 1 {
+	if stagevar(info.name) = "Training Stage V" && RoundNo = $i && Roundstate = 4 {
+		modifyBGCtrl{
+			id: 10 + $i;
+			time: 0,0;
+			value: 1;
+		}
+	} else {
+		modifyBGCtrl{
+			id: 10 + $i;
+			time: 0,0;
+			value: 0;
+		}
+	}
+}
+
+# ========================================================================================================================================
+# Floor Shake Helper 2
+[StateDef 6; anim: -2;]
+
+for i = 1; 8; 1 {
+	if playerIDexist(player($i), ID) {
+		if player($i), stateno = 5100{
+			if root, map(_vnix_training_shockeffect_cfg_enable) != 0 {
+				if time = 0 && player($i), alive = 1 && player($i), map(_vnix_fall_bounce) = 0 {
+					playsnd{value: 0, cond(player($i), sysvar(1) > 14,2,cond(random <= 500, 0, 1)); volumescale: 100; freqmul: 1.0}
+					explod{
+						anim: 1;
+						postype: none;
+						pos: 0,50;
+						scale: .5,.5;
+						angle: 0;
+						facing: 1;
+						ontop: 0;
+						bindtime: 0;
+						removetime: 30;
+						sprpriority: -5;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						trans: addalpha;
+						alpha: 128,256;
+						interpolation.time: 10;
+						#interpolation.scale: .5,.5;
+						interpolation.alpha: 0,256;
+					}
+					explod{
+						anim: 10;
+						postype: none;
+						pos: 0, 0;
+						scale: cond(player($i), sysvar(1) > 14,1,.75), .15;
+						angle: 0;
+						random: 0,0;
+						facing: cond(random <= 500, 1, -1);
+						ontop: 0;
+						under: 0;
+						bindID: player($i), ID;
+						bindtime: 1;
+						vel: 0,0;
+						sprpriority: -6;
+						removetime: cond(player($i), sysvar(1) > 14,400,200);
+						pausemovetime: -1;
+						supermovetime: -1;
+						trans: sub;
+						#alpha: 256,0;
+						ownpal: 1;
+						layerno: 0;
+						#palfx.time: -1;
+						#palfx.mul: 0, 0, 200;
+						#palfx.add: 0,0,100;
+						interpolation.time: cond(player($i), sysvar(1) > 14,400,200);
+						interpolation.alpha: 0,256;
+						#window: -65,0,65,-77;
+					}
+					explod{
+						anim: 11;
+						postype: none;
+						pos: 0, -20;
+						scale: cond(player($i), sysvar(1) > 14,.33,.15),cond(player($i), sysvar(1) > 14,.33,.15);
+						angle: 0;
+						random: 0,0;
+						facing: cond(random <= 500, 1, -1);
+						ontop: 0;
+						under: 0;
+						bindID: player($i), ID;
+						bindtime: 1;
+						vel: 0,0;
+						sprpriority: -6;
+						removetime: -2;
+						pausemovetime: -1;
+						supermovetime: -1;
+						trans: addalpha;
+						alpha: 256,0;
+						ownpal: 1;
+						layerno: 0;
+						palfx.time: -1;
+						palfx.mul: 0, 0, 200;
+						#palfx.add: 0,0,100;
+						interpolation.time: 30;
+						interpolation.alpha: 0,256;
+						#window: -65,0,65,-77;
+					}
+					explod{
+						anim: 9;
+						postype: none;
+						pos: 0, 0;
+						scale: cond(player($i), sysvar(1) > 14,.75,.5), .5;
+						angle: 0;
+						random: 0,0;
+						facing: cond(random <= 500, 1, -1);
+						ontop: 0;
+						under: 0;
+						bindID: player($i), ID;
+						bindtime: 1;
+						vel: 0,0;
+						sprpriority: -5;
+						removetime: -2;
+						pausemovetime: -1;
+						supermovetime: -1;
+						trans: Addalpha;
+						alpha: 256,256;
+						ownpal: 1;
+						layerno: 0;
+						#palfx.time: -1;
+						#palfx.mul: 0, 0, 200;
+						#palfx.add: 0,0,100;
+						#interpolation.time: 30;
+						#interpolation.alpha: 0,256;
+						#window: -65,0,65,-77;
+					}
+					explod{
+						anim: 6;
+						postype: none;
+						pos: 0, 20;
+						scale: .25, .25;
+						angle: 0;
+						random: 0,0;
+						facing: cond(random <= 500, 1, -1);
+						ontop: 0;
+						under: 0;
+						bindID: player($i), ID;
+						bindtime: 10;
+						vel: 0,-1;
+						sprpriority: -5;
+						removetime: 30;
+						pausemovetime: -1;
+						supermovetime: -1;
+						trans: Addalpha;
+						alpha: 256,256;
+						ownpal: 1;
+						layerno: 1;
+						interpolation.time: 30;
+						interpolation.alpha: 0,256;
+						#window: -65,0,65,-77;
+					}
+					explod{
+						anim: 2;
+						postype: none;
+						pos: 0,0;
+						scale: cond(player($i), sysvar(1) > 14,1,.33),.33;
+						angle: 0;
+						facing: 1;
+						ontop: 0;
+						bindID: player($i), ID;
+						bindtime: 1;
+						removetime: -2;
+						sprpriority: -5;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						#trans: addalpha;
+						#alpha: 128,256;
+					}
+					explod{
+						anim: 3;
+						postype: none;
+						pos: 0,-20;
+						scale: cond(player($i), sysvar(1) > 14,1,.4),.25;
+						angle: 0;
+						facing: 1;
+						ontop: 0;
+						bindID: player($i), ID;
+						bindtime: 1;
+						removetime: -2;
+						sprpriority: 2;
+						pausemovetime: -1;
+						supermovetime: -1;
+						ownpal: 1;
+						trans: add;
+						#alpha: 128,256;
+					}
+					explod{
+						anim: VP 50000;
+						postype: none;
+						pos: 10, -10;
+						scale: 1.0, 1.0;
+						angle: 0;
+						facing: 1;
+						ontop: 0;
+						bindID: player($i), ID;
+						bindtime: 1;
+						vel: 0,-2;
+						sprpriority: 3;
+						pausemovetime: -1;
+						supermovetime: -1;
+						trans: Add;
+						ownpal: 1;
+					}
+					explod{
+						anim: VP 50000;
+						postype: none;
+						pos: 10, 0;
+						scale: .5, .5;
+						angle: 0;
+						vfacing: -1;
+						ontop: 0;
+						bindID: player($i), ID;
+						bindtime: 1;
+						vel: 0,-3;
+						sprpriority: 3;
+						pausemovetime: -1;
+						supermovetime: -1;
+						trans: Add;
+						ownpal: 1;
+					}
+					explod{
+						anim: VP 50000;
+						postype: none;
+						pos: -10, -20;
+						scale: .8, .8;
+						angle: 0;
+						facing: -1;
+						ontop: 0;
+						bindID: player($i), ID;
+						bindtime: 1;
+						vel: 0,-1;
+						sprpriority: 3;
+						pausemovetime: -1;
+						supermovetime: -1;
+						trans: Add;
+						ownpal: 1;
+					}
+					palfx{
+						time: 30;
+						add: 255, 255, 255;
+						sinadd: -255, -255, -255, 120;
+						redirectID: player($i), ID;
+					}
+					lifeadd{
+						value: cond(player($i), sysvar(1) > 14, root, map(_vnix_training_shockdamage_cfg) * 2.0,root, map(_vnix_training_shockdamage_cfg));
+						kill: 1;
+						absolute: 1;
+						redirectID: player($i), ID;
+					}
+					if root, map(_vnix_wall_hp) < 110 {
+						parentmapadd{map: "_vnix_wall_hp"; value: 10}
+						playsnd{value: 1, cond(root, map(_vnix_wall_hp) = 110, 0, 1); volumescale: 200; freqmul: 1.0}
+						modifyBGCtrl{
+							id: 2;
+							time: 0,0;
+							y: 0 - root, map(_vnix_wall_hp);
+						}
+						for expos = -480; 480; 30 {
+							explod{
+								anim: 5;
+								postype: none;
+								pos: $expos, -30;
+								scale: 1.5, .25 + (random%75 * 0.01);
+								angle: 0;
+								random: 0,10;
+								facing: cond(random <= 500, 1, -1);
+								ontop: 0;
+								under: 1;
+								bindtime: 1;
+								vel: 0,.2;
+								sprpriority: -5;
+								pausemovetime: -1;
+								supermovetime: -1;
+								trans: Addalpha;
+								alpha: 128,256;
+								ownpal: 1;
+								layerno: 0;
+								interpolation.time: 30;
+								interpolation.alpha: 0,256;
+								#window: -65,0,65,-77;
+							}
+							explod{
+								anim: 7;
+								postype: none;
+								pos: $expos,-32;
+								scale: .75 + (Random%25 * 0.01),.25 + (Random%25 * 0.01);
+								angle: 0;
+								facing: cond(random <= 500, 1, -1);
+								ontop: 0;
+								random: 10,0;
+								bindtime: 1;
+								removetime: -2;
+								sprpriority: -5;
+								pausemovetime: -1;
+								supermovetime: -1;
+								ownpal: 1;
+								window: -220,0,220,-300;
+								trans: add;
+								#alpha: 128,256;
+							}
+						}
+					}
+					if root, map(_vnix_wall_hp) = 110 {
+						modifyBGCtrl{
+							id: 20;
+							time: 0,0;
+							value: 1;
+						}
+					}
+				}
+				if time = 2 && player($i), alive = 1 {
+					if player($i), map(_vnix_fall_bounce) = 0 {
+						velset{x: 0; y: cond(player($i), sysvar(1) > 14, -12, -8); redirectID: player($i), ID}
+						selfstate{value: 5035; redirectID: player($i), ID}
+						mapset{map: "_vnix_fall_bounce"; value: 1; redirectID: player($i), ID}
+					} else {
+						selfstate{value: 5101; redirectID: player($i), ID}
+						mapset{map: "_vnix_fall_bounce"; value: 0; redirectID: player($i), ID}
+					}
+				}
+			}
+		}
+		if player($i), map(_vnix_fall_bounce) != 0 && (player($i), stateno = 5110 || player($i), movetype != H) {
+			mapset{map: "_vnix_fall_bounce"; value: 0; redirectID: player($i), ID}
+		}
+	}
+}
+
+if root, map(_vnix_training_envshake_cfg_enable) != 0 {
+	if time = 0 || time = 4 {
+		modifyBGCtrl{
+			id: 1;
+			time: 0,0;
+			y: 2
+		}
+	}
+
+	if time = 2 || time = 8 {
+		modifyBGCtrl{
+			id: 1;
+			time: 0,0;
+			y: 1
+		}
+	}
+
+	if time = 6 {
+		modifyBGCtrl{
+			id: 1;
+			time: 0,0;
+			y: 0
+		}
+	}
+
+	if time = 10 {
+		modifyBGCtrl{
+			id: 1;
+			time: 0,0;
+			y: -1
+		}
+	}
+
+	if time = 12 {
+		modifyBGCtrl{
+			id: 1;
+			time: 0,0;
+			y: 0
+		}
+	}
+}
+
+if time > 1 {
+	if ((player(1), stateno = 5100 || player(1), stateno = 5110) && player(1), time = 1)
+	|| ((player(2), stateno = 5100 || player(2), stateno = 5110) && player(2), time = 1)
+	|| ((player(3), stateno = 5100 || player(3), stateno = 5110) && player(3), time = 1)
+	|| ((player(4), stateno = 5100 || player(4), stateno = 5110) && player(4), time = 1)
+	|| ((player(5), stateno = 5100 || player(5), stateno = 5110) && player(5), time = 1)
+	|| ((player(6), stateno = 5100 || player(6), stateno = 5110) && player(6), time = 1)
+	|| ((player(7), stateno = 5100 || player(7), stateno = 5110) && player(7), time = 1)
+	|| ((player(8), stateno = 5100 || player(8), stateno = 5110) && player(8), time = 1)
+	{
+		changestate{value: 6}
+	}
+}
+
+if time = 15 {
+	changestate{value: 1}
+}
+
+[StateDef 175; anim: -2;]
+
+[StateDef 5900; anim:-2;]
+changestate{value:0;}
+
+[StateDef -4]
+
+ignorehitpause {
+	screenBound{value: 0; movecamera: 0,0}
+	assertSpecial{flag: invisible; flag2: noturntarget; flag3: noinput}
+	notHitBy{value: SCA}
+	width{value: 0,0}
+	
+	# Initialize
+	if roundstate = 0 && time = 0 {
+		# Run config
+		call F_Vnix_Stage_Config();
+		mapset{map: "_vnix_secret_factor"; value: 0}
+	}
+}

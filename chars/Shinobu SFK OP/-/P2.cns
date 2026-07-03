@@ -1,0 +1,965 @@
+;==========================================================
+; P2 - Knockdown
+[StateDef 1002]
+Type = S
+MoveType = H
+Physics = N
+Anim = 9999
+Ctrl = 0
+SprPriority = 1
+FaceP2 = 1
+
+[State 0, PlayerPush]
+Type = PlayerPush
+Trigger1 = 1
+Value = 0
+IgnoreHitPause = 1
+
+[State 0, VelSet]
+Type = VelSet
+Trigger1 = Time = 0
+x = -7
+y = 8
+
+[State 0, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = 1
+Value = 5100+(Var(10))
+Elem = 1
+
+[State 0, End]
+Type = ChangeState
+Trigger1 = Pos y > 0
+Value = 1003
+
+;==================================================
+; P2 - Knockdown Remate
+[StateDef 1003]
+Type = S
+MoveType = H
+Physics = N
+Ctrl = 0
+SprPriority = 1
+FaceP2 = 1
+
+[State 0, RemoveExplod]
+Type = RemoveExplod
+Trigger1 = Time = 0
+ID = 6030
+
+[State 0, LifeAdd]
+Type = LifeAdd
+Trigger1 = Time <= 15
+Value = -LifeMax/1000
+Kill = 1
+
+[State 0, PosSet]
+Type = PosSet
+Trigger1 = Time = 0
+y = 0
+
+[State 0, VelSet]
+Type = VelSet
+Trigger1 = Time = 0
+x = -7
+y = 0
+
+[State 0, VelSet]
+Type = VelSet
+Trigger1 = Time >= 15
+x = 0
+y = 0
+
+[State 0, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = 1
+Flag = NoAutoTurn
+
+[State 0, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = Time <= 15
+Value = 5101+(Var(10))
+Elem = 1
+
+[State 0, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = Time >= 15
+Value = 5110+(Var(10))
+Elem = 1
+
+[State 0, SelfState]
+Type = SelfState
+Triggerall = Alive
+Trigger1 = Time = 40
+Value = 5120
+
+[State 0, SelfState]
+Type = SelfState
+Triggerall = !Alive
+Trigger1 = Time = 40
+Value = 5150
+
+[State 0, End]
+Type = ChangeState
+Trigger1 = backEdgeBodyDist <= 5
+Value = 1010
+Persistent = 0
+
+;=======================================================
+; P2 - Fling
+[StateDef 1005]
+Type = s
+MoveType = h
+Physics = n
+Anim = 9999
+Ctrl = 0
+SprPriority = 1
+FaceP2 = 1
+
+[State 0, PlayerPush]
+Type = PlayerPush
+Trigger1 = 1
+Value = 0
+IgnoreHitPause = 1
+
+[State 0, VelSet]
+Type = VelSet
+Trigger1 = Time = 0
+x = -7
+y = 8
+
+[State 0, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = 1
+Value = 5100+(Var(10))
+Elem = 1
+
+[State 0, ChangeState]
+Type = ChangeState
+Trigger1 = Pos y > 0
+Value = 1010
+
+;=====================================================
+; P2 - Knockdown Helper
+[StateDef 1006]
+Type = U
+MoveType = I
+physics = N
+VelSet = 0,0
+Ctrl = 0
+Anim = 9999
+SprPriority = 2
+
+[State 0, PlaySnd]
+Type = PlaySnd
+Trigger1 = Time = 0
+Value = S80,7
+Persistent = 0
+
+[State 0, PlaySnd]
+Type = PlaySnd
+Trigger1 = Time = 0
+Value = S80,7
+Persistent = 0
+
+[State 0, Helper]
+Type = Helper
+Trigger1 = (Time%2 = 0) && (Time <= 10)
+ID = 60575
+Stateno = 60570
+Pos = 10-(Random%30),-5-(Random%20)
+PosType = P1
+Facing = 1
+OwnPal = 0
+
+[State 0, End]
+Type = DestroySelf
+Trigger1 = Time = 50
+
+;===============================================
+; P2 - Knockdown Helper Remate
+[StateDef 1007]
+Type = U
+MoveType = I
+Physics = N
+Anim = 9999
+Ctrl = 0
+
+[State 0, PosAdd]
+Type = PosAdd
+Trigger1 = 1
+x = P2Dist x
+
+[State 0, PosSet]
+Type = PosSet
+Trigger1 = 1
+y = 0
+
+[State 0, Explod]
+Type = Explod
+Trigger1 = ((Pos y = 0) && (Time%8 = 0)) && (Time <= 12)
+Anim = 6100
+ID = 6100
+Pos = -15,3
+PosType = P1
+Facing = -1
+BindTime = 1
+RemoveTime = -2
+SprPriority = 0
+Scale = .15,.2
+Angle = 0
+OwnPal = 1
+Remappal = 3,31
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+SuperMoveTime = 999
+PauseMoveTime = 999
+Vel = 2,0
+Trans = Sub
+Persistent = 0
+
+[State 0, Explod]
+Type = Explod
+Trigger1 = ((Pos y = 0) && (Time%8 = 0)) && (Time <= 12)
+Anim = 6100
+ID = 6100	
+Pos = -15,3
+PosType = P1
+Facing = -1
+BindTime = 1
+RemoveTime = -2
+SprPriority = 5
+Scale = .15,.2
+Angle = 0
+OwnPal = 1
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+SuperMoveTime = 999
+PauseMoveTime = 999
+Vel = 2,0
+Persistent = 0
+
+[State 0, End]
+Type = DestroySelf
+Trigger1 = Enemy,Stateno != 1003
+
+;===================================================
+; P2 - WallBounce
+[StateDef 1010]
+Type = S
+MoveType = H
+Physics = N
+Anim = 5050+(Var(10))
+Ctrl = 0
+VelSet = 0, 0
+SprPriority = 1
+FaceP2 = 1
+
+[State 0, VelSet]
+Type = VelSet
+Trigger1 = Time >= 0
+x = -11
+y = 0
+IgnoreHitPause = 1
+
+[State 0, PosSet]
+Type = PosSet
+Trigger1 = Pos y >= 0
+y = 0
+
+[State 0, PlayerPush]
+Type = PlayerPush
+Trigger1 = 1
+Value = 0
+
+[State 0, End]
+Type = ChangeState
+Trigger1 = backEdgeBodyDist <= 5
+Value = 1011
+
+;==========================================================
+; P2 - WallBounce Remate
+[StateDef 1011]
+Type = A
+MoveType = H
+Physics = N
+Ctrl = 0
+VelSet = 0, 0
+SprPriority = 1
+
+[State 0, LifeAdd]
+Type = LifeAdd
+Trigger1 = Time = 0
+Value = -LifeMax/100
+
+[State 0, LifeAdd]
+Type = PowerAdd
+Trigger1 = Time = 0
+Value = -PowerMax/5
+
+[State 0, EnvShake]
+Type = EnvShake
+Trigger1 = Time = 0
+Time = 15
+Ampl = -5
+Freq = 25
+
+[State 0, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = 1
+Value = 5020+(Var(10))
+
+[State 0, SelfState]
+Type = SelfState
+Trigger1 = Time >= 10
+Value = 5050
+
+;=========================================================
+; P2 - Helper Special 1
+[StateDef 1015]
+Type = U
+MoveType = I
+Physics = N
+Anim = 9999
+Ctrl = 0
+
+[State 0, PlaySnd]
+Type = PlaySnd
+Trigger1 = Time = 0
+Value = S80,5
+
+[State 0, PosSet]
+Type = PosSet
+Trigger1 = 1
+y = 0
+
+[State 0, Helper]
+Type = Helper
+Trigger1 = Time%2 = 0
+ID = 60572
+Stateno = 60570
+Pos = 60-(Random%40),-10-(Random%30)
+PosType = P1
+Facing = 1
+OwnPal = 0
+
+[State 0, Explod]
+Type = Null;Explod
+Trigger1 = Time%2 = 0
+Anim = 6030
+ID = 6030
+Pos = 60-(Random%40),-10-(Random%30)
+PosType = P2
+Facing = 1
+BindTime = 1
+Removetime = -2
+SprPriority = 3
+Scale = .25,.1
+Angle = 90
+OwnPal = 1
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+SuperMoveTime = 999
+PauseMoveTime = 999
+Vel = 4,0
+
+[State 0, Explod]
+Type = Explod
+Trigger1 = (Pos y = 0) && ((Time = 0) || (Time%6 = 0))
+Anim = 6100
+ID = 6100
+Pos = 0,0
+PosType = P2
+Facing = -1
+BindTime = 1
+RemoveTime = -2
+SprPriority = 10
+Scale = .15,.2
+Angle = 0
+OwnPal = 1
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+SuperMoveTime = 999
+PauseMoveTime = 999
+Vel = -1.5,0
+
+[State 0, Explod]
+Type = Explod
+Trigger1 = (Pos y = 0) && ((Time = 0) || (Time%6 = 0))
+Anim = 6100
+ID = 6100
+Pos = 0,0
+PosType = P2
+Facing = -1
+BindTime = 1
+RemoveTime = -2
+SprPriority = 0
+Scale = .15,.2
+Angle = 0
+OwnPal = 1
+Remappal = 3,31
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+SuperMoveTime = 999
+PauseMoveTime = 999
+Vel = -1.5, 0
+Trans = Sub
+
+[State 0, Explod]
+Type = Explod
+Trigger1 = Time%8 = 0
+Anim = 6025
+ID = 6025
+Pos = 0,-25
+PosType = P2
+Facing = -1
+BindTime = 1
+RemoveTime = -2
+SprPriority = 0
+Scale = .4,.6
+Angle = 90
+OwnPal = 1
+Remappal = 3,47
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+SuperMoveTime = 999
+PauseMoveTime = 999
+Vel = -1.5, 0
+
+[State 0, Explod]
+Type = Explod
+Trigger1 = Time%8 = 0
+Anim = 6025
+ID = 6025
+Pos = 0,-25
+PosType = P2
+Facing = -1
+BindTime = 1
+RemoveTime = -2
+SprPriority = 0
+Scale = .4,.6
+Angle = 90
+OwnPal = 1
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+SuperMoveTime = 999
+PauseMoveTime = 999
+Vel = -1.5, 0
+Trans = Sub
+
+[State 0, DestroySelf]
+Type = DestroySelf
+Trigger1 = Enemy,Stateno != 1010
+
+;=======================================================
+; P2 - Special 1 Helper Remate
+[StateDef 1016]
+Type = U
+MoveType = I
+Physics = N
+Anim = 9999
+Ctrl = 0
+SprPriority = 2
+
+[State 0, PlaySnd]
+Type = PlaySnd
+Trigger1 = Time = 0
+Value = S80,6
+Persistent = 0
+
+[State 0, PlaySnd]
+Type = PlaySnd
+Trigger1 = Time = 0
+Value = S80,6
+Persistent = 0
+
+[State 0, Explod]
+Type = Explod
+Trigger1 = Time = 0
+Anim = 6210
+ID = 6210
+Pos = -15,0
+PosType = P1
+Facing = 1
+BindTime = 1
+RemoveTime = -2
+SprPriority = 0
+Scale = .5, .5
+Angle = -90
+OwnPal = 1
+RemoveOnGetHit = 0
+IgnoreHitPause = 0
+Supermovetime = 999
+Pausemovetime = 999
+Vel = .25,0
+Trans = Sub
+Persistent = 0
+
+[State 0, Explod]
+Type = Explod
+Trigger1 = Time = 0
+Anim = 6210
+ID = 6210
+Pos = -15,0
+PosType = P1
+Facing = 1
+BindTime = 1
+RemoveTime = -2
+SprPriority = 5
+Scale = .5,.5
+Angle = -90
+OwnPal = 1
+Remappal = 3,24
+RemoveOnGetHit = 0
+IgnoreHitPause = 0
+SuperMoveTime = 999
+PauseMoveTime = 999
+Vel = .25, 0
+Persistent = 0
+
+[State 0, Explod]
+Type = Explod
+Trigger1 = Time = 0
+Anim = 6135
+ID = 6135
+Pos = -20,0
+PosType = P1
+Facing = 1
+BindTime = 1
+RemoveTime = -2
+SprPriority = 0
+Scale = .5, .5
+Angle = -90
+OwnPal = 1
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+SuperMoveTime = 999
+PauseMoveTime = 999
+Persistent = 0
+
+[State 0, End]
+Type = DestroySelf
+Trigger1 = Time = 60
+
+;=======================================================
+; P2 - Poison Helper
+[StateDef 1450]
+Type = U
+Movetype = H
+Physics = N
+Velset = 0,0
+Anim = 1503
+Ctrl = 0
+SprPriority = 3
+
+[State 0, AttackMulSet]
+Type = AttackMulSet
+Trigger1 = 1
+Value = Cond(IsHelper,Root,Fvar(11),Fvar(11))
+IgnoreHitPause = 1
+
+[State 0, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = 1
+Flag = UnGuardable
+
+[State 0, HitDef]
+Type = HitDef
+Trigger1 = 1 ;Cond(IsHelper(21),Timemod = 50,0,Cond(IsHelper(20),(Time = 55) || (Time = 115) || (Time = 145) || (Time = 200) || (Time = 245) || (Time = 295) || (Time = 325),(Time = 125) || (Time = 225) || (Time = 325)))
+Attr = A, HP
+HitSound = -1
+GuardSound = -1
+P1Stateno = 4601
+Fall.Recover = 0
+PalFx.Time = Cond(IsHelper(21),1000,360)
+PalFx.Add = -80,-120,-10
+PalFx.SinAdd = 25,0,80,50
+
+[State 0, PosAdd]
+Type = PosAdd
+Trigger1 = 1
+x = P2Dist x - 1
+y = P2BodyDist y - 20
+
+[State 0, Explod]
+Type = Explod
+Trigger1 = Cond(IsHelper(21),Timemod = 50,0,Cond(IsHelper(20),(Time = 55) || (Time = 115) || (Time = 145) || (Time = 200) || (Time = 245) || (Time = 295) || (Time = 325),(Time = 125) || (Time = 225) || (Time = 325)))
+Anim = 6225
+ID = 6225
+Pos = -5+(Random%10),-15-(Random%30)
+PosType = P2
+Facing = 1
+BindTime = 1
+RemoveTime = -2
+SprPriority = 3
+Scale = .2,.4
+Angle = 0
+OwnPal = 1
+Remappal = 3,47
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+SuperMoveTime = 999
+PauseMoveTime = 999
+Vel = 0,-.3
+
+[State 0, Explod]
+Type = Explod
+Trigger1 = Cond(IsHelper(21),Timemod = 50,0,Cond(IsHelper(20),(Time = 55) || (Time = 115) || (Time = 145) || (Time = 200) || (Time = 245) || (Time = 295) || (Time = 325),(Time = 125) || (Time = 225) || (Time = 325)))
+Anim = 6220
+ID = 6220
+Pos = -5+(Random%10),-15-(Random%30)
+PosType = P2
+Facing = 1
+BindTime = 1
+RemoveTime = -2
+SprPriority = 3
+Scale = .2, .4
+Angle = 0
+OwnPal = 1
+Remappal = 3,47
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+SuperMoveTime = 999
+PauseMoveTime = 999
+Vel = 0,-.3
+
+[State 0, DestroySelf]
+Type = DestroySelf
+Trigger1 = Time = Cond(IsHelper(21),1000,360)
+
+;--------------------------------------------------------------------------
+; P2 - Super
+[StateDef 4600]
+Type    = S
+MoveType= H
+Physics = N
+VelSet = 0,0
+
+[State 0, SprPriority]
+Type = SprPriority
+Trigger1 = 1
+Value = 9500
+
+[State 0, LifeAdd]
+Type = LifeAdd
+Trigger1 = Time = 405
+Value = -LifeMax/3.2
+kill = 1
+
+[State 0, Turn]
+Type = Turn
+Trigger1 = Facing = 1
+
+[State 0, SuperPause]
+Type = SuperPause
+Trigger1 = Time = 0
+Pos = 5,-36
+Time = 0
+UnHittable = 0
+MoveTime = 450
+darken = 0
+
+[State 0, AngleDraw]
+Type = AngleDraw
+Trigger1 = Time > 425
+Value = Time*10
+
+[State 0, PosSet]
+Type = PosSet
+Trigger1 = Time = 0
+x = -0
+y = 0
+
+[State 0, VelSet]
+Type = VelSet
+Trigger1 = Time >= 410
+x = 2
+y = -2
+
+[State 0, VelSet]
+Type = VelSet
+Trigger1 = Time = [380,410]
+x = 10
+y = -10
+
+[State 0, PosSet]
+Type = PosSet
+Trigger1 = Time = 105
+x = 240
+y = 200
+
+[State 0, ScreenBound]
+Type = ScreenBound
+Trigger1 = Time > 100
+Value = 0
+MoveCamera = 0,0
+
+[State 0, ScreenBound]
+Type = ScreenBound
+Trigger1 = Time <  100
+Value = 1
+MoveCamera = 0,0
+
+[State 0, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = 1
+Flag = NoShadow
+
+[State 0, NotHitBy]
+Type = NotHitBy
+Trigger1 = 1
+Value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+Time = 10
+
+[State 0, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = Time = 0
+Value = 4600+Cond(Var(4) = 1 && EnemyNear,Name = "Shinobu SFK OP" && EnemyNear,AuthorName = "Soulfire, Edited By Kuro",1,0)
+
+[State 0, SelfState]
+Type = SelfState
+Trigger1 = Time = 450
+Value = 5050
+Ctrl = 0
+
+;-------------------------------------------------------------------------------
+; P2 - Poison Reversal
+[StateDef 4601]
+Type = U
+MoveType = H
+Physics = N
+Juggle = 1
+Anim = 1503
+
+[State 0, PosAdd]
+Type = PosAdd
+Trigger1 = 1
+x = P2Dist x -1
+y = P2BodyDist y -20
+
+[State 0, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = 1
+Flag = UnGuardable
+
+[State 0, ReversalDef]
+Type = ReversalDef
+Trigger1 = 1
+Reversal.attr = C, HT
+P1Stateno = -1
+
+[State 0, TargetLifeAdd]
+Type = TargetLifeAdd
+Trigger1 = Cond(IsHelper(21),Timemod = 50,0,Cond(IsHelper(20),(Time = 55) || (Time = 115) || (Time = 145) || (Time = 200) || (Time = 245) || (Time = 295) || (Time = 325),(Time = 125) || (Time = 225) || (Time = 325)))
+Value = -Cond(IsHelper(21),Enemy,LifeMax/100,Enemy,LifeMax/100)
+Kill = Cond(IsHelper(21),1,0)
+
+[State 0, TargetPowerAdd]
+Type = TargetPowerAdd
+Trigger1 = Cond(IsHelper(21),Timemod = 50,0,Cond(IsHelper(20),(Time = 55) || (Time = 115) || (Time = 145) || (Time = 200) || (Time = 245) || (Time = 295) || (Time = 325),(Time = 125) || (Time = 225) || (Time = 325)))
+Value = -PowerMax/5
+
+[State 0, Explod]
+Type = Explod
+Trigger1 = Cond(IsHelper(21),Timemod = 50,0,Cond(IsHelper(20),(Time = 55) || (Time = 115) || (Time = 145) || (Time = 200) || (Time = 245) || (Time = 295) || (Time = 325),(Time = 125) || (Time = 225) || (Time = 325)))
+Anim = 6225
+ID = 6225
+Pos = -5+(Random%10),-15-(Random%30)
+PosType = P2
+Facing = 1
+BindTime = 1
+RemoveTime = -2
+SprPriority = 3
+Scale = .2,.4
+Angle = 0
+OwnPal = 1
+Remappal = 3,47
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+SuperMoveTime = 999
+PauseMoveTime = 999
+Vel = 0,-.3
+
+[State 0, Explod]
+Type = Explod
+Trigger1 = Cond(IsHelper(21),Timemod = 50,0,Cond(IsHelper(20),(Time = 55) || (Time = 115) || (Time = 145) || (Time = 200) || (Time = 245) || (Time = 295) || (Time = 325),(Time = 125) || (Time = 225) || (Time = 325)))
+Anim = 6220
+ID = 6220
+Pos = -5+(Random%10),-15-(Random%30)
+PosType = P2
+Facing = 1
+BindTime = 1
+RemoveTime = -2
+SprPriority = 3
+Scale = .2, .4
+Angle = 0
+OwnPal = 1
+Remappal = 3,47
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+SuperMoveTime = 999
+PauseMoveTime = 999
+Vel = 0,-.3
+
+[State 0, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = Time = 0
+Value = 1503
+Elem = 1
+
+[State 0, End]
+Type = DestroySelf
+Trigger1 = Win || Lose || DrawGame
+Trigger2 = Time = Cond(IsHelper(21),1000,360)
+
+;==================================================================
+; P2 - Stun
+;==================================================================
+[Statedef 7000]
+Type = A
+MoveType = H
+Physics = N
+Ctrl = 0
+Anim = Anim
+VelSet = 0,0
+FaceP2 = 1
+SprPriority = 2
+
+[State 0, ChangeAnim2]
+Type = ChangeAnim2
+Triggerall = Anim != 5035
+Trigger1 = 1
+Value = 5035
+IgnoreHitPause = 1
+
+[State 0, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = 1
+MoveType = H
+IgnoreHitPause = 1
+
+[State 0, HitVelSet]
+Type = HitVelSet
+Trigger1 = Time = 1
+x = 1
+y = 1
+IgnoreHitPause = 1
+
+[State 0, VelAdd]
+Type = VelAdd
+Trigger1 = Time >= 2
+y = GetHitVar(yAccel)
+IgnoreHitPause = 1
+
+[State 0, HitOverride]
+Type = HitOverride
+Trigger1 = 1
+Attr =
+Slot = 0
+Time = 0
+IgnoreHitPause = 1
+
+[State 0, HitOverride]
+Type = HitOverride
+Trigger1 = 1
+Attr =
+Slot = 1
+Time = 0
+IgnoreHitPause = 1
+
+[State 0, HitOverride]
+Type = HitOverride
+Trigger1 = 1
+Attr =
+Slot = 2
+Time = 0
+IgnoreHitPause = 1
+
+[State 0, HitOverride]
+Type = HitOverride
+Trigger1 = 1
+Attr =
+Slot = 3
+Time = 0
+IgnoreHitPause = 1
+
+[State 0, HitOverride]
+Type = HitOverride
+Trigger1 = 1
+Attr =
+Slot = 4
+Time = 0
+IgnoreHitPause = 1
+
+[State 0, HitOverride]
+Type = HitOverride
+Trigger1 = 1
+Attr =
+Slot = 5
+Time = 0
+IgnoreHitPause = 1
+
+[State 0, HitOverride]
+Type = HitOverride
+Trigger1 = 1
+Attr =
+Slot = 6
+Time = 0
+IgnoreHitPause = 1
+
+[State 0, HitOverride]
+Type = HitOverride
+Trigger1 = 1
+Attr =
+Slot = 7
+Time = 0
+IgnoreHitPause = 1
+
+[State 0, HitBy]
+Type = HitBy
+Trigger1 = 1
+Value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT,AA,AT,AP
+Time = 3000000
+IgnoreHitPause = 1
+
+[State 0, HitBy]
+Type = HitBy
+Trigger1 = 1
+Value2 = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT,AA,AT,AP
+Time = 1000000
+IgnoreHitPause = 1
+
+[State 0, SelfState]
+Type = SelfState
+Trigger1 = !Alive
+Value = 5050
+Ctrl = 0
+IgnoreHitPause = 1
+
+[State 0, VarSet]
+Type = VarSet
+Trigger1 = Time = 0
+V = 9
+Value = 1
+
+[State 0, SelfState]
+Type = SelfState
+Trigger1 = !Alive
+Value = 5050
+Ctrl = 0
+IgnoreHitPause = 1
+
+[State 0, DestroySelf]
+Type = Destroyself
+Triggerall = IsHelper
+Trigger1 = 1
+IgnoreHitPause = 1
+
+[State 0, SelfState]
+Type = SelfState
+Trigger1 = !IsHelper
+Trigger1 = Alive = 1
+Trigger1 = Time > 40
+Value = 5050
+Ctrl = 0
+IgnoreHitPause = 1

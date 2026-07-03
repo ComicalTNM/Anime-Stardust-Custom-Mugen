@@ -1,0 +1,110 @@
+#===============================================================================
+# Training INFO Display by Orochi_Kyo for Ikemen Go 0.98
+#===============================================================================
+
+
+#===============================================================================
+
+[StateDef -4]
+
+ignorehitpause if (map(_addon_disable_trainingdisplayinfo_zss) = 0) && ( roundstate = 2 && gameMode = "training" && !isHelper && teamside != 0 && map(attdt) = 0) {
+		
+#===============================================================================
+		#; INFO DISPLAY
+		
+		ignorehitpause if (map(_addon_disable_trainingdisplayinfo_zss) = 0) && ( (teamside = 2 && teammode != tag) || (teamside = 2 && teammode = tag && playerno = teamleader))  {
+			ignorehitpause if (map(_addon_disable_trainingdisplayinfo_zss) = 0) && ( (stateno = 5000 || stateno = 5010 || stateno = 5020) && time = 0)  {
+				mapset{map:"advFrame";value:0;}
+			}	
+		ignorehitpause  if (map(_addon_disable_trainingdisplayinfo_zss) = 0) && ( enemynear,combocount > 0)  {
+			mapset{map:"totalDamage";value:ReceivedDamage;}
+			mapset{map:"comboHits";value:enemynear,combocount}
+			}
+		ignorehitpause  if (map(_addon_disable_trainingdisplayinfo_zss) = 0) && ( map(totalDamage) > map(maxDamage))  {
+			mapset{map:"maxDamage";value:map(totalDamage);}
+		}
+		ignorehitpause  if (map(_addon_disable_trainingdisplayinfo_zss) = 0) && ( map(comboHits) > map(maxCombo))  {
+			mapset{map:"maxCombo";value:map(comboHits);}
+		}
+		ignorehitpause if (map(_addon_disable_trainingdisplayinfo_zss) = 0) && ( movetype = H)  {
+				ignorehitpause if (map(_addon_disable_trainingdisplayinfo_zss) = 0) && ( time = 0) {
+					mapset{map:"actualLife";value:life;}
+					}
+				}
+			ignorehitpause if (map(_addon_disable_trainingdisplayinfo_zss) = 0) && ( enemynear,combocount > 0 && time = 1)  {
+				mapset{map:"newLife";value:map(actualLife)-life;}
+			}
+				
+		ignorehitpause if (map(_addon_disable_trainingdisplayinfo_zss) = 0) && ( (prevstateno = 151 || prevstateno = 153 || prevstateno = 155 || prevstateno = 140) && ctrl)  {
+			mapset{map:"justGuarded";value:1;}
+		}	else  {
+			mapset{map:"justGuarded";value:0;}
+		}
+		
+		ignorehitpause if (map(_addon_disable_trainingdisplayinfo_zss) = 0) && ( (prevstateno = 5001 || prevstateno = 5011) && ctrl)  {
+			mapset{map:"justGotHit";value:1;}
+		}	else  {
+			mapset{map:"justGotHit";value:0;}
+		}
+		
+		ignorehitpause if (map(_addon_disable_trainingdisplayinfo_zss) = 0) && ( enemynear,ctrl = 1 && (map(justGuarded) || map(justGotHit)))  {
+			if  map(_iksys_trainingGuardMode) = 1 {mapset{map:"timeToGuard"; value:30}} 
+			#assertInput{flag: L}	
+		}
+		
+		if map(timeToGuard) > 0 {mapadd{map:"timeToGuard"; value:-1}}
+		
+		
+		ignorehitpause if (map(_addon_disable_trainingdisplayinfo_zss) = 0) && ( ((enemynear,combocount = 1 && (stateno = 5000 || stateno = 5010 || stateno = 5020 || stateno = 5070 || incustomstate) ) || 
+		((prevstateno != 151 && prevstateno != 153 && prevstateno != 155) && (stateno = 150 || stateno = 152 || stateno = 154))) &&
+		time = 0)  {
+			mapset{map:"advFrame";value:0;}
+			}				
+		# Adv Frame - Player 1 Positives		
+		ignorehitpause if (map(_addon_disable_trainingdisplayinfo_zss) = 0) && ( enemynear,ctrl = 1 && ctrl = 0)  {
+			mapadd{map:"advFrame";value:1;}		
+			} 
+		# Dummy Control - Instant Block
+		ignorehitpause if (map(_addon_disable_trainingdisplayinfo_zss) = 0) && ( map(_iksys_trainingGuardMode) = 6 && (stateno = 151 || stateno = 153 || stateno = 155) && ctrl = 1)  {
+			mapadd{map:"advFrame";value:-1;}
+			}
+		# Dummy Control - Normal Block
+		ignorehitpause if (map(_addon_disable_trainingdisplayinfo_zss) = 0) && ( enemynear,ctrl = 0 && stateno = 140)  {
+			mapadd{map:"advFrame";value:-1;}
+			}	
+		ignorehitpause if (map(_addon_disable_trainingdisplayinfo_zss) = 0) && ( enemynear,ctrl = 0 && ctrl = 1 && (map(justGuarded) || map(justGotHit)))   {
+			mapadd{map:"advFrame";value:-1;}
+			}
+		# Adv Frame Reset
+		ignorehitpause if (map(_addon_disable_trainingdisplayinfo_zss) = 0) && ( enemynear,ctrl = 1 && enemynear, time >= 50)  {
+			mapset{map:"advFrame";value:0;}
+			}
+
+		
+		#;TEXT
+		if map(attdt) = 0 {
+		mapset{map:"textRemovetime";value:3}
+		text{removetime:map(textRemovetime); text:"Damage"; layerno:0; pos:screenwidth-65,screenheight+5; scale:1.0,1.0;font:F2;color:256, 256, 256; }
+		text{removetime:map(textRemovetime); text:"Total Damage"; layerno:0; pos:screenwidth-65,screenheight+35; scale:1.0,1.0;font:F2;color:256, 256, 256;  }
+		text{removetime:map(textRemovetime); text:"ADV Frame"; layerno:0; pos:screenwidth-65,screenheight+65; scale:1.0,1.0;font:F2;color:256, 256, 256; }
+		text{removetime:map(textRemovetime); text:"Enemy Control"; layerno:0; pos:screenwidth-65,screenheight+95; scale:1.0,1.0;font:F2;color:256, 256, 256; }
+		}
+		#;VALUES
+		mapset{map:"valueRemovetime";value:3}
+		text{removetime:map(valueRemovetime); text:"%v"; layerno:0; pos:screenwidth+300,screenheight+5; scale:1.0,1.0;font:F2;params:map(newLife);align:-1;color:256, 256, 0;  }
+		text{removetime:map(valueRemovetime); text:"%v"; layerno:0; pos:screenwidth+300,screenheight+35; scale:1.0,1.0;font:F2;params:map(totalDamage);align:-1;color:256, 256, 0; }
+		if map(advFrame) >= 0 { 
+			text{removetime:map(valueRemovetime); text:"%v"; layerno:0; pos:screenwidth+300,screenheight+65; scale:1.0,1.0;font:F2;params:map(advFrame);align:-1;color:256, 256, 0; }
+		}
+		if map(advFrame) < 0 { 
+			text{removetime:map(valueRemovetime); text:"%v"; layerno:0; pos:screenwidth+300,screenheight+65; scale:1.0,1.0;font:F2;params:map(advFrame);align:-1;color:256, 0, 0; }
+		}
+		if ctrl = 1 {
+		text{removetime:map(valueRemovetime); text:"%v"; layerno:0; pos:screenwidth+300,screenheight+95; scale:1.0,1.0;font:F20;params:ctrl;align:-1;color:256, 256, 0; }
+		} else {
+		text{removetime:map(valueRemovetime); text:"%v"; layerno:0; pos:screenwidth+300,screenheight+95; scale:1.0,1.0;font:F20;params:ctrl;align:-1;color:256, 256, 0; }
+		}
+		}
+		 #; end of info display				
+	}
+

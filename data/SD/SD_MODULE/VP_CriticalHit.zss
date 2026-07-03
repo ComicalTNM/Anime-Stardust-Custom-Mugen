@@ -1,0 +1,112 @@
+
+#===============================================================================
+# Configuration
+#===============================================================================
+
+[Function F_Vnix_CriticalHit_Config()]
+
+# Critical Hit
+mapset{map: "_vnix_critical_cfg_enable"; value: 1} 		# Enable Critical Hit, 0 to disable
+mapset{map: "_vnix_critical_cfg_chance"; value: 12} 	# Chance to Occur, number between 0 - 100 (0% - 100%)
+mapset{map: "_vnix_critical_cfg_dmg"; value: 0} 		# Configure Extra Damage Dealt, 1 = 100%, 0.5 = 50%
+
+# Critical Hit Stun - Pseudo DOA
+mapset{map: "_vnix_criticalstun_cfg_enable"; value: 0} 	# Enable Critical Hit Stun, 0 to disable
+mapset{map: "_vnix_criticalstun_cfg_time"; value: 0} 	# Critical Hit Stun Time, in game ticks
+
+
+[StateDef -4]
+
+ignoreHitPause if !ishelper && (teamside = 1 || teamside = 2) {
+
+	# Initialize
+	if roundstate = 0 && time = 0 {
+		# Run config
+		call F_Vnix_CriticalHit_Config();
+	}	
+}
+
+ignoreHitPause if !const(Default.Enable.Action) || isHelper || teamSide = 0 {
+	# Do nothing, global code disabled locally or executed by helper or stage
+} else if roundState >= 2 {
+
+# ========================================================================================================================================
+# V-Nix - Critical Hit
+# ========================================================================================================================================
+
+	if map(_vnix_critical_cfg_enable)
+	&& map(_vnix_critical_hitdetect) = 0
+	&& map(_vnix_rushdrive_active) = 0
+	&& movehit && p2,GetHitVar(damage) >= 10
+	&& p2,getHitVar(frame) && pausetime = 0
+	&& playerNo = teamLeader && p2, alive
+	&& Random <= ((map(_vnix_critical_cfg_chance) + Const(CritChance)) * 10.0) {
+		mapset{map: "_vnix_critical_hitdetect"; value: 1} # Hit Detection Map just to be sure
+		# Increase Damage
+		targetLifeAdd {
+			value: p2,GetHitVar(damage) * (-1.0 * map(_vnix_critical_cfg_dmg));
+			absolute: 1;
+			kill: 0
+		}
+		if p2, InCustomAnim = 0 && MoveHitVar(SparkX) != 0 && MoveHitVar(SparkY) != 0 && LocalCoord X <= 320 {
+			# Hard Hitspark
+			explod{
+				anim: VP 333;
+				postype: p1;
+				pos: const240p(MoveHitVar(SparkX)), const240p(MoveHitVar(SparkY));
+				scale: (ifelse(Random <= 500, 1.5, 1.33)), (ifelse(Random <= 500, 1.5, 1.33));
+				angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+				facing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1
+			}
+		} else if p2, InCustomAnim = 0 && LocalCoord X > 320 {
+			# Hard Hitspark
+			explod{
+				anim: VP 333;
+				postype: p2;
+				pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+				scale: (ifelse(Random <= 500, 1.5, 1.33)), (ifelse(Random <= 500, 1.5, 1.33));
+				angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+				facing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1
+			}
+		} else if p2, InCustomAnim && p2, HitDefAttr = SCA, AA {
+			# Hard Hitspark
+			explod{
+				anim: VP 333;
+				postype: p2;
+				pos: p2,const(size.mid.pos.x), p2,const(size.mid.pos.y);
+				scale: (ifelse(Random <= 500, 1.5, 1.33)), (ifelse(Random <= 500, 1.5, 1.33));
+				angle: (Random / 33)*(ifelse(Random <= 500, 1, -1));
+				facing: (ifelse(Random <= 500, 1, -1));
+				ontop: 0;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1
+			}		
+		}
+		if map(_vnix_criticalstun_cfg_enable) && p2, getHitVar(frame) {
+			getHitVarSet{hitshaketime: gethitvar(hitshaketime) + ceil(map(_vnix_criticalstun_cfg_time) * cond(p2, stateType != A, 1.0, 0.5)); redirectID: p2, ID;}
+		}
+		palfx{time: 20; add: 200, -128, -128; sinadd: -200, 128, 128, 60; redirectID: target, ID}
+		playsnd{value: VP 100, 45; volumescale: 200; freqmul: 1.0}
+		lifebaraction{text: ""; top: 0}
+		mapadd{map: "_vnix_critical_count"; value: 1}
+		envshake {
+			time: 10;
+			freq: 90;
+			ampl: 2
+		}
+	}
+	
+	#Reset Hit Detection
+	if map(_vnix_critical_hitdetect) && (p2, GetHitVar(hittime) < 1 || p2, GetHitVar(hitshaketime) < 1 || p2, GetHitVar(slidetime) < 1) {
+		mapset{map: "_vnix_critical_hitdetect"; value: 0}
+	}
+}

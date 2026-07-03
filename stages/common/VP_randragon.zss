@@ -1,0 +1,1708 @@
+
+# ========================================================================================================================================
+# Stage Config
+# ========================================================================================================================================
+
+[Function F_Vnix_Stage_Config()]
+
+# Stage Effects - 
+
+# ========================================================================================================================================
+# Stage States
+# ========================================================================================================================================
+
+[StateDef 0; anim: -2;]
+
+# Wall Helper Right
+persistent(0) if numHelper(1) = 0 && stagevar(info.name) = "Randragon Outskirts" {
+	helper{id: 1; stateno: 1;}
+}
+
+# Wall Helper Left
+persistent(0) if numHelper(10) = 0 && stagevar(info.name) = "Randragon Outskirts" {
+	helper{id: 10; stateno: 10;}
+}
+
+# Water Effects
+if map(_vnix_brokenwall_right) = 1 {
+	for i = 0; numPlayer; 1 {
+		if playerIDexist(player($i + 1), ID) {
+			if numHelper(20 + $i) = 0 && stagevar(info.name) = "Randragon Outskirts"  {
+				helper{id: 20 + $i; stateno: 20 + $i;}
+			}
+		}
+	}
+}
+
+# Secret Achievement Helper
+persistent(0) if numHelper(9999) = 0 && stagevar(info.name) = "Randragon Outskirts" {
+	helper{id: 9999; stateno: 9999;}
+}
+
+
+# ========================================================================================================================================
+# Wall Helper Right
+[StateDef 1; anim: -2;]
+
+for i = 1; 8; 1 {
+	if ((player($i), stateno = 301027 || player($i), stateno = 301028)
+	&& ((player($i), pos X + player($i), cameraPos X) = [265,270])
+	&& player($i), time = 1)
+	{
+		changestate{value: 2}
+	}
+}
+
+
+# ========================================================================================================================================
+# Wall Helper Right 2
+[StateDef 2; anim: -2;]
+
+if time = 0 && root, map(_vnix_brokenwall_right) = 0 {
+	if root, map(_vnix_wallhp_right) != 100 {
+		parentmapadd{map: "_vnix_wallhp_right"; value: 10}
+	} else {
+		pause{time: 60}
+		playsnd{value: 0, 0; volumescale: 200; freqmul: 1.0}
+		envshake{
+			time: 40;
+			freq: 60;
+			ampl: 2
+		}
+		bgpalfx{
+			time: 60;
+			add: -132, -132, -132;
+		}
+		for i = 1; 8; 1 {
+			if (player($i), moveType = H) {
+				zoom{
+					scale: 1.25;
+					time: 60;
+					pos: player($i), Pos X, player($i), Pos Y;
+					lag: 0.5;
+					stagebound: 1;
+					camerabound: 1;
+				}
+				explod{
+					anim: 10;
+					postype: none;
+					pos: player($i), const(size.mid.pos.x) + 10, player($i), const(size.mid.pos.y);
+					scale: .33,.33;
+					angle: 0;
+					random: 0,0;
+					facing: 1;
+					ontop: 0;
+					under: 0;
+					bindID: player($i), ID;
+					bindtime: 1;
+					vel: 0,0;
+					sprpriority: -5;
+					removetime: -2;
+					pausemovetime: -1;
+					supermovetime: -1;
+					trans: add;
+					ownpal: 1;
+				}
+				explod{
+					anim: 9;
+					postype: none;
+					pos: player($i), const(size.mid.pos.x) + 10, player($i), const(size.mid.pos.y);
+					scale: .5,.5;
+					angle: 0;
+					random: 0,0;
+					facing: -1;
+					ontop: 0;
+					under: 0;
+					bindID: player($i), ID;
+					bindtime: 1;
+					vel: 0,0;
+					sprpriority: -5;
+					removetime: -2;
+					pausemovetime: -1;
+					supermovetime: -1;
+					trans: add;
+					ownpal: 1;
+				}
+				explod{
+					anim: 8;
+					postype: none;
+					pos: 0, 10 - player($i), Pos Y;
+					scale: 1,1;
+					angle: 0;
+					random: 0,0;
+					facing: 1;
+					ontop: 0;
+					under: 0;
+					bindID: player($i), ID;
+					bindtime: 1;
+					vel: 0,0;
+					sprpriority: 5;
+					removetime: -2;
+					pausemovetime: -1;
+					supermovetime: -1;
+					trans: add;
+					ownpal: 1;
+				}
+			}
+		}
+		parentmapset{map: "_vnix_brokenwall_right"; value: 1}
+	}
+}
+
+if time = 1 && root, map(_vnix_brokenwall_right) = 0 {
+	changestate{value: 1}
+}
+
+if root, map(_vnix_brokenwall_right) = 1 {
+	for i = 1; 8; 1 {
+		nothitby{value: SCA; redirectID: player($i), ID;}
+	}
+	if time = 2 {
+		allpalfx{time: 20; add: 255,255,255;}
+	}
+	if time = 2 {
+		changestate{value: 3}
+	}
+}
+
+
+# ========================================================================================================================================
+# Wall Helper Right 3
+[StateDef 3; anim: -2;]
+
+if time >= 0 {
+	for i = 1; 8; 1 {
+		if player($i), moveType = H && player($i), alive = 1 {
+			nothitby{value: SCA; redirectID: player($i), ID;}
+			selfstate{value: 115050; ctrl: 0; redirectID: player($i), ID;}
+		}
+	}
+}
+
+
+if time = 2 {
+	modifyBGCtrl{
+		id: 1;
+		time: 0,0;
+		value: 0;
+	}
+	modifyBGCtrl{
+		id: 2;
+		time: 0,0;
+		value: 1;
+	}
+	modifyStageVar{
+		camera.boundright: 200;
+		camera.boundleft: -200;
+	}
+	playBgm{bgm: "sound/cvs2_stadium.mp3"; volume: 100;}
+}
+
+if time = 5 {
+	destroySelf{}
+}
+
+
+# ========================================================================================================================================
+# Wall Helper Left
+[StateDef 10; anim: -2;]
+
+for i = 1; 8; 1 {
+	if ((player($i), stateno = 301027 || player($i), stateno = 301028)
+	&& ((player($i), pos X + player($i), cameraPos X) = [-270,-265])
+	&& player($i), time = 1)
+	{
+		changestate{value: 11}
+	}
+}
+
+
+# ========================================================================================================================================
+# Wall Helper Left 2
+[StateDef 11; anim: -2;]
+
+if time = 0 && root, map(_vnix_brokenwall_left) = 0 {
+	if root, map(_vnix_wallhp_left) != 100 {
+		parentmapadd{map: "_vnix_wallhp_left"; value: 10}
+	} else {
+		pause{time: 60}
+		playsnd{value: 0, 0; volumescale: 200; freqmul: 1.0}
+		envshake{
+			time: 40;
+			freq: 60;
+			ampl: 2
+		}
+		bgpalfx{
+			time: 60;
+			add: -132, -132, -132;
+		}
+		for i = 1; 8; 1 {
+			if (player($i), moveType = H) {
+				zoom{
+					scale: 1.25;
+					time: 60;
+					pos: player($i), Pos X, player($i), Pos Y;
+					lag: 0.5;
+					stagebound: 1;
+					camerabound: 1;
+				}
+				explod{
+					anim: 10;
+					postype: none;
+					pos: player($i), const(size.mid.pos.x) - 10, player($i), const(size.mid.pos.y);
+					scale: .33,.33;
+					angle: 0;
+					random: 0,0;
+					facing: -1;
+					ontop: 0;
+					under: 0;
+					bindID: player($i), ID;
+					bindtime: 1;
+					vel: 0,0;
+					sprpriority: -5;
+					removetime: -2;
+					pausemovetime: -1;
+					supermovetime: -1;
+					trans: add;
+					ownpal: 1;
+				}
+				explod{
+					anim: 9;
+					postype: none;
+					pos: player($i), const(size.mid.pos.x) - 10, player($i), const(size.mid.pos.y);
+					scale: .5,.5;
+					angle: 0;
+					random: 0,0;
+					facing: 1;
+					ontop: 0;
+					under: 0;
+					bindID: player($i), ID;
+					bindtime: 1;
+					vel: 0,0;
+					sprpriority: -5;
+					removetime: -2;
+					pausemovetime: -1;
+					supermovetime: -1;
+					trans: add;
+					ownpal: 1;
+				}
+				explod{
+					anim: 8;
+					postype: none;
+					pos: 0, 10 - player($i), Pos Y;
+					scale: 1,1;
+					angle: 0;
+					random: 0,0;
+					facing: -1;
+					ontop: 0;
+					under: 0;
+					bindID: player($i), ID;
+					bindtime: 1;
+					vel: 0,0;
+					sprpriority: 5;
+					removetime: -2;
+					pausemovetime: -1;
+					supermovetime: -1;
+					trans: add;
+					ownpal: 1;
+				}
+			}
+		}
+		parentmapset{map: "_vnix_brokenwall_left"; value: 1}
+	}
+}
+
+if time = 1 && root, map(_vnix_brokenwall_left) = 0 {
+	changestate{value: 10}
+}
+
+if root, map(_vnix_brokenwall_left) = 1 {
+	for i = 1; 8; 1 {
+		nothitby{value: SCA; redirectID: player($i), ID;}
+	}
+	if time = 2 {
+		allpalfx{time: 20; add: 255,255,255;}
+	}
+	if time = 2 {
+		changestate{value: 12}
+	}
+}
+
+
+# ========================================================================================================================================
+# Wall Helper Left 3
+[StateDef 12; anim: -2;]
+
+if time >= 0 {
+	for i = 1; 8; 1 {
+		if player($i), moveType = H && player($i), alive = 1 {
+			nothitby{value: SCA; redirectID: player($i), ID;}
+			selfstate{value: 115060; ctrl: 0; redirectID: player($i), ID;}
+		}
+	}
+}
+
+if time = 1 {
+	explod{
+		anim: -1; #7;
+		postype: left;
+		pos: 0,180;
+		scale: 0.75, 0.6;
+		angle: 0;
+		random: 0,0;
+		facing: 1;
+		bindtime: -1;
+		ontop: 0;
+		under: 0;
+		vel: 0,0;
+		sprpriority: -5;
+		removetime: 150;
+		pausemovetime: -1;
+		supermovetime: -1;
+		ownpal: 1;
+	}
+	explod{
+		anim: -1; #6;
+		postype: left;
+		pos: 0,0;
+		scale: 0.75, 0.75;
+		angle: 0;
+		random: 0,0;
+		facing: 1;
+		bindtime: -1;
+		ontop: 0;
+		under: 0;
+		vel: 0,0;
+		sprpriority: -5;
+		removetime: 150;
+		pausemovetime: -1;
+		supermovetime: -1;
+		ownpal: 1;
+	}
+}
+
+if time = 2 {
+	modifyBGCtrl{
+		id: 1;
+		time: 0,0;
+		value: 0;
+	}
+	modifyBGCtrl{
+		id: 3;
+		time: 0,0;
+		value: 1;
+	}
+	modifyStageVar{
+		camera.boundright: 200;
+		camera.boundleft: -200;
+	}
+	playBgm{bgm: "sound/Sakura_Theme.mp3"; volume: 100;}
+}
+
+if time = 5 {
+	destroySelf{}
+}
+
+
+# ========================================================================================================================================
+# Water Effects P1
+[StateDef 20; anim: -2;]
+
+let i = 1;
+if playerIDexist(player($i), ID) {
+
+	#Idle
+	if player($i), stateno = [0, 9999] && player($i), pos Y >= 0 && numExplod(10) = 0 {
+		if time = 1 {
+			explod{
+				anim: 3;
+				id: 10;
+				pos: 0, 0;
+				scale: 1,1;
+				postype: none;
+				bindID: player($i), ID;
+				bindtime: -1;
+				facing: player($i), facing;
+				removetime: -1;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+		}
+	}
+	if player($i), pos Y < 0 {
+		removeexplod{id: 10;}
+	}
+	
+	# Jump Up
+	persistent(0) if player($i), stateno = 40
+	|| (player($i), moveType = A && player($i), vel Y < 0 && player($i), pos y >= -10) {
+		if time = 1 {
+			explod{
+				anim: 4;
+				id: 11;
+				pos: 0, 0 - player($i), Pos Y;
+				scale: .8,.8;
+				postype: none;
+				bindID: player($i), ID;
+				facing: cond(player($i), vel X >= 0, player($i), facing, player($i), facing * -1.0);
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, 1; volume: 100}
+		}
+	}
+
+	# Land
+	persistent(0) if player($i), stateno = 52
+	|| (player($i), stateno = [106, 108] && player($i), pos y >= 0)
+	|| (player($i), moveType != H && player($i), prevStateType = A && player($i), vel y >= 0 && player($i), pos y >= 0) {
+		if time = 1 {
+			explod{
+				anim: 2;
+				id: 12;
+				pos: 0, 0;
+				scale: .75,.5;
+				postype: none;
+				bindID: player($i), ID;
+				facing: player($i), facing;
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, 3; volume: 100}
+		}
+	}
+	
+	#Fall
+	persistent(0) if player($i), stateno = 5100 || player($i), stateno = 5110 {
+		if time = 1 {
+			explod{
+				anim: 2;
+				id: 13;
+				pos: 0, 0 - player($i), Pos Y;
+				scale: cond(player($i), stateno = 5100, 1, .65),cond(player($i), stateno = 5100, 1, .5);
+				postype: none;
+				bindID: player($i), ID;
+				facing: cond(player($i), vel X >= 0, player($i), facing, player($i), facing * -1.0);
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, cond(player($i), stateno = 5100, 2, 3); volume: 100}
+		}
+	}
+	
+	# Run
+	persistent(0) if player($i), stateno = 100 || (player($i), stateno = 1615201910 && player($i), map(_pots_dash_cmd_66) <= 0)
+	{
+		if time = 1 {
+			playSnd{value: 0, 4; volume: 100; loop: 1; channel: 3;}
+		}
+		if time = 1 || gametime%10 = 2 {
+			explod{
+				anim: 5;
+				id: 14;
+				pos: cond(player($i), facing = 1, -10, 10), 0 - player($i), Pos Y;
+				scale: .75,.75;
+				postype: none;
+				bindID: player($i), ID;
+				facing: player($i), facing * -1.0;
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+		}
+	}
+	
+	# Back Dash
+	persistent(0) if player($i), stateno = 105 {
+		if time = 1 {
+			explod{
+				anim: 5;
+				id: 15;
+				pos: cond(player($i), facing = 1, 10, -10), 0 - player($i), Pos Y;
+				scale: .75,.75;
+				postype: none;
+				bindID: player($i), ID;
+				facing: player($i), facing;
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, 1; volume: 100;}
+		}
+	}
+	
+	if player($i), stateno != 100 {
+		stopsnd{channel: 3;}
+	}
+}
+
+if time >= 1 {
+	changestate{value: 20}
+}
+
+
+# ========================================================================================================================================
+# Water Effects P2
+[StateDef 21; anim: -2;]
+
+let i = 2;
+if playerIDexist(player($i), ID) {
+
+	#Idle
+	if player($i), stateno = [0, 9999] && player($i), pos Y >= 0 && numExplod(20) = 0 {
+		if time = 1 {
+			explod{
+				anim: 3;
+				id: 20;
+				pos: 0, 0;
+				scale: 1,1;
+				postype: none;
+				bindID: player($i), ID;
+				bindtime: -1;
+				facing: player($i), facing;
+				removetime: -1;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+		}
+	}
+	if player($i), pos Y < 0 {
+		removeexplod{id: 20;}
+	}
+	
+	# Jump Up
+	persistent(0) if player($i), stateno = 40
+	|| (player($i), moveType = A && player($i), vel Y < 0 && player($i), pos y >= -10) {
+		if time = 1 {
+			explod{
+				anim: 4;
+				id: 21;
+				pos: 0, 0 - player($i), Pos Y;
+				scale: .8,.8;
+				postype: none;
+				bindID: player($i), ID;
+				facing: cond(player($i), vel X >= 0, player($i), facing, player($i), facing * -1.0);
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, 1; volume: 100}
+		}
+	}
+
+	# Land
+	persistent(0) if player($i), stateno = 52
+	|| (player($i), stateno = [106, 108] && player($i), pos y >= 0)
+	|| (player($i), moveType != H && player($i), prevStateType = A && player($i), vel y >= 0 && player($i), pos y >= 0) {
+		if time = 1 {
+			explod{
+				anim: 2;
+				id: 22;
+				pos: 0, 0;
+				scale: .75,.5;
+				postype: none;
+				bindID: player($i), ID;
+				facing: player($i), facing;
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, 3; volume: 100}
+		}
+	}
+	
+	#Fall
+	persistent(0) if player($i), stateno = 5100 || player($i), stateno = 5110 {
+		if time = 1 {
+			explod{
+				anim: 2;
+				id: 23;
+				pos: 0, 0 - player($i), Pos Y;
+				scale: cond(player($i), stateno = 5100, 1, .65),cond(player($i), stateno = 5100, 1, .5);
+				postype: none;
+				bindID: player($i), ID;
+				facing: cond(player($i), vel X >= 0, player($i), facing, player($i), facing * -1.0);
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, cond(player($i), stateno = 5100, 2, 3); volume: 100}
+		}
+	}
+	
+	# Run
+	persistent(0) if player($i), stateno = 100 || (player($i), stateno = 1615201910 && player($i), map(_pots_dash_cmd_66) <= 0)
+	{
+		if time = 1 {
+			playSnd{value: 0, 4; volume: 100; loop: 1; channel: 3;}
+		}
+		if time = 1 || gametime%10 = 2 {
+			explod{
+				anim: 5;
+				id: 24;
+				pos: cond(player($i), facing = 1, -10, 10), 0 - player($i), Pos Y;
+				scale: .75,.75;
+				postype: none;
+				bindID: player($i), ID;
+				facing: player($i), facing * -1.0;
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+		}
+	}
+	
+	# Back Dash
+	persistent(0) if player($i), stateno = 105 {
+		if time = 1 {
+			explod{
+				anim: 5;
+				id: 25;
+				pos: cond(player($i), facing = 1, 10, -10), 0 - player($i), Pos Y;
+				scale: .75,.75;
+				postype: none;
+				bindID: player($i), ID;
+				facing: player($i), facing;
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, 1; volume: 100;}
+		}
+	}
+	
+	if player($i), stateno != 100 {
+		stopsnd{channel: 3;}
+	}
+}
+
+if time >= 1 {
+	changestate{value: 21}
+}
+
+
+# ========================================================================================================================================
+# Water Effects P3
+[StateDef 22; anim: -2;]
+
+let i = 3;
+if playerIDexist(player($i), ID) {
+
+	#Idle
+	if player($i), stateno = [0, 9999] && player($i), pos Y >= 0 && numExplod(30) = 0 {
+		if time = 1 {
+			explod{
+				anim: 3;
+				id: 30;
+				pos: 0, 0;
+				scale: 1,1;
+				postype: none;
+				bindID: player($i), ID;
+				bindtime: -1;
+				facing: player($i), facing;
+				removetime: -1;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+		}
+	}
+	if player($i), pos Y < 0 {
+		removeexplod{id: 30;}
+	}
+	
+	# Jump Up
+	persistent(0) if player($i), stateno = 40
+	|| (player($i), moveType = A && player($i), vel Y < 0 && player($i), pos y >= -10) {
+		if time = 1 {
+			explod{
+				anim: 4;
+				id: 31;
+				pos: 0, 0 - player($i), Pos Y;
+				scale: .8,.8;
+				postype: none;
+				bindID: player($i), ID;
+				facing: cond(player($i), vel X >= 0, player($i), facing, player($i), facing * -1.0);
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, 1; volume: 100}
+		}
+	}
+
+	# Land
+	persistent(0) if player($i), stateno = 52
+	|| (player($i), stateno = [106, 108] && player($i), pos y >= 0)
+	|| (player($i), moveType != H && player($i), prevStateType = A && player($i), vel y >= 0 && player($i), pos y >= 0) {
+		if time = 1 {
+			explod{
+				anim: 2;
+				id: 32;
+				pos: 0, 0;
+				scale: .75,.5;
+				postype: none;
+				bindID: player($i), ID;
+				facing: player($i), facing;
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, 3; volume: 100}
+		}
+	}
+	
+	#Fall
+	persistent(0) if player($i), stateno = 5100 || player($i), stateno = 5110 {
+		if time = 1 {
+			explod{
+				anim: 2;
+				id: 33;
+				pos: 0, 0 - player($i), Pos Y;
+				scale: cond(player($i), stateno = 5100, 1, .65),cond(player($i), stateno = 5100, 1, .5);
+				postype: none;
+				bindID: player($i), ID;
+				facing: cond(player($i), vel X >= 0, player($i), facing, player($i), facing * -1.0);
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, cond(player($i), stateno = 5100, 2, 3); volume: 100}
+		}
+	}
+	
+	# Run
+	persistent(0) if player($i), stateno = 100 || (player($i), stateno = 1615201910 && player($i), map(_pots_dash_cmd_66) <= 0)
+	{
+		if time = 1 {
+			playSnd{value: 0, 4; volume: 100; loop: 1; channel: 3;}
+		}
+		if time = 1 || gametime%10 = 2 {
+			explod{
+				anim: 5;
+				id: 34;
+				pos: cond(player($i), facing = 1, -10, 10), 0 - player($i), Pos Y;
+				scale: .75,.75;
+				postype: none;
+				bindID: player($i), ID;
+				facing: player($i), facing * -1.0;
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+		}
+	}
+	
+	# Back Dash
+	persistent(0) if player($i), stateno = 105 {
+		if time = 1 {
+			explod{
+				anim: 5;
+				id: 35;
+				pos: cond(player($i), facing = 1, 10, -10), 0 - player($i), Pos Y;
+				scale: .75,.75;
+				postype: none;
+				bindID: player($i), ID;
+				facing: player($i), facing;
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, 1; volume: 100;}
+		}
+	}
+	
+	if player($i), stateno != 100 {
+		stopsnd{channel: 3;}
+	}
+}
+
+if time >= 1 {
+	changestate{value: 22}
+}
+
+
+# ========================================================================================================================================
+# Water Effects P4
+[StateDef 23; anim: -2;]
+
+let i = 4;
+if playerIDexist(player($i), ID) {
+
+	#Idle
+	if player($i), stateno = [0, 9999] && player($i), pos Y >= 0 && numExplod(40) = 0 {
+		if time = 1 {
+			explod{
+				anim: 3;
+				id: 40;
+				pos: 0, 0;
+				scale: 1,1;
+				postype: none;
+				bindID: player($i), ID;
+				bindtime: -1;
+				facing: player($i), facing;
+				removetime: -1;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+		}
+	}
+	if player($i), pos Y < 0 {
+		removeexplod{id: 40;}
+	}
+	
+	# Jump Up
+	persistent(0) if player($i), stateno = 40
+	|| (player($i), moveType = A && player($i), vel Y < 0 && player($i), pos y >= -10) {
+		if time = 1 {
+			explod{
+				anim: 4;
+				id: 41;
+				pos: 0, 0 - player($i), Pos Y;
+				scale: .8,.8;
+				postype: none;
+				bindID: player($i), ID;
+				facing: cond(player($i), vel X >= 0, player($i), facing, player($i), facing * -1.0);
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, 1; volume: 100}
+		}
+	}
+
+	# Land
+	persistent(0) if player($i), stateno = 52
+	|| (player($i), stateno = [106, 108] && player($i), pos y >= 0)
+	|| (player($i), moveType != H && player($i), prevStateType = A && player($i), vel y >= 0 && player($i), pos y >= 0) {
+		if time = 1 {
+			explod{
+				anim: 2;
+				id: 42;
+				pos: 0, 0;
+				scale: .75,.5;
+				postype: none;
+				bindID: player($i), ID;
+				facing: player($i), facing;
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, 3; volume: 100}
+		}
+	}
+	
+	#Fall
+	persistent(0) if player($i), stateno = 5100 || player($i), stateno = 5110 {
+		if time = 1 {
+			explod{
+				anim: 2;
+				id: 43;
+				pos: 0, 0 - player($i), Pos Y;
+				scale: cond(player($i), stateno = 5100, 1, .65),cond(player($i), stateno = 5100, 1, .5);
+				postype: none;
+				bindID: player($i), ID;
+				facing: cond(player($i), vel X >= 0, player($i), facing, player($i), facing * -1.0);
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, cond(player($i), stateno = 5100, 2, 3); volume: 100}
+		}
+	}
+	
+	# Run
+	persistent(0) if player($i), stateno = 100 || (player($i), stateno = 1615201910 && player($i), map(_pots_dash_cmd_66) <= 0)
+	{
+		if time = 1 {
+			playSnd{value: 0, 4; volume: 100; loop: 1; channel: 3;}
+		}
+		if time = 1 || gametime%10 = 2 {
+			explod{
+				anim: 5;
+				id: 44;
+				pos: cond(player($i), facing = 1, -10, 10), 0 - player($i), Pos Y;
+				scale: .75,.75;
+				postype: none;
+				bindID: player($i), ID;
+				facing: player($i), facing * -1.0;
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+		}
+	}
+	
+	# Back Dash
+	persistent(0) if player($i), stateno = 105 {
+		if time = 1 {
+			explod{
+				anim: 5;
+				id: 45;
+				pos: cond(player($i), facing = 1, 10, -10), 0 - player($i), Pos Y;
+				scale: .75,.75;
+				postype: none;
+				bindID: player($i), ID;
+				facing: player($i), facing;
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, 1; volume: 100;}
+		}
+	}
+	
+	if player($i), stateno != 100 {
+		stopsnd{channel: 3;}
+	}
+}
+
+if time >= 1 {
+	changestate{value: 23}
+}
+
+
+# ========================================================================================================================================
+# Water Effects P5
+[StateDef 24; anim: -2;]
+
+let i = 5;
+if playerIDexist(player($i), ID) {
+
+	#Idle
+	if player($i), stateno = [0, 9999] && player($i), pos Y >= 0 && numExplod(50) = 0 {
+		if time = 1 {
+			explod{
+				anim: 3;
+				id: 50;
+				pos: 0, 0;
+				scale: 1,1;
+				postype: none;
+				bindID: player($i), ID;
+				bindtime: -1;
+				facing: player($i), facing;
+				removetime: -1;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+		}
+	}
+	if player($i), pos Y < 0 {
+		removeexplod{id: 50;}
+	}
+	
+	# Jump Up
+	persistent(0) if player($i), stateno = 40
+	|| (player($i), moveType = A && player($i), vel Y < 0 && player($i), pos y >= -10) {
+		if time = 1 {
+			explod{
+				anim: 4;
+				id: 51;
+				pos: 0, 0 - player($i), Pos Y;
+				scale: .8,.8;
+				postype: none;
+				bindID: player($i), ID;
+				facing: cond(player($i), vel X >= 0, player($i), facing, player($i), facing * -1.0);
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, 1; volume: 100}
+		}
+	}
+
+	# Land
+	persistent(0) if player($i), stateno = 52
+	|| (player($i), stateno = [106, 108] && player($i), pos y >= 0)
+	|| (player($i), moveType != H && player($i), prevStateType = A && player($i), vel y >= 0 && player($i), pos y >= 0) {
+		if time = 1 {
+			explod{
+				anim: 2;
+				id: 52;
+				pos: 0, 0;
+				scale: .75,.5;
+				postype: none;
+				bindID: player($i), ID;
+				facing: player($i), facing;
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, 3; volume: 100}
+		}
+	}
+	
+	#Fall
+	persistent(0) if player($i), stateno = 5100 || player($i), stateno = 5110 {
+		if time = 1 {
+			explod{
+				anim: 2;
+				id: 53;
+				pos: 0, 0 - player($i), Pos Y;
+				scale: cond(player($i), stateno = 5100, 1, .65),cond(player($i), stateno = 5100, 1, .5);
+				postype: none;
+				bindID: player($i), ID;
+				facing: cond(player($i), vel X >= 0, player($i), facing, player($i), facing * -1.0);
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, cond(player($i), stateno = 5100, 2, 3); volume: 100}
+		}
+	}
+	
+	# Run
+	persistent(0) if player($i), stateno = 100 || (player($i), stateno = 1615201910 && player($i), map(_pots_dash_cmd_66) <= 0)
+	{
+		if time = 1 {
+			playSnd{value: 0, 4; volume: 100; loop: 1; channel: 3;}
+		}
+		if time = 1 || gametime%10 = 2 {
+			explod{
+				anim: 5;
+				id: 54;
+				pos: cond(player($i), facing = 1, -10, 10), 0 - player($i), Pos Y;
+				scale: .75,.75;
+				postype: none;
+				bindID: player($i), ID;
+				facing: player($i), facing * -1.0;
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+		}
+	}
+	
+	# Back Dash
+	persistent(0) if player($i), stateno = 105 {
+		if time = 1 {
+			explod{
+				anim: 5;
+				id: 55;
+				pos: cond(player($i), facing = 1, 10, -10), 0 - player($i), Pos Y;
+				scale: .75,.75;
+				postype: none;
+				bindID: player($i), ID;
+				facing: player($i), facing;
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, 1; volume: 100;}
+		}
+	}
+	
+	if player($i), stateno != 100 {
+		stopsnd{channel: 3;}
+	}
+}
+
+if time >= 1 {
+	changestate{value: 24}
+}
+
+
+# ========================================================================================================================================
+# Water Effects P6
+[StateDef 25; anim: -2;]
+
+let i = 6;
+if playerIDexist(player($i), ID) {
+
+	#Idle
+	if player($i), stateno = [0, 9999] && player($i), pos Y >= 0 && numExplod(60) = 0 {
+		if time = 1 {
+			explod{
+				anim: 3;
+				id: 60;
+				pos: 0, 0;
+				scale: 1,1;
+				postype: none;
+				bindID: player($i), ID;
+				bindtime: -1;
+				facing: player($i), facing;
+				removetime: -1;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+		}
+	}
+	if player($i), pos Y < 0 {
+		removeexplod{id: 60;}
+	}
+	
+	# Jump Up
+	persistent(0) if player($i), stateno = 40
+	|| (player($i), moveType = A && player($i), vel Y < 0 && player($i), pos y >= -10) {
+		if time = 1 {
+			explod{
+				anim: 4;
+				id: 61;
+				pos: 0, 0 - player($i), Pos Y;
+				scale: .8,.8;
+				postype: none;
+				bindID: player($i), ID;
+				facing: cond(player($i), vel X >= 0, player($i), facing, player($i), facing * -1.0);
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, 1; volume: 100}
+		}
+	}
+
+	# Land
+	persistent(0) if player($i), stateno = 52
+	|| (player($i), stateno = [106, 108] && player($i), pos y >= 0)
+	|| (player($i), moveType != H && player($i), prevStateType = A && player($i), vel y >= 0 && player($i), pos y >= 0) {
+		if time = 1 {
+			explod{
+				anim: 2;
+				id: 62;
+				pos: 0, 0;
+				scale: .75,.5;
+				postype: none;
+				bindID: player($i), ID;
+				facing: player($i), facing;
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, 3; volume: 100}
+		}
+	}
+	
+	#Fall
+	persistent(0) if player($i), stateno = 5100 || player($i), stateno = 5110 {
+		if time = 1 {
+			explod{
+				anim: 2;
+				id: 63;
+				pos: 0, 0 - player($i), Pos Y;
+				scale: cond(player($i), stateno = 5100, 1, .65),cond(player($i), stateno = 5100, 1, .5);
+				postype: none;
+				bindID: player($i), ID;
+				facing: cond(player($i), vel X >= 0, player($i), facing, player($i), facing * -1.0);
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, cond(player($i), stateno = 5100, 2, 3); volume: 100}
+		}
+	}
+	
+	# Run
+	persistent(0) if player($i), stateno = 100 || (player($i), stateno = 1615201910 && player($i), map(_pots_dash_cmd_66) <= 0)
+	{
+		if time = 1 {
+			playSnd{value: 0, 4; volume: 100; loop: 1; channel: 3;}
+		}
+		if time = 1 || gametime%10 = 2 {
+			explod{
+				anim: 5;
+				id: 64;
+				pos: cond(player($i), facing = 1, -10, 10), 0 - player($i), Pos Y;
+				scale: .75,.75;
+				postype: none;
+				bindID: player($i), ID;
+				facing: player($i), facing * -1.0;
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+		}
+	}
+	
+	# Back Dash
+	persistent(0) if player($i), stateno = 105 {
+		if time = 1 {
+			explod{
+				anim: 5;
+				id: 65;
+				pos: cond(player($i), facing = 1, 10, -10), 0 - player($i), Pos Y;
+				scale: .75,.75;
+				postype: none;
+				bindID: player($i), ID;
+				facing: player($i), facing;
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, 1; volume: 100;}
+		}
+	}
+	
+	if player($i), stateno != 100 {
+		stopsnd{channel: 3;}
+	}
+}
+
+if time >= 1 {
+	changestate{value: 25}
+}
+
+
+# ========================================================================================================================================
+# Water Effects P7
+[StateDef 26; anim: -2;]
+
+let i = 7;
+if playerIDexist(player($i), ID) {
+
+	#Idle
+	if player($i), stateno = [0, 9999] && player($i), pos Y >= 0 && numExplod(70) = 0 {
+		if time = 1 {
+			explod{
+				anim: 3;
+				id: 70;
+				pos: 0, 0;
+				scale: 1,1;
+				postype: none;
+				bindID: player($i), ID;
+				bindtime: -1;
+				facing: player($i), facing;
+				removetime: -1;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+		}
+	}
+	if player($i), pos Y < 0 {
+		removeexplod{id: 70;}
+	}
+	
+	# Jump Up
+	persistent(0) if player($i), stateno = 40
+	|| (player($i), moveType = A && player($i), vel Y < 0 && player($i), pos y >= -10) {
+		if time = 1 {
+			explod{
+				anim: 4;
+				id: 71;
+				pos: 0, 0 - player($i), Pos Y;
+				scale: .8,.8;
+				postype: none;
+				bindID: player($i), ID;
+				facing: cond(player($i), vel X >= 0, player($i), facing, player($i), facing * -1.0);
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, 1; volume: 100}
+		}
+	}
+
+	# Land
+	persistent(0) if player($i), stateno = 52
+	|| (player($i), stateno = [106, 108] && player($i), pos y >= 0)
+	|| (player($i), moveType != H && player($i), prevStateType = A && player($i), vel y >= 0 && player($i), pos y >= 0) {
+		if time = 1 {
+			explod{
+				anim: 2;
+				id: 72;
+				pos: 0, 0;
+				scale: .75,.5;
+				postype: none;
+				bindID: player($i), ID;
+				facing: player($i), facing;
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, 3; volume: 100}
+		}
+	}
+	
+	#Fall
+	persistent(0) if player($i), stateno = 5100 || player($i), stateno = 5110 {
+		if time = 1 {
+			explod{
+				anim: 2;
+				id: 73;
+				pos: 0, 0 - player($i), Pos Y;
+				scale: cond(player($i), stateno = 5100, 1, .65),cond(player($i), stateno = 5100, 1, .5);
+				postype: none;
+				bindID: player($i), ID;
+				facing: cond(player($i), vel X >= 0, player($i), facing, player($i), facing * -1.0);
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, cond(player($i), stateno = 5100, 2, 3); volume: 100}
+		}
+	}
+	
+	# Run
+	persistent(0) if player($i), stateno = 100 || (player($i), stateno = 1615201910 && player($i), map(_pots_dash_cmd_66) <= 0)
+	{
+		if time = 1 {
+			playSnd{value: 0, 4; volume: 100; loop: 1; channel: 3;}
+		}
+		if time = 1 || gametime%10 = 2 {
+			explod{
+				anim: 5;
+				id: 74;
+				pos: cond(player($i), facing = 1, -10, 10), 0 - player($i), Pos Y;
+				scale: .75,.75;
+				postype: none;
+				bindID: player($i), ID;
+				facing: player($i), facing * -1.0;
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+		}
+	}
+	
+	# Back Dash
+	persistent(0) if player($i), stateno = 105 {
+		if time = 1 {
+			explod{
+				anim: 5;
+				id: 75;
+				pos: cond(player($i), facing = 1, 10, -10), 0 - player($i), Pos Y;
+				scale: .75,.75;
+				postype: none;
+				bindID: player($i), ID;
+				facing: player($i), facing;
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, 1; volume: 100;}
+		}
+	}
+	
+	if player($i), stateno != 100 {
+		stopsnd{channel: 3;}
+	}
+}
+
+if time >= 1 {
+	changestate{value: 26}
+}
+
+
+# ========================================================================================================================================
+# Water Effects P6
+[StateDef 27; anim: -2;]
+
+let i = 8;
+if playerIDexist(player($i), ID) {
+
+	#Idle
+	if player($i), stateno = [0, 9999] && player($i), pos Y >= 0 && numExplod(80) = 0 {
+		if time = 1 {
+			explod{
+				anim: 3;
+				id: 80;
+				pos: 0, 0;
+				scale: 1,1;
+				postype: none;
+				bindID: player($i), ID;
+				bindtime: -1;
+				facing: player($i), facing;
+				removetime: -1;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+		}
+	}
+	if player($i), pos Y < 0 {
+		removeexplod{id: 80;}
+	}
+	
+	# Jump Up
+	persistent(0) if player($i), stateno = 40
+	|| (player($i), moveType = A && player($i), vel Y < 0 && player($i), pos y >= -10) {
+		if time = 1 {
+			explod{
+				anim: 4;
+				id: 81;
+				pos: 0, 0 - player($i), Pos Y;
+				scale: .8,.8;
+				postype: none;
+				bindID: player($i), ID;
+				facing: cond(player($i), vel X >= 0, player($i), facing, player($i), facing * -1.0);
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, 1; volume: 100}
+		}
+	}
+
+	# Land
+	persistent(0) if player($i), stateno = 52
+	|| (player($i), stateno = [106, 108] && player($i), pos y >= 0)
+	|| (player($i), moveType != H && player($i), prevStateType = A && player($i), vel y >= 0 && player($i), pos y >= 0) {
+		if time = 1 {
+			explod{
+				anim: 2;
+				id: 82;
+				pos: 0, 0;
+				scale: .75,.5;
+				postype: none;
+				bindID: player($i), ID;
+				facing: player($i), facing;
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, 3; volume: 100}
+		}
+	}
+	
+	#Fall
+	persistent(0) if player($i), stateno = 5100 || player($i), stateno = 5110 {
+		if time = 1 {
+			explod{
+				anim: 2;
+				id: 83;
+				pos: 0, 0 - player($i), Pos Y;
+				scale: cond(player($i), stateno = 5100, 1, .65),cond(player($i), stateno = 5100, 1, .5);
+				postype: none;
+				bindID: player($i), ID;
+				facing: cond(player($i), vel X >= 0, player($i), facing, player($i), facing * -1.0);
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, cond(player($i), stateno = 5100, 2, 3); volume: 100}
+		}
+	}
+	
+	# Run
+	persistent(0) if player($i), stateno = 100 || (player($i), stateno = 1615201910 && player($i), map(_pots_dash_cmd_66) <= 0)
+	{
+		if time = 1 {
+			playSnd{value: 0, 4; volume: 100; loop: 1; channel: 3;}
+		}
+		if time = 1 || gametime%10 = 2 {
+			explod{
+				anim: 5;
+				id: 84;
+				pos: cond(player($i), facing = 1, -10, 10), 0 - player($i), Pos Y;
+				scale: .75,.75;
+				postype: none;
+				bindID: player($i), ID;
+				facing: player($i), facing * -1.0;
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+		}
+	}
+	
+	# Back Dash
+	persistent(0) if player($i), stateno = 105 {
+		if time = 1 {
+			explod{
+				anim: 5;
+				id: 85;
+				pos: cond(player($i), facing = 1, 10, -10), 0 - player($i), Pos Y;
+				scale: .75,.75;
+				postype: none;
+				bindID: player($i), ID;
+				facing: player($i), facing;
+				removetime: -2;
+				sprpriority: player($i), sprpriority + 1;
+				superMoveTime: -1;
+				pauseMoveTime: -1;
+				#redirectID: player($i), ID;
+			}
+			playSnd{value: 0, 1; volume: 100;}
+		}
+	}
+	
+	if player($i), stateno != 100 {
+		stopsnd{channel: 3;}
+	}
+}
+
+if time >= 1 {
+	changestate{value: 27}
+}
+
+
+# ========================================================================================================================================
+# Secret Achievement Helper - Not Used
+[StateDef 9999; anim: -2;]
+
+if fightScreenState(RoundDisplay) && root, map(_vnix_broken_wall) != 0 {
+	DestroySelf{}
+}
+
+if root, map(_vnix_broken_wall) != 0 && root, map(_vnix_secret_factor) = 0 {
+	for s = 1; 8; 2 {
+		if player($s), roundState = 4 && player($s), win {
+			explod{
+				anim: 20;
+				postype: left;
+				pos: 160,0;
+				scale: .5,.5;
+				angle: 0;
+				facing: 1;
+				ontop: 1;
+				random: 0,0;
+				bindtime: 1;
+				removetime: -1;
+				sprpriority: 5;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				palfx.time: -1;
+				palfx.add: 255,255,255;
+				interpolation.time: 60;
+				interpolation.palfx.add: 0,0,0;
+			}
+			playsnd{value: 1, 2; volumescale: 200; freqmul: 1.0}
+			parentmapset{map: "_vnix_secret_factor"; value: 1;}
+		}
+	}
+	for t = 2; 8; 2 {
+		if player($t), roundState = 4 && player($t), win {
+			explod{
+				anim: 21;
+				postype: left;
+				pos: 160,0;
+				scale: .5,.5;
+				angle: 0;
+				facing: 1;
+				ontop: 1;
+				random: 0,0;
+				bindtime: 1;
+				removetime: -1;
+				sprpriority: 5;
+				pausemovetime: -1;
+				supermovetime: -1;
+				ownpal: 1;
+				palfx.time: -1;
+				palfx.add: 255,255,255;
+				interpolation.time: 60;
+				interpolation.palfx.add: 0,0,0;
+			}
+			playsnd{value: 1, 2; volumescale: 200; freqmul: 1.0}
+			parentmapset{map: "_vnix_secret_factor"; value: 1;}
+		}
+	}
+}
+
+
+# ========================================================================================================================================
+
+[StateDef 175; anim: -2;]
+
+[StateDef 5900; anim:-2;]
+changestate{value:0;}
+
+[StateDef -4]
+
+ignorehitpause {
+	screenBound{value: 0; movecamera: 0,0}
+	assertSpecial{flag: invisible; flag2: noturntarget; flag3: noinput}
+	notHitBy{value: SCA}
+	width{value: 0,0}
+	
+	# Initialize
+	if roundstate = 0 && time = 0 {
+		# Run config
+		call F_Vnix_Stage_Config();
+		mapset{map: "_vnix_secret_factor"; value: 0}
+	}
+}
