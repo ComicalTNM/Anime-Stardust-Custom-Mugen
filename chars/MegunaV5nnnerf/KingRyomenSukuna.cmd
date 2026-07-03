@@ -1,6 +1,6 @@
-
-
-
+;===============================================================================
+;-------------------------------Comandos----------------------------------------
+;===============================================================================
 [Remap]
 x = x
 y = y
@@ -15,14 +15,14 @@ name = "Super Jump"
 command = ~D,U
 time = 10
 
-
+;-| Supers |-------------------------------------------------------
 
 [command]
 name = "SUPER1"
 command = ~D,DF,F,D,DF,F,a+b
 time = 30
 
-
+;-| Specials |-------------------------------------------------------
 [command]
 name = "SPECIAL 1"
 command = ~D,DF,F,a
@@ -108,7 +108,7 @@ name = "SPECIAL 12"
 command = ~F,DF,D,DB,B,c
 time = 30
 
-
+;-| Specials2 |-------------------------------------------------------
 
 
 [command]
@@ -183,30 +183,30 @@ time = 20
 
 [Defaults]
 
-
+;-| Double Tap |-----------------------------------------------------------
 [Command]
-name = "FF"     
+name = "FF"     ;Required (do not remove)
 command = F, F
 time = 10
 
 [Command]
-name = "DDD"     
+name = "DDD"     ;Required (do not remove)
 command = D, D, D
 time = 10
 
 
 [Command]
-name = "BB"     
+name = "BB"     ;Required (do not remove)
 command = B, B
 time = 10
 
 [Command]
-name = "zz"     
+name = "zz"     ;Required (do not remove)
 command = z, z
 time = 10
-
+;-| 2/3 Button Combination |-----------------------------------------------
 [Command]
-name = "recovery" 
+name = "recovery" ;Required (do not remove)
 command = x+y
 time = 1
 
@@ -234,7 +234,7 @@ time = 1
 name = "recovery"
 command = a+c
 time = 1
-
+;-| Dir + Button |---------------------------------------------------------
 [Command]
 name = "back_x"
 command = /$B,x
@@ -354,7 +354,7 @@ time = 1
 name = "up_c"
 command = /$U,c
 time = 1
-
+;-| Single Button |---------------------------------------------------------
 [Command]
 name = "a"
 command = a
@@ -389,9 +389,9 @@ time = 1
 name = "s"
 command = s
 time = 1
-
+;-| Single Dir |------------------------------------------------------------
 [Command]
-name = "fwd" 
+name = "fwd" ;Required (do not remove)
 command = $F
 time = 1
 
@@ -401,7 +401,7 @@ command = $DF
 time = 1
 
 [Command]
-name = "down" 
+name = "down" ;Required (do not remove)
 command = $D
 time = 1
 
@@ -411,7 +411,7 @@ command = $DB
 time = 1
 
 [Command]
-name = "back" 
+name = "back" ;Required (do not remove)
 command = $B
 time = 1
 
@@ -421,7 +421,7 @@ command = $UB
 time = 1
 
 [Command]
-name = "up" 
+name = "up" ;Required (do not remove)
 command = $U
 time = 1
 
@@ -429,7 +429,7 @@ time = 1
 name = "upfwd"
 command = $UF
 time = 1
-
+;-| Hold Button |--------------------------------------------------------------
 [Command]
 name = "hold_x"
 command = /x
@@ -464,9 +464,9 @@ time = 1
 name = "hold_s"
 command = /s
 time = 1
-
+;-| Hold Dir |--------------------------------------------------------------
 [Command]
-name = "holdfwd" 
+name = "holdfwd" ;Required (do not remove)
 command = /$F
 time = 1
 
@@ -476,7 +476,7 @@ command = /$DF
 time = 1
 
 [Command]
-name = "holddown" 
+name = "holddown" ;Required (do not remove)
 command = /$D
 time = 1
 
@@ -486,7 +486,7 @@ command = /$DB
 time = 1
 
 [Command]
-name = "holdback" 
+name = "holdback" ;Required (do not remove)
 command = /$B
 time = 1
 
@@ -496,7 +496,7 @@ command = /$UB
 time = 1
 
 [Command]
-name = "holdup" 
+name = "holdup" ;Required (do not remove)
 command = /$U
 time = 1
 
@@ -504,7 +504,7 @@ time = 1
 name = "holdupfwd"
 command = /$UF
 time = 1
-
+;---------------------------------------------------------------------------
 [Statedef -1]
 
 [state 0]
@@ -529,26 +529,26 @@ pausemovetime = 99999999999
 ignorehitpause = 1
 
 
-[State 0]
+[State 0, Helper]
 type = Helper
 triggerall = !ishelper
 trigger1 = numhelper(1151) = 0
 trigger1 = numhelper(17002)= 0
-helpertype = normal 
+helpertype = normal ;player
 name = "FX"
 ID = 17002
 stateno = 17002
 pos = 0,0
-postype = p1    
+postype = p1    ;p2,front,back,left,right
 facing = 1
 keyctrl = 0
 ownpal = 1
 supermovetime = 999999
 pausemovetime = 999999
 
-
-
-[State 0]
+;-------------------------------------------------------------------------
+; Correr Adelante air
+[State -1, Correr Atras]
 type = ChangeState
 triggerall = !ishelper
 triggerall = var(5) = 0
@@ -559,9 +559,9 @@ value = 10060
 trigger1 = command = "FF"
 trigger1 = ctrl
 triggerall = ailevel = 0 
-
-
-[State 0]
+;---------------------------------------------------------------------------
+; Correr Atras
+[State -1, Correr Atras]
 type = ChangeState
 triggerall = !ishelper
 triggerall = var(5) = 0
@@ -572,9 +572,9 @@ value = 10070
 trigger1 = command = "BB"
 trigger1 = ctrl
 triggerall = ailevel = 0 
-
-
-[State 0]
+;---------------------------------------------------------------------------
+; Super Jump
+[State -1, Super Jump]
 type = ChangeState
 triggerall = !ishelper
 value = 80
@@ -583,7 +583,7 @@ trigger1 = statetype = S
 trigger1 = ctrl
 triggerall = ailevel = 0 
 
-[State 0]
+[State 0, Helper]
 type = Helper
 triggerall = !ishelper
 triggerall = ailevel = 0
@@ -606,10 +606,10 @@ supermovetime=2147483647
 
 
 
+;===============================Ten Shadows============================================
 
 
-
-[State 0]
+[State -1, Ten Shadows]
 type = VarSet
 triggerall = !ishelper
 triggerall = Var(43) = 0 && Var(4) <= 1
@@ -633,7 +633,7 @@ trigger1 = command = "z"
 trigger1 = !AILevel
 ignorehitpause = 1
 
-[State 0]
+[State -1, Mahoraga Summon]
 type = ChangeState
 triggerall = Var(11) = 10000
 triggerall = !ishelper
@@ -648,7 +648,7 @@ trigger1 = ctrl
 triggerall = ailevel = 0 
 
 
-[State 0]
+[State -1, Mahoraga Protect]
 type = VarSet
 triggerall = !ishelper
 triggerall = helper(30990),Var(25) = 0
@@ -664,7 +664,7 @@ trigger1 =  Command = "z"
 trigger1 = !AILevel
 ignorehitpause = 1
 
-[State 0]
+[State -1, Mahoraga Protect Ally]
 type = VarSet
 triggerall = !ishelper
 triggerall = helper(30990),Var(25) >= 10
@@ -680,7 +680,7 @@ trigger1 =  Command = "z"
 trigger1 = !AILevel
 ignorehitpause = 1
 
-[State 0]
+[State -1, Mahoraga Berserk]
 type = VarSet
 triggerall = !ishelper
 var(16) = 0
@@ -694,7 +694,7 @@ trigger1 =  Command = "z"
 trigger1 = !AILevel
 ignorehitpause = 1
 
-[State 0]
+[State -1, Mahoraga Stay]
 type = VarSet
 triggerall = !ishelper
 triggerall = helper(30990),Var(26) = 0
@@ -712,7 +712,7 @@ ignorehitpause = 1
 
 
 
-[State 0]
+[State -1, Mahoraga Follow]
 type = VarSet
 triggerall = !ishelper
 triggerall = helper(30990),Var(26) >= 10
@@ -732,7 +732,7 @@ ignorehitpause = 1
 
 
 
-[State 0]
+[State -1, Mahoraga Attack First Enemy]
 type = VarSet
 triggerall = !ishelper
 triggerall = helper(30990),Var(24) = 0
@@ -750,7 +750,7 @@ ignorehitpause = 1
 
 
 
-[State 0]
+[State -1, Mahoraga Attack Partner Enemey]
 type = VarSet
 triggerall = !ishelper
 triggerall = helper(30990),Var(24) >= 10
@@ -767,7 +767,7 @@ trigger1 = !AILevel
 ignorehitpause = 1
 
 
-[State 0]
+[State -1, Mahoraga Ctrl]
 type = VarSet
 triggerall = !ishelper
 triggerall = Var(25) = 1
@@ -783,7 +783,7 @@ trigger1 = !AILevel
 ignorehitpause = 1
 
 
-[State 0]
+[State -1, Urame Protect]
 type = VarSet
 triggerall = !ishelper
 triggerall = helper(30990),Var(41) >= 10
@@ -799,7 +799,7 @@ trigger1 =  Command = "y"
 trigger1 = !AILevel
 ignorehitpause = 1
 
-[State 0]
+[State -1, Urame Berserk]
 type = VarSet
 triggerall = !ishelper
 triggerall = helper(30990),Var(41) = 0
@@ -814,7 +814,7 @@ trigger1 =  Command = "y"
 trigger1 = !AILevel
 ignorehitpause = 1
 
-[State 0]
+[State -1, Urame Stay]
 type = VarSet
 triggerall = !ishelper
 triggerall = helper(30990),Var(26) = 0
@@ -832,7 +832,7 @@ ignorehitpause = 1
 
 
 
-[State 0]
+[State -1, Urame Follow]
 type = VarSet
 triggerall = !ishelper
 triggerall = helper(30990),Var(26) >= 10
@@ -849,7 +849,7 @@ trigger1 = !AILevel
 ignorehitpause = 1
 
 
-[State 0]
+[State -1, Urame Ctrl]
 type = VarSet
 triggerall = !ishelper
 triggerall = Var(24) = 1
@@ -866,7 +866,9 @@ ignorehitpause = 1
 
 
 
-[State 0]
+
+;Wabbits
+[State 0, Wabbits]
 type = Helper
 triggerall = !ishelper
 triggerall = movetype = H
@@ -893,9 +895,9 @@ supermovetime = 0
 pausemovetime = 0
 
 
-
-
-[State 0]
+;===============================Supers============================================
+;Domain expansion
+[State -1, Domain expansion]
 type = ChangeState
 triggerall = !ishelper
 triggerall  = numhelper(51310) = 0 ||Var(11) = 20000 && helper(30980),Var(8) = 1
@@ -908,10 +910,11 @@ Triggerall = statetype != A
 triggerall = ailevel = 0 
 trigger1 = ctrl
 
-
-[State 0]
+;Heian Era
+[State -1, Heian Era]
 type = ChangeState
 triggerall = !ishelper
+triggerall = map(kameto) = 0
 triggerall  = numhelper(51310) = 0
 triggerall =  Var(11) = 10000
 Triggerall = power >= 3000
@@ -922,12 +925,12 @@ triggerall = ailevel = 0
 trigger1 = ctrl
 
 
+;===========================================================================
+;SPECIALS:
+;===========================================================================
 
-
-
-
-
-[State 0]
+;Dismantle
+[State -1, Dismantle]
 type = ChangeState
 triggerall = !ishelper
 triggerall = var(11) = 10000
@@ -939,8 +942,8 @@ trigger1 = ctrl
 triggerall = ailevel = 0 
 
 
-
-[State 0]
+;Cleave
+[State -1, Cleave]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(43) = 0 && Var(4) <= 1
@@ -952,8 +955,8 @@ Triggerall = statetype != A
 trigger1 = ctrl
 triggerall = ailevel = 0
 
-
-[State 0]
+;Beatdown
+[State -1, Hadou number 31 Shakahou]
 type = ChangeState
 triggerall = !ishelper
 value =1400
@@ -963,8 +966,8 @@ Triggerall = !var(25) && power >=1000
 triggerall = ailevel = 0 
 trigger1 = ctrl && statetype != A
 
-
-[State 0]
+;Face Smash
+[State -1, Face Smash]
 type = ChangeState
 triggerall = !ishelper
 triggerall = power >= 1500
@@ -975,8 +978,8 @@ trigger1 = ctrl
 Triggerall = var(11) = 10000
 triggerall = ailevel = 0 
 
-
-[State 0]
+;Cleave: Spiderweb
+[State -1, Cleave: Spiderweb]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(43) = 0 && Var(4) <= 1
@@ -988,8 +991,8 @@ triggerall = ailevel = 0
 Triggerall = statetype != A
 trigger1 = ctrl
 
-
-[State 0]
+;Fuga
+[State -1, Fuga]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(43) = 0 && Var(4) <= 1
@@ -1001,8 +1004,8 @@ trigger1 = ctrl
 triggerall = ailevel = 0 
 Triggerall = var(11) = 10000
 
-
-[State 0]
+;Counter
+[State -1, Counter]
 type = ChangeState
 triggerall = !ishelper
 triggerall = power >= 500 && !var(3)
@@ -1012,11 +1015,11 @@ Triggerall = statetype != A
 trigger1 = ctrl
 triggerall = ailevel = 0 
 
-
-
-
-
-[State 0]
+;===========================================================================
+;Hien SPECIALS:
+;===========================================================================
+;Dismantle
+[State -1, Dismantle]
 type = ChangeState
 triggerall = !ishelper
 triggerall = var(11) = 20000
@@ -1028,8 +1031,8 @@ trigger1 = ctrl
 triggerall = ailevel = 0
 
 
-
-[State 0]
+;Cleave
+[State -1, Cleave]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(43) = 0 && Var(4) <= 1
@@ -1041,8 +1044,8 @@ Triggerall = statetype != A
 trigger1 = ctrl
 triggerall = ailevel = 0
 
-
-[State 0]
+;Heian Beatdown
+[State -1, Heian Beatdown]
 type = ChangeState
 triggerall = !ishelper
 triggerall = power >= 1000 && !var(3)
@@ -1053,8 +1056,8 @@ trigger1 = ctrl
 Triggerall = var(11) = 20000
 triggerall = ailevel = 0 
 
-
-[State 0]
+;Heian Beatdown
+[State -1, Heian Beatdown]
 type = ChangeState
 triggerall = !ishelper
 triggerall = power >= 1000 && !var(3)
@@ -1066,8 +1069,8 @@ Triggerall = var(11) = 20000
 triggerall = ailevel = 0 
 
 
-
-[State 0]
+;;Divine Flame: Open
+[State -1, Heian Beatdown]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(21) = 4
@@ -1080,8 +1083,8 @@ trigger1 = ctrl
 Triggerall = var(11) = 20000
 triggerall = ailevel = 0 
 
-
-[State 0]
+;Kametuke
+[State -1, Heian Beatdown]
 type = ChangeState
 triggerall = helper(30990),Var(6) = 0
 triggerall = !ishelper
@@ -1092,8 +1095,8 @@ trigger1 = ctrl
 Triggerall = var(11) = 20000
 triggerall = ailevel = 0 
 
-
-[State 0]
+;Hiten
+[State -1, Hiten Switch]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(21) = 4
@@ -1104,7 +1107,7 @@ trigger1 = ctrl
 Triggerall = var(11) = 20000
 triggerall = ailevel = 0 
 
-[State 0]
+[State 0, Hiten Switch 2]
 type = Helper
 triggerall = !ishelper
 triggerall = !ctrl
@@ -1124,11 +1127,11 @@ ownpal = 1
 size.xscale =0.96
 size.yscale =2.4
 
+;=================================Basics==========================================
 
-
-
-
-[State 0]
+;---------------------------------------------------------------------------
+; A
+[State -1, A]
 type = ChangeState
 triggerall = !ishelper
 value = ifelse(var(23) =1,20201,200+var(11))
@@ -1137,20 +1140,20 @@ triggerall = command = "a"
 Triggerall = statetype != A
 triggerall = ailevel = 0 
 trigger1 = ctrl
-
-
-[State 0]
+;---------------------------------------------------------------------------
+; Up A
+[State -1, Hadou number 31 Shakahou]
 type = ChangeState
 triggerall = !ishelper
-value = ifelse(var(23) =1,20207,ifelse(var(11) =20000,20205,201+var(11)))
+value = ifelse(var(23) =1,20207,ifelse(var(11) =20000,20205,201+var(11)));1050 +var(11)
 triggerall = command = "holddown"
 triggerall = command = "a"
 Triggerall = statetype != A
 trigger1 = ctrl
 triggerall = ailevel = 0 
-
-
-[State 0]
+;---------------------------------------------------------------------------
+; B
+[State -1, B]
 type = ChangeState
 triggerall = !ishelper
 value = ifelse(var(23) =1,20301,300+var(11))
@@ -1159,9 +1162,9 @@ triggerall = command = "b"
 Triggerall = statetype != A
 triggerall = ailevel = 0 
 trigger1 = ctrl
-
-
-[State 0]
+;---------------------------------------------------------------------------
+; Up B
+[State -1, Hadou number 31 Shakahou]
 type = ChangeState
 triggerall = !ishelper
 value = ifelse(var(23) =1,20307,ifelse(var(11) =20000,20305,301+var(11)))
@@ -1170,9 +1173,9 @@ triggerall = command = "b"
 Triggerall = statetype != A
 triggerall = ailevel = 0 
 trigger1 = ctrl
-
-
-[State 0]
+;---------------------------------------------------------------------------
+; C
+[State -1, C]
 type = ChangeState
 triggerall = !ishelper
 value = ifelse(var(23) =1,20401,400+var(11))
@@ -1181,9 +1184,9 @@ triggerall = command = "c"
 Triggerall = statetype != A
 triggerall = ailevel = 0 
 trigger1 = ctrl
-
-
-[State 0]
+;---------------------------------------------------------------------------
+; Up C
+[State -1, Down C Kick]
 type = ChangeState
 triggerall = !ishelper
 value = ifelse(var(23) =1,20407,ifelse(var(11) =20000,20402,10405))
@@ -1192,9 +1195,9 @@ triggerall = command = "c"
 Triggerall = statetype != A
 triggerall = ailevel = 0 
 trigger1 = ctrl
-
-
-[State 0]
+;---------------------------------------------------------------------------
+; A Aire
+[State -1, A Aire]
 type = ChangeState
 triggerall = !ishelper
 value = ifelse(var(23) =1,20605,600+var(11))
@@ -1202,9 +1205,9 @@ triggerall = command = "a"
 Triggerall = statetype = A
 triggerall = ailevel = 0 
 trigger1 = ctrl
-
-
-[State 0]
+;---------------------------------------------------------------------------
+; B Aire
+[State -1, B Aire]
 type = ChangeState
 triggerall = !ishelper
 value = ifelse(var(23) =1,20615,610+var(11))
@@ -1212,9 +1215,9 @@ triggerall = command = "b"
 Triggerall = statetype = A
 triggerall = ailevel = 0 
 trigger1 = ctrl
-
-
-[State 0]
+;---------------------------------------------------------------------------
+; C Aire
+[State -1, C Aire]
 type = ChangeState
 triggerall = !ishelper
 value = ifelse(var(23) =1,20625,620+var(11))
@@ -1222,9 +1225,9 @@ triggerall = command = "c"
 Triggerall = statetype = A
 triggerall = ailevel = 0 
 trigger1 = ctrl
-
-
-[State 0]
+;---------------------------------------------------------------------------
+; Power Charge 
+[State -1, Power Charge]
 type = ChangeState
 triggerall = Var(43) = 0 && Var(4) <= 1
 triggerall = !ishelper
@@ -1236,8 +1239,8 @@ value = 500
 triggerall = command = "s" && command != "holdback" && command != "holdfwd" || command = "hold_s" && command != "holdback" && command != "holdfwd" 
 trigger1 = ctrl
 
-
-[State 0]
+; Power Charge (Zoned)
+[State -1, Power Charge]
 type = ChangeState
 triggerall = Var(43) = 0 && Var(4) <= 1
 triggerall = !ishelper
@@ -1248,9 +1251,9 @@ Triggerall = power < powermax
 value = 500
 triggerall = command = "s" && command != "holdback" && command != "holdfwd"  || command = "hold_s" && command != "holdback" && command != "holdfwd" 
 trigger1 = ctrl
-
-
-[State 0]
+;---------------------------------------------------------------------------
+; Reverse Curse Technique
+[State -1, Reverse Curse Technique]
 type = ChangeState
 triggerall = Var(43) = 0 && Var(4) <= 1
 triggerall = !ishelper
@@ -1261,9 +1264,9 @@ Triggerall = power >= 100
 value = 510
 triggerall = command = "hold_s" && command = "holddown"
 trigger1 = ctrl
-
-
-[State 0]
+;---------------------------------------------------------------------------
+; Domain Amplification
+[State -1, Domain Amplification]
 type = ChangeState
 triggerall = Var(43) = 0 && Var(4) <= 1
 triggerall = !ishelper
@@ -1273,9 +1276,9 @@ Triggerall = power >= 500
 value = 51400
 triggerall =  (command = "hold_s" && command = "holdback")
 trigger1 = ctrl
-
-
-[State 0]
+;---------------------------------------------------------------------------
+; Hollow Wicker Basket
+[State -1, HWB]
 type = ChangeState
 triggerall = Var(43) = 0 && Var(4) <= 1
 triggerall = Var(21) = 4 || Var(11) = 10000
@@ -1289,9 +1292,9 @@ triggerall =  (command = "hold_s" && command = "holdfwd")
 trigger1 = ctrl
 
 
-
-
-[State 0]
+;---------------------------------------------------------------------------
+; Pause
+[State 0, Helper]
 type = Helper
 triggerall = !ishelper
 triggerall = ailevel = 0
@@ -1313,48 +1316,48 @@ pausemovetime=2147483647
 supermovetime=2147483647
 
 
+;=================================Discontinued Moves==========================================
+;---------------------------------------------------------------------------
+;[State -1, web cut]
+;type = ChangeState
+;triggerall = !ishelper
+;triggerall = power >= 0 
+;value = 1773
+;triggerall = command = "y"
+;Triggerall = statetype != A
+;trigger1 = ctrl
+;triggerall = ailevel = 0 
+;---------------------------------------------------------------------------
+;Punch ground small
+;[State -1, Hadou number 31 Shakahou]
+;type = ChangeState
+;triggerall = !ishelper
+;Triggerall = power >= 500
+;value = 11002
+;triggerall = command = "SPECIAL 1"
+;Triggerall = statetype != A
+;Triggerall = var(11) = 10000 && !var(25)
+;trigger1 = ctrl
+;triggerall = ailevel = 0 
+;---------------------------------------------------------------------------
+;Tiny Airelith Lock
+;[State -1, Tiny Airelith Lock]
+;type = ChangeState
+;triggerall = !ishelper
+;Triggerall = power >= 500 && !var(3)
+;value = 11420
+;triggerall = command = "SPECIAL 8"
+;Triggerall = statetype != A
+;Triggerall = var(11) = 10000
+;trigger1 = ctrl
+;triggerall = ailevel = 0 
+;---------------------------------------------------------------------------
+;==================================================================AI==================================================================
 
 
+;AI Binding Vows
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-[State 0]
+[State -1, Auto Dismantle Binding Vow]
 type = Helper
 triggerall = !ishelper
 triggerall = Var(43) = 0 && Var(4) <= 1
@@ -1395,7 +1398,7 @@ trigger8 = random < ((64+20*(inguarddist)+var(45)*2+20+30*(EnemyNear(var(58)),mo
 trigger9 = stateno != 13000 && FrontEdgeBodyDist > 30
 trigger10 = stateno != 13000 && cond(var(52),(EnemyNear(var(58)),stateno != var(52)),1) && p2dist y >-90 && p2bodydist x = [120,451]
 trigger10= random < ((64+20*(inguarddist)+var(45)*2+20+30*(EnemyNear(var(58)),movetype = H && EnemyNear(var(58)),statetype = A))*(AILevel ** 2 / 64.0))
-helpertype = normal 
+helpertype = normal ;player
 name = "Moveless Dismantle"
 ID = 20172
 stateno = 11560
@@ -1410,7 +1413,7 @@ size.xscale = 1
 size.yscale = 1
 
 
-[State 0]
+[State 0, DefenceMulSet]
 type = DefenceMulSet
 triggerall = !ishelper
 trigger1= 1
@@ -1418,7 +1421,7 @@ value = 1 + helper(30980),fVar(3) + helper(30980),fVar(5) - helper(30980),fVar(7
 ignorehitpause = 1
 
 
-[State 0]
+[State 0, AttackMulSet]
 type = AttackMulSet
 triggerall = !ishelper
 trigger1 = 1
@@ -1426,8 +1429,8 @@ value = 1 + helper(30980),fVar(4) + (helper(30980),fVar(7)*2)+ifelse(numhelper(5
 ignorehitpause = 1
 
 
-
-[State 0]
+;Passive RCT
+[State 0, LifeAdd]
 type = LifeAdd
 triggerall = Var(43) = 0 && Var(4) <= 1
 triggerall = !ishelper
@@ -1441,7 +1444,7 @@ kill = 1
 absolute = 1
 ignorehitpause = 1
 
-[State 0]
+[State 0, VarSet]
 type = VarAdd
 triggerall = Var(43) = 0 && Var(4) <= 1
 triggerall = !ishelper
@@ -1450,15 +1453,15 @@ triggerall = stateno != 19999 && stateno !=51325 && stateno !=51324 && stateno !
 triggerall = timemod = 2,1
 triggerall = fVar(23) > 0
 trigger1 = helper(30980),Var(5) =1
-fv = 23    
+fv = 23    ;fv = 10
 value = ifelse(helper(30980),Var(7) =1,-0.001,-0.002)
 
+;---------------------------------------------------------------------------
+;Sukuna
+;Base Sukuna---------------------------------
 
 
-
-
-
-[State 0]
+[State -1, RCT]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(43) = 0 && Var(4) <= 1
@@ -1477,7 +1480,7 @@ trigger1 = random < ((cond(life<=(lifemax/2.0),cond(life<=(lifemax/3.0),cond(lif
 value = 510
 
 
-[State 0]
+[State -1, AI A NORMAL]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(11) = 10000
@@ -1490,7 +1493,7 @@ trigger1 = p2bodydist y = [-42-(EnemyNear(var(58)), movetype = H)*floor(4*(Enemy
 trigger1 = random < 300
 value = 10200
 
-[State 0]
+[State -1, AI B NORMAL]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(11) = 10000
@@ -1503,7 +1506,7 @@ trigger1 = p2bodydist y = [-48-(EnemyNear(var(58)), movetype = H)*floor(10*(Enem
 trigger1 = random < 300
 value = 10300
 
-[State 0]
+[State -1, AI B Up]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(11) = 10000
@@ -1516,7 +1519,7 @@ trigger1 = p2bodydist y = [-48-(EnemyNear(var(58)), movetype = H)*floor(10*(Enem
 trigger1 = random < 300
 value = 10301
 
-[State 0]
+[State -1, AI C NORMAL]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(11) = 10000
@@ -1529,7 +1532,7 @@ trigger1 = p2bodydist y = [-64-(EnemyNear(var(58)), movetype = H)*floor(4*(Enemy
 trigger1 = random < 300
 value = 10400
 
-[State 0]
+[State -1, AI C UP]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(11) = 10000
@@ -1544,7 +1547,7 @@ trigger1 = random < 300
 value = 10405
 
 
-[State 0]
+[State -1, AI A Air]
 type = ChangeState
 triggerall = !ishelper
 value = 10600
@@ -1558,7 +1561,7 @@ trigger1 = cond(pos y < -80,(p2bodydist y = [-60,25]),(p2bodydist y = [-65,50]))
 trigger1 = random < 300
 
 
-[State 0]
+[State -1, AI B Air]
 type = ChangeState
 triggerall = !ishelper
 value = 10610
@@ -1571,7 +1574,7 @@ trigger1 = cond(pos y < -80,(p2bodydist y = [5,200]),(p2bodydist y = [-82,60]))
 trigger1 = random < 300
 
 
-[State 0]
+[State -1, AI C Air]
 type = ChangeState
 triggerall = !ishelper
 value = 10620
@@ -1584,10 +1587,10 @@ trigger1 = p2bodydist y = [-45,60]
 trigger1 = random < 300
 
 
-[State 0]
+[State -1, AI Dash Forward]
 type = ChangeState
 triggerall = !ishelper
-triggerall = stateno !=34000 || stateno !=34001 || (stateno !=[31700,31703]) || (stateno !=[31900,31903])  || (stateno !=[21705,21708])  || (stateno !=[21805,21809])
+triggerall = stateno !=34000 || stateno !=34001 || stateno !=[31700,31703] || stateno !=[31900,31903]  || stateno !=[21705,21708]  || stateno !=[21805,21809]
 triggerall = ailevel && roundstate = 2 && numenemy && (ctrl || stateno = 501 || stateno = 21) && frontedgebodydist > 60 && (EnemyNear(var(58)), stateno != [10221,10224]) && (EnemyNear(var(58)), stateno != [10425,10427]) && (EnemyNear(var(58)), stateno != [11003,11005]) && (EnemyNear(var(58)), stateno != 21666) && (EnemyNear(var(58)), stateno != [13006,13008])
 trigger1 = EnemyNear(var(58)), p2bodydist x >= 150 && (!inguarddist) && EnemyNear(var(58)),statetype != L
 trigger1 = random < ((200+50*(var(3))+16+30*(var(25))+50*(p2bodydist x > 300)+12*(life<lifemax/2)+35*(statetype = A && p2bodydist x = [160,225])-20*(statetype =A && !inguarddist)+80*((EnemyNear(var(58)), statetype = A && !var(46) && (var(45) < 15) && p2bodydist x > 150 && EnemyNear(var(58)),movetype = H)))*(AILevel ** 2 / 64.0))
@@ -1605,19 +1608,19 @@ trigger4 = random < 700
 trigger4 = ailevel > 3 && facing != EnemyNear(var(58)),facing && (ctrl || stateno = 501 || stateno = 21)
 value = 10060
 
-[State 0]
+[State -1, AI Dash Back]
 type = ChangeState
 triggerall = !ishelper
-triggerall = stateno !=34000 || stateno !=34001 || (stateno !=[31700,31703]) || (stateno !=[31900,31903])  || (stateno !=[21705,21708])  || (stateno !=[21805,21809])
+triggerall = stateno !=34000 || stateno !=34001 || stateno !=[31700,31703] || stateno !=[31900,31903]  || stateno !=[21705,21708]  || stateno !=[21805,21809]
 triggerall = ailevel && roundstate = 2 && numenemy && (ctrl || stateno = 501 || stateno = 21) && backedgebodydist > 30 && !(p2bodydist x < 200 && statetype != A && EnemyNear(var(58)),movetype = A && (EnemyNear(var(58)),statetype = A || EnemyNear(var(58)), pos y < -50))
 trigger1 = EnemyNear(var(58)),movetype = A && (EnemyNear(var(58)), statetype = A && statetype = A || EnemyNear(var(58)), statetype != A && statetype != A) && p2bodydist x = [-3,130]
 trigger1 = random < 800
 value = 10070
 
-[State 0]
+[State -1, AI Guard]
 type = ChangeState
 triggerall = !ishelper
-triggerall = stateno !=34000 || stateno !=34001 || (stateno !=[31700,31703]) || (stateno !=[31900,31903])  || (stateno !=[21705,21708])  || (stateno !=[21805,21809])
+triggerall = stateno !=34000 || stateno !=34001 || stateno !=[31700,31703] || stateno !=[31900,31903]  || stateno !=[21705,21708]  || stateno !=[21805,21809]
 triggerall = inguarddist
 triggerall = ailevel && roundstate = 2 && numenemy
 triggerall = (ctrl || stateno = 21 || stateno = 501 || (Anim = 15120 && AnimTime >= -1)) && (stateno != [120, 155])
@@ -1626,20 +1629,20 @@ trigger1 = EnemyNear(var(58)), movetype != I  && EnemyNear(var(58)), movetype !=
 trigger1 = !(p2bodydist x < 200 && statetype != A && EnemyNear(var(58)),movetype = A && (EnemyNear(var(58)),statetype = A || EnemyNear(var(58)), pos y < -50))
 value = 120
 
+;Specials
+;[State -1, AI Heart-out]
+;type = ChangeState
+;triggerall = !ishelper
+;triggerall = ailevel && (EnemyNear(var(58)), life<= EnemyNear(var(58)),lifemax/4) && roundstate = 2 && numenemy && (EnemyNear(var(58)), stateno != [10221,10224]) && (EnemyNear(var(58)), stateno != [10425,10427]) && (EnemyNear(var(58)), stateno != [11003,11005]) && (EnemyNear(var(58)), stateno != 21666) && (EnemyNear(var(58)), stateno != [13006,13008])
+;triggerall = var(25) && !var(3)  && power >= 2000 && !inguarddist && var(11) && !var(46) && (var(45) < 13) && statetype != A && cond(var(52),(EnemyNear(var(58)),stateno != var(52)),1)
+;triggerall = (EnemyNear(var(58)),stateno != [5200,5210])&& cond((EnemyNear(var(58)),stateno = 5120),(EnemyNear(var(58)),animtime > -1),(EnemyNear(var(58)),statetype != L))
+;trigger1 = ctrl || stateno = 21 || stateno = 501 || ((stateno = 10200 || stateno = 10210 || stateno = 10400 || stateno = 10500) && movehit = [1,4])
+;trigger1 = p2bodydist x = [0,312]
+;trigger1 = EnemyNear(var(58)),statetype != A
+;trigger1 = random < 800
+;value = 11250
 
-
-
-
-
-
-
-
-
-
-
-
-
-[State 0]
+[State -1, AI Flash Beatdown]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(11) = 10000
@@ -1654,7 +1657,7 @@ trigger1 = p2bodydist y = [-30-(EnemyNear(var(58)), movetype = H)*floor(1*(Enemy
 trigger1 = random < 600
 value = 1400
 
-[State 0]
+[State -1, AI SUPER 2(STOMP)]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(11) = 10000
@@ -1668,7 +1671,7 @@ trigger1 = p2bodydist y = [-30,0]
 trigger1 = random < 600
 value = 11700
 
-[State 0]
+[State 0, Simple/Hollow Wicker Basket]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(43) = 0 && Var(4) <= 1
@@ -1684,7 +1687,7 @@ triggerall = p2bodydist x <= 500
 triggerall = random < (ailevel * 100)
 value = 1157
 
-[State 0]
+[State 0, Domain Amp]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(4) <= 1 
@@ -1700,25 +1703,26 @@ triggerall = random < 100
 value = 51400
 
 
+;[State 0, Domain Expand]
+;type = ChangeState
+;triggerall = !ishelper
+;triggerall = helper(30990),Var(3) = 0
+;triggerall = p2bodydist x >= 50
+;triggerall = !ishelper
+;triggerall = statetype != A
+;triggerall= numhelper(51310) = 0
+;triggerall = power >= 3000
+;triggerall = ailevel > 0
+;triggerall = ctrl
+;trigger1 = random < (ailevel * 200)
+;;;trigger2 = random < 900 && Var(49) > 5 && life <= lifemax/2 ||  random < 900 && life <= lifemax/2
+;value = 51300
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-[State 0]
+[State -1, AI Counter]
 type = ChangeState
 triggerall = !ishelper
 triggerall = ailevel
+triggerall = helper(30990),Map(Counter) = 0
 triggerall = Var(11) = 10000
 triggerall = stateno != 1050
 trigger1 =  numenemy && EnemyNear(var(58)),movetype != H
@@ -1734,7 +1738,7 @@ trigger2 = enemynear,stateno = 5120 || enemynear,stateno = 5110
 trigger2 = random > 100 + ((life/4))
 value = 1050
 
-[State 0]
+[State -1, AI Fuga]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(43) = 0 && Var(4) <= 1
@@ -1751,7 +1755,7 @@ trigger2 = numhelper(30000) != 0 && helper(30000),p2dist x < 50
 trigger2 = random < 500
 value = 11900
 
-[State 0]
+[State 200, Dismantle]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(43) = 0 && Var(4) <= 1
@@ -1769,11 +1773,12 @@ trigger2 = random >= 500
 value = 11500
 
 
-[State 0]
+[State 200, Dismantle]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(43) = 0 && Var(4) <= 1
 triggerall = Var(11) = 10000
+triggerall = helper(30990),Map(3) = 0
 triggerall = ailevel && numenemy
 triggerall = power >= 200 && !inguarddist
 trigger1 = random < 400
@@ -1781,11 +1786,12 @@ trigger1 = ctrl || stateno = 21 || stateno = 501  || stateno = 50
 trigger1 = AIlevel && (inguarddist*(!var(25)) || (p2bodydist x <= 100) && (EnemyNear(var(58)), stateno != [10221,10224]) && (EnemyNear(var(58)), stateno != [10425,10427]) && (EnemyNear(var(58)), stateno != [11003,11005]) && (EnemyNear(var(58)), stateno != 21666)&& (EnemyNear(var(58)), stateno != 84644)&&(EnemyNear(var(58)), stateno != 21198) && (EnemyNear(var(58)), stateno != 21405) && (EnemyNear(var(58)), stateno != [99050,99060]))
 value = 11501
 
-[State 0]
+[State 200, Dismantle]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(43) = 0 && Var(4) <= 1
 triggerall = Var(11) = 10000
+triggerall = helper(30990),Map(0) = 0
 triggerall = ailevel && numenemy
 triggerall = power >= 200 && !inguarddist
 trigger1 = ctrl || stateno = 21 || stateno = 501  || stateno = 50
@@ -1794,11 +1800,12 @@ trigger1 = p2bodydist x < 80
 trigger1 = p2bodydist x >= 0 || (EnemyNear(var(58)), stateno = 21405) || (EnemyNear(var(58)), stateno = [13006,13008]) || (EnemyNear(var(58)), stateno = [10221,10224]) || (EnemyNear(var(58)), stateno = [10425,10427]) || (EnemyNear(var(58)), stateno = 84644) || (EnemyNear(var(58)), stateno = 11003) || (EnemyNear(var(58)), stateno = 21666)
 value = 11502
 
-[State 0]
+[State 200, Dismantle]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(43) = 0 && Var(4) <= 1
 triggerall = Var(11) = 10000
+triggerall = helper(30990),Map(1) = 0
 triggerall = ailevel && numenemy
 triggerall = power >= 200 && !inguarddist
 triggerall = ctrl || stateno = 21 || stateno = 501  || stateno = 50
@@ -1806,11 +1813,12 @@ trigger1 = random < 400
 trigger1 = p2bodydist x >= 0 || (EnemyNear(var(58)), stateno = 21405) || (EnemyNear(var(58)), stateno = [13006,13008]) || (EnemyNear(var(58)), stateno = [10221,10224]) || (EnemyNear(var(58)), stateno = [10425,10427]) || (EnemyNear(var(58)), stateno = 11003) || (EnemyNear(var(58)), stateno = 21666)
 value = 11503
 
-[State 0]
+[State 200, Dismantle]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(43) = 0 && Var(4) <= 1
 triggerall = Var(11) = 10000
+triggerall = helper(30990),Map(2) = 0
 triggerall = ctrl || stateno = 21 || stateno = 501  || stateno = 50
 triggerall = ailevel && numenemy
 triggerall = power >= 200 && !inguarddist
@@ -1819,7 +1827,7 @@ trigger1 = p2bodydist x >= 0 || (EnemyNear(var(58)), stateno = 21405) || (EnemyN
 trigger1 = random < 400
 value = 11504
 
-[State 0]
+[State 200, Cleave: Web]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(43) = 0 && Var(4) <= 1
@@ -1838,7 +1846,7 @@ trigger2 = numhelper(30000) != 0 && helper(30000),p2dist x < 50
 trigger2 = random < 900
 value = 11950
 
-[State 0]
+[State -1, Cleave]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(43) = 0 && Var(4) <= 1
@@ -1854,7 +1862,7 @@ trigger1 = random < 300
 value = 11600
 
 
-[State 0]
+[State -1, AI Punch Ground]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(11) = 10000
@@ -1868,7 +1876,7 @@ trigger1 = p2bodydist x > 50
 trigger1 = random < 300
 value = 11000
 
-[State 0]
+[State 200, Domain Expansion]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(43) = 0 && Var(4) <= 1
@@ -1887,7 +1895,7 @@ value = 51300
 
 
 
-[State 0]
+[State -1, AI Ten Shadows]
 type = VarSet
 triggerall = !ishelper
 triggerall = Var(43) = 0 && Var(4) <= 1
@@ -1936,16 +1944,16 @@ trigger10 = var(27) = 8 && stateno != 13000 && cond(var(52),(EnemyNear(var(58)),
 trigger10= random < ((64+20*(inguarddist)+var(45)*2+20+30*(EnemyNear(var(58)),movetype = H && EnemyNear(var(58)),statetype = A))*(AILevel ** 2 / 64.0))
 ignorehitpause = 1
 
-[State 0]
+[State 0, VarSet]
 type = VarSet
 triggerall = !ishelper
 trigger1 = Var(27) = 3
-v = 27    
+v = 27    ;fv = 10
 value = 4
+;ignorehitpause = 
+;persistent = 
 
-
-
-[State 0]
+[State -1, AI Power Charge]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(43) = 0 && Var(4) <= 1
@@ -1959,7 +1967,7 @@ trigger1 = random < ((cond(Power<(PowerMax/3.0),42,35)+120*((EnemyNear(var(58)),
 value = 500
 
 
-[State 0]
+[State -1, AI Power Charge]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(43) = 0 && Var(4) <= 1
@@ -1972,7 +1980,7 @@ trigger1 = p2bodydist x >= 100 || (EnemyNear(var(58)), stateno = 21405) || (Enem
 trigger1 = random < ((cond(Power<(3000/3.0),42,35)+120*((EnemyNear(var(58)), stateno = [13006,13008]))+68*((EnemyNear(var(58)),stateno = [5100,5110]) && p2bodydist x > 110 || EnemyNear(var(58)),movetype = I && EnemyNear(var(58)), vel x = 0.0 || (EnemyNear(var(58)), stateno = [10221,10224]) || (EnemyNear(var(58)), stateno = [10425,10427]) || (EnemyNear(var(58)), stateno = 11003) || (EnemyNear(var(58)), stateno = 5110))) *(AIlevel ** 2 / 64.0))
 value = 500
 
-[State 0]
+[State -1, AI recover1]
 type = ChangeState
 triggerall = !ishelper
 triggerall = ailevel && roundstate = 2 && numenemy
@@ -1982,7 +1990,7 @@ triggerall = canrecover
 trigger1 = random < ((200+105*(var(25)))*(AIlevel ** 2 / 64.0))
 value = 5200
 
-[State 0]
+[State -1, AI recover2]
 type = ChangeState
 triggerall = !ishelper
 triggerall = ailevel && roundstate = 2 && numenemy
@@ -1991,9 +1999,9 @@ triggerall = canrecover
 trigger1 = random < ((200+156*(var(25)))*(AIlevel ** 2 / 64.0))
 value = 5210
 
+;heian
 
-
-[State 0]
+[State -1, AI A NORMAL]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(23) = 0
@@ -2007,7 +2015,7 @@ trigger1 = p2bodydist y = [-42-(EnemyNear(var(58)), movetype = H)*floor(4*(Enemy
 trigger1 = random < 300
 value = 20200
 
-[State 0]
+[State -1, AI B NORMAL]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(23) = 0
@@ -2021,7 +2029,7 @@ trigger1 = p2bodydist y = [-48-(EnemyNear(var(58)), movetype = H)*floor(10*(Enem
 trigger1 = random < 300
 value = 20300
 
-[State 0]
+[State -1, AI B Up]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(23) = 0
@@ -2035,7 +2043,7 @@ trigger1 = p2bodydist y = [-48-(EnemyNear(var(58)), movetype = H)*floor(10*(Enem
 trigger1 = random < 300
 value = 20305
 
-[State 0]
+[State -1, AI C NORMAL]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(23) = 0
@@ -2049,7 +2057,7 @@ trigger1 = p2bodydist y = [-64-(EnemyNear(var(58)), movetype = H)*floor(4*(Enemy
 trigger1 = random < 300
 value = 20400
 
-[State 0]
+[State -1, AI C UP]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(23) = 0
@@ -2065,7 +2073,7 @@ trigger1 = random < 300
 value = 20402
 
 
-[State 0]
+[State -1, AI A Air]
 type = ChangeState
 triggerall = !ishelper
 value = 20600
@@ -2080,7 +2088,7 @@ trigger1 = p2bodydist y = [-30,30]
 trigger1 = random < 300
 
 
-[State 0]
+[State -1, AI B Air]
 type = ChangeState
 triggerall = !ishelper
 value = 20610
@@ -2094,7 +2102,7 @@ trigger1 = p2bodydist y = [-30,30]
 trigger1 = random < 300
 
 
-[State 0]
+[State -1, AI C Air]
 type = ChangeState
 triggerall = !ishelper
 value = 20620
@@ -2109,7 +2117,7 @@ trigger1 = p2bodydist x = [0,200]
 trigger1 = p2bodydist y = [-45,60]
 trigger1 = random < 300
 
-[State 0]
+[State -1, AI Fuga]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(23) = 0
@@ -2132,7 +2140,7 @@ trigger3 =random < 700
 trigger3 = numhelper(31564) != 0 && EnemyNear(var(58)),movetype = h
 value = 11300
 
-[State 0]
+[State 200, Dismantle]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(43) = 0 && Var(4) <= 1
@@ -2149,7 +2157,7 @@ trigger2 = numhelper(40000) != 0 && helper(40000),p2dist x < 50
 trigger2 = random >= 500
 value = ifelse(pos y = 0,31500,31501)
 
-[State 0]
+[State 200, Dismantle]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(43) = 0 && Var(4) <= 1
@@ -2167,11 +2175,12 @@ trigger2 = random >= 500
 value = ifelse(pos y = 0,31500,31501)
 
 
-[State 0]
+[State 200, Dismantle Base]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(43) = 0 && Var(4) <= 1
 triggerall = Var(11) = 20000
+triggerall = helper(30990),Map(3) = 0
 triggerall = ailevel && numenemy
 triggerall = power >= 200 && !inguarddist
 trigger1 = ifelse(helper(30980),Var(2) = 1,ifelse(Var(9) = 3,1,random < 300),random < 300)
@@ -2185,23 +2194,25 @@ trigger2 = numhelper(40000) != 0 && helper(40000),p2dist x < 50
 trigger2 = random <= 500
 value = 31501
 
-[State 0]
+[State 200, Dismantle down]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(43) = 0 && Var(4) <= 1
 triggerall = Var(11) = 20000
+triggerall = helper(30990),Map(0) = 0
 triggerall = power >= 500
 triggerall = ailevel && roundstate = 2 && numenemy
-trigger1 = ifelse(Var(41) = 0,(p2bodydist x = [-180,180]),p2bodydist x = [-480,480])
+trigger1 = ifelse(Var(41) = 0,p2bodydist x = [-180,180],p2bodydist x = [-480,480])
 trigger1 = ctrl || stateno = 21 || stateno = 501  || stateno = 50
 trigger1 = random >=500
 value = ifelse(Var(41) = 0,31613,31502)
 
-[State 0]
+[State 200, Dismantle back]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(43) = 0 && Var(4) <= 1
 triggerall = Var(11) = 20000
+triggerall = helper(30990),Map(1) = 0
 trigger1 = ctrl || stateno = 21 || stateno = 501  || stateno = 50
 triggerall = ailevel && numenemy
 triggerall = power >= 500 && !inguarddist
@@ -2211,11 +2222,12 @@ trigger1 = p2bodydist x >= 0 || (EnemyNear(var(58)), stateno = 21405) || (EnemyN
 trigger1 = random < 400
 value = 31503
 
-[State 0]
+[State 200, Dismantle fwd]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(43) = 0 && Var(4) <= 1
 triggerall = Var(11) = 20000
+triggerall = helper(30990),Map(2) = 0
 trigger1 = ctrl || stateno = 21 || stateno = 501  || stateno = 50
 triggerall = power >= 500 && !inguarddist
 triggerall = ailevel && roundstate = 2 && numenemy
@@ -2226,7 +2238,7 @@ trigger1 = p2bodydist x >= 0 || (EnemyNear(var(58)), stateno = 21405) || (EnemyN
 value = 31504
 
 
-[State 0]
+[State 200, Instant Shot]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(11) = 20000
@@ -2239,7 +2251,7 @@ trigger3 = numhelper(40000) != 0 && helper(40000),p2dist x < 50
 value = 31801
 
 
-[State 0]
+[State 200, Indiscrim Shot]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(11) = 20000
@@ -2251,7 +2263,7 @@ trigger1 = p2bodydist x >= 0 || (EnemyNear(var(58)), stateno = 21405) || (EnemyN
 trigger1 = random >= 300 && random < 500
 value = 31802
 
-[State 0]
+[State 200, Twin Shot]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(11) = 20000
@@ -2263,7 +2275,7 @@ trigger1 = p2bodydist x >= 0 || (EnemyNear(var(58)), stateno = 21405) || (EnemyN
 trigger1 = random >= 300 && random < 500
 value = 31803
 
-[State 0]
+[State 200, Direct Shot]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(11) = 20000
@@ -2277,12 +2289,13 @@ trigger1 = random < 500
 value = 31804
 
 
-[State 0]
+[State 200, hiten down]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(23) != 0
 triggerall = Var(11) = 20000
 triggerall = ctrl || stateno = 21 || stateno = 501  || stateno = 50
+triggerall = helper(30990),Map(9) = 0
 triggerall = power >= 500
 triggerall = ailevel && roundstate = 2 && numenemy
 trigger1 = p2bodydist x = [-200,200] 
@@ -2290,10 +2303,11 @@ trigger1 = (EnemyNear(var(58)), stateno = 21405) || (EnemyNear(var(58)), stateno
 trigger1 = random < 400
 value = ifelse(pos y != 0,21902,21913)
 
-[State 0]
+[State 200, hiten slash]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(23) != 0
+triggerall = helper(30990),Map(10) = 0
 triggerall = Var(11) = 20000
 triggerall = power >= 500
 triggerall = ctrl || stateno = 21 || stateno = 501  || stateno = 50
@@ -2303,12 +2317,13 @@ trigger1 = p2bodydist x >= 0 || (EnemyNear(var(58)), stateno = 21405) || (EnemyN
 trigger1 = random < 400
 value = 21904
 
-[State 0]
+[State 200, hiten shockwave]
 type = ChangeState
 triggerall = !ishelper
-triggerall = stateno !=34000 || stateno !=34001 || (stateno !=[31700,31703]) || (stateno !=[31900,31903])  || (stateno !=[21705,21708])  || (stateno !=[21805,21809])
+triggerall = stateno !=34000 || stateno !=34001 || stateno !=[31700,31703] || stateno !=[31900,31903]  || stateno !=[21705,21708]  || stateno !=[21805,21809]
 triggerall = Var(23) != 0
 triggerall = Var(11) = 20000
+triggerall = helper(30990),Map(8) = 0
 triggerall =  power >= 1000  && statetype != A 
 triggerall = ctrl || movetype = H
 triggerall = Var(11) = 20000
@@ -2319,13 +2334,14 @@ trigger1 = random < 400
 value = 21901
 
 
-[State 0]
+[State -1, hiten Counter]
 type = ChangeState
 triggerall = !ishelper
-triggerall = stateno !=34000 || stateno !=34001 || (stateno !=[31700,31703]) || (stateno !=[31900,31903])  || (stateno !=[21705,21708])  || (stateno !=[21805,21809])
+triggerall = stateno !=34000 || stateno !=34001 || stateno !=[31700,31703] || stateno !=[31900,31903]  || stateno !=[21705,21708]  || stateno !=[21805,21809]
 triggerall = ailevel
 triggerall = Var(23) != 0
 triggerall = Var(11) = 20000
+triggerall = helper(30990),Map(11) = 0
 triggerall = stateno != 21903
 triggerall = power >= 1000 
 trigger1 =  numenemy && EnemyNear(var(58)),movetype != H
@@ -2347,7 +2363,7 @@ trigger4 = cond(numhelper(33333333),helper(33333333), cond(1, var(22) := 3, 0), 
 trigger4 = cond(helper(33333333),numexplod((helper(33333333),var(22)*100000000)+PlayerID(helper(33333333),var(3)),stateno) = 0, 1, helper(33333333),numexplod((helper(33333333),var(22)*100000000)+abs(floor(PlayerID(helper(33333333),var(3)),vel x))) = 0)
 value = 21903
 
-[State 0]
+[State 0, VarSet]
 type = VarSet
 triggerall = !ishelper
 triggerall = var(21)!=-1
@@ -2360,20 +2376,20 @@ triggerall = helper(30990),Var(35) = 0
 triggerall = stateno != 51325
 triggerall = ailevel && numenemy
 trigger1 = random < 800
-fv = 9    
+fv = 9    ;fv = 10
 value = 1
 
-[State 0]
+[State 0, VarSet]
 type = VarSet
 triggerall = !ishelper
 trigger1 = movetype = H
 trigger3 = stateno = 56110
 trigger2 = stateno = 51325
-fv = 9    
+fv = 9    ;fv = 10
 value = 0
 
 
-[State 0]
+[State 200, Cleave]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(11) = 20000
@@ -2389,25 +2405,27 @@ trigger1 = AIlevel && (inguarddist*(!var(25)) || (p2bodydist x <= 100) && (Enemy
 value = 31601
 
 
-[State 0]
+[State 200, Cleave]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(11) = 20000
 triggerall = ctrl || stateno = 21 || stateno = 501  || stateno = 50
+triggerall = helper(30990),Map(4) = 0
 triggerall =  power >= 1000  && statetype != A
 triggerall = enemynear,stateno != 5120 || enemynear,stateno != 5110
 triggerall = Var(43) = 0 && Var(4) <= 1
 triggerall = Var(11) = 20000
 triggerall = ailevel && roundstate = 2 && numenemy
-trigger1 =ifelse(Var(41) = 0, (p2bodydist x = [-100,100]) ,p2bodydist x = [-50,550) )
+trigger1 =ifelse(Var(41) = 0, p2bodydist x = [-100,100) ,p2bodydist x = [-50,550) )
 trigger1 = random >=500
 value = ifelse(Var(41) = 0,31602,ifelse(numhelper(51310)=0,31606,31602))
 
-[State 0]
+[State 200, Cleave]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(11) = 20000
 triggerall = ctrl || stateno = 21 || stateno = 501  || stateno = 50
+triggerall = helper(30990),Map(5) = 0
 triggerall = enemynear,stateno != 5120 || enemynear,stateno != 5110
 triggerall =  power >= 1000
 triggerall = Var(43) = 0 && Var(4) <= 1
@@ -2423,12 +2441,14 @@ trigger2 = random >= 500
 value = 31603
 
 
-[State 0]
+[State -1, AI Cleave]
 type = ChangeState
 triggerall = !ishelper
-triggerall = stateno !=34000 || stateno !=34001 || (stateno !=[31700,31703]) || (stateno !=[31900,31903])  || (stateno !=[21705,21708])  || (stateno !=[21805,21809])
+triggerall = helper(30990),Map(Counter) = 0
+triggerall = stateno !=34000 || stateno !=34001 || stateno !=[31700,31703] || stateno !=[31900,31903]  || stateno !=[21705,21708]  || stateno !=[21805,21809]
 triggerall = Var(11) = 20000
 triggerall = ailevel  && statetype != A
+triggerall = helper(30990),Map(6) = 0
 triggerall = Var(43) = 0 && Var(4) <= 1
 triggerall = Var(11) = 20000
 triggerall = Var(41) = 0
@@ -2448,12 +2468,13 @@ trigger2 = enemynear,stateno = 5120 || enemynear,stateno = 5110
 trigger2 = random > 100 + ((life/4))
 value = 31604
 
-[State 0]
+[State 200, Cleave]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(11) = 20000
 triggerall = ctrl || stateno = 21 || stateno = 501  || stateno = 50
-triggerall =  power >= 1000
+triggerall =  power >= 1000  
+triggerall = helper(30990),Map(6) = 0
 triggerall = enemynear,stateno != 5120 || enemynear,stateno != 5110
 triggerall = Var(43) = 0 && Var(4) <= 1
 triggerall = Var(11) = 20000
@@ -2467,7 +2488,7 @@ value = 31607
 
 
 
-[State 0]
+[State -1, AI Flash Beatdown]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(23) = 0
@@ -2483,7 +2504,7 @@ trigger1 = p2bodydist y = [-30-(EnemyNear(var(58)), movetype = H)*floor(1*(Enemy
 trigger1 = random >= 300
 value = 31700
 
-[State 0]
+[State -1, AI SUPER 2(STOMP)]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(23) = 0
@@ -2500,11 +2521,12 @@ trigger1 = random >= 300
 value = 31900
 
 
-[State 0]
+[State -1, AI Counter]
 type = ChangeState
 triggerall = !ishelper
+triggerall = helper(30990),Map(Counter) = 0
 triggerall = ailevel
-triggerall = stateno !=34000 || stateno !=34001 || (stateno !=[31700,31703]) || (stateno !=[31900,31903])  || (stateno !=[21705,21708])  || (stateno !=[21805,21809])
+triggerall = stateno !=34000 || stateno !=34001 || stateno !=[31700,31703] || stateno !=[31900,31903]  || stateno !=[21705,21708]  || stateno !=[21805,21809]
 triggerall = Var(11) = 20000
 triggerall = stateno != 21050
 triggerall = power >= 500 
@@ -2522,9 +2544,10 @@ trigger2 = random > 100 + ((life/4))
 value = 21050
 
 
-[State 0]
+[State 0, Hiten Switch]
 type = Helper
 triggerall = !ishelper
+triggerall = helper(30990),Map(7) = 0
 triggerall = ailevel
 triggerall = Var(11) = 20000
 triggerall = !ctrl
@@ -2544,9 +2567,10 @@ ownpal = 1
 size.xscale =0.96
 size.yscale =2.4
 
-[State 0]
+[State 0, Hiten Switch]
 type = Helper
 triggerall = !ishelper
+triggerall = helper(30990),Map(7) = 0
 triggerall = ailevel
 triggerall = Var(23) = 20
 triggerall = Var(11) = 20000
@@ -2567,7 +2591,7 @@ ownpal = 1
 size.xscale =0.96
 size.yscale =2.4
 
-[State 0]
+[State -1, AI Hiten Beatdown]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(23) != 0
@@ -2583,7 +2607,7 @@ trigger1 = p2bodydist y = [-42-(EnemyNear(var(58)), movetype = H)*floor(4*(Enemy
 trigger1 = random >= 300
 value = 21705
 
-[State 0]
+[State -1, AI Hiten Imaple]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(23) != 0
@@ -2599,7 +2623,7 @@ trigger1 = p2bodydist y = [-42-(EnemyNear(var(58)), movetype = H)*floor(4*(Enemy
 trigger1 = random >= 300
 value = 21805
 
-[State 0]
+[State -1, AI A NORMAL]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(23) != 0
@@ -2613,7 +2637,7 @@ trigger1 = p2bodydist y = [-42-(EnemyNear(var(58)), movetype = H)*floor(4*(Enemy
 trigger1 = random < 300
 value = 20201
 
-[State 0]
+[State -1, AI B NORMAL]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(23) != 0
@@ -2627,7 +2651,7 @@ trigger1 = p2bodydist y = [-48-(EnemyNear(var(58)), movetype = H)*floor(10*(Enem
 trigger1 = random < 300
 value = 20301
 
-[State 0]
+[State -1, AI C NORMAL]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(23) != 0
@@ -2642,7 +2666,7 @@ trigger1 = random < 300
 value = 20401
 
 
-[State 0]
+[State -1, AI B Up]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(23) != 0
@@ -2657,7 +2681,7 @@ trigger1 = random < 300
 value = 20307
 
 
-[State 0]
+[State -1, AI C UP]
 type = ChangeState
 triggerall = !ishelper
 triggerall = Var(23) != 0
@@ -2673,7 +2697,7 @@ trigger1 = random < 300
 value = 20407
 
 
-[State 0]
+[State -1, AI A Air]
 type = ChangeState
 triggerall = !ishelper
 value = 20605
@@ -2688,7 +2712,7 @@ trigger1 = p2bodydist y = [-30,30]
 trigger1 = random < 300
 
 
-[State 0]
+[State -1, AI B Air]
 type = ChangeState
 triggerall = !ishelper
 value = 20615
@@ -2702,7 +2726,7 @@ trigger1 = p2bodydist y = [-30,30]
 trigger1 = random < 300
 
 
-[State 0]
+[State -1, AI C Air]
 type = ChangeState
 triggerall = !ishelper
 value = 20625
@@ -2717,22 +2741,22 @@ trigger1 = random < 300
 
 
 
+;Transformations
 
-
-[State 0]
+[State 0, SelfState]
 Type = SelfState
 triggerall = ailevel != 0
 triggerall = !ishelper
 triggerall = Var(11) = 10000
 triggerall = (roundstate = 2) && (alive)
 triggerall = !ishelper
-trigger1 = life <=  500
+trigger1 = life <= 1000
 triggerall = stateno !=19999
 value = 19999
 ignorehitpause = 1
 persistent = 0
 
-[State 0]
+[State 0, SelfState]
 Type = SelfState
 triggerall = !ishelper
 triggerall = ailevel != 0
@@ -2744,21 +2768,35 @@ ignorehitpause = 1
 persistent = 0
 
 
-[State 0]
+[State 0, SelfState]
 Type = SelfState
 triggerall = !ishelper
 triggerall = ailevel != 0
 triggerall = Var(11) = 10000
 triggerall = (roundstate = 2) && (alive)
 triggerall = !ishelper
-trigger1 = life <=  500
+trigger1 = life <= 1000
 triggerall = stateno !=19999
 value = 19999
 ignorehitpause = 1
 persistent = 0
 
 
-[State 0]
+[State 0, SelfState]
+Type = SelfState
+triggerall = ailevel !=0 
+triggerall = !ishelper
+triggerall = Var(11) = 20000
+triggerall = (roundstate = 2) && (alive)
+triggerall = !ishelper
+triggerall = var(19) = 0
+trigger1 = life <=  500
+triggerall = stateno !=51300 &&  stateno != [51324,51325]
+value = 51300
+ignorehitpause = 1
+persistent = 0
+
+[State 0, SelfState]
 Type = SelfState
 triggerall = !ishelper
 triggerall = Var(11) = 10000
@@ -2769,7 +2807,7 @@ Triggerall = Life <= 1500
 Value = 11550
 IgnoreHitPause = 1
 
-[State 0]
+[State 0, VarSet]
 type = VarSet
 triggerall = ailevel !=0 
 triggerall = !ishelper
@@ -2779,7 +2817,7 @@ triggerall = stateno = [51324,51325]
 trigger1 = life <=  500
 var(19) = 1
 
-[State 0]
+[State 0, VarSet]
 type = VarSet
 triggerall = ailevel =0 
 triggerall = !ishelper
@@ -2790,7 +2828,7 @@ trigger1 = life <=  500
 var(19) = 1
 
 
-[State 0]
+[State -1, AI Super Jump]
 type = ChangeState
 triggerall = !ishelper
 triggerall = !var(5)
@@ -2802,7 +2840,7 @@ trigger1 = EnemyNear(var(58)),statetype = A && (p2bodydist x = [100,180]) && (En
 trigger1 = random < ((25+25*(ailevel < 6)+ailevel)*(AILevel ** 2 / 64.0))
 value = 80
 
-[State 0]
+[State -1, AI Jump]
 type = ChangeState
 triggerall = !ishelper
 triggerall = AILevel && numenemy && roundstate = 2 && EnemyNear(var(58)),statetype != L 
@@ -2813,7 +2851,7 @@ trigger1 = EnemyNear(var(58)),statetype = A && (p2bodydist x = [100,180]) && (En
 trigger1 = random < ((21+25*(ailevel < 6))*(AILevel ** 2 / 64.0))
 value = 40
 
-[State 0]
+[State 0, SelfState]
 Type = SelfState
 triggerall = !ishelper
 triggerall = !ishelper
