@@ -1,0 +1,1221 @@
+
+[Statedef -2]
+
+[State 0, PowerAdd]
+type = PowerAdd
+trigger1 = 1
+value = 2
+persistent = 10
+
+[State 0, AttackMulSet]
+type = AttackMulSet
+trigger1 = 1
+value = 1.3
+
+
+
+
+[State 0, Dash Forward]
+type = ChangeState
+triggerall = statetype != A
+triggerall = ailevel > 0 && roundstate = 2
+triggerall = ctrl
+triggerall = p2bodydist x > 50
+trigger1 = random < (ailevel * 100)/6
+value = 60
+
+[State 0, Dash Backwards]
+type = ChangeState
+triggerall = statetype != A
+triggerall = backedgebodydist > 50
+triggerall = ailevel > 0 && roundstate = 2
+triggerall = ctrl
+triggerall = p2bodydist x < 50 && p2movetype = A
+triggerall = p2bodydist x < 50 && p2movetype = H
+trigger1 = random < (ailevel * 100)/4
+value = 70
+
+
+
+;Var(59) - 5A 3X
+
+;Var(58) -5C Cooldown
+
+;Var(52) - 6C Cooldown (Only IA)
+
+;Var(57) - j.6C One use per jump
+
+;Var(55) - 236A Akabana Ranbu On/Off
+;Var(53) - 236A Cooldown
+
+;Var(54) - 236B Cooldown
+
+;Var(56) - j.623C One use per jump
+
+;Var(51) - 5ABC Time
+
+;Fvar(0) - 5ABC Zoom Factor
+
+
+
+
+;===============================================================
+;RESET VARS / SET VARS
+;===============================================================
+
+[State -2, Null]
+Type = Null
+Trigger1 = StateType = S
+Trigger1 = Var(10) := 28
+Trigger2 = StateType = C
+Trigger2 = Var(10) := 18
+Trigger3 = StateType = A
+Trigger3 = Var(10) := 30
+IgnoreHitPause = 1
+
+[State -2, Null]
+Type = Null
+Trigger1 = StateType = S
+Trigger1 = Var(11) := -130
+Trigger2 = StateType = C
+Trigger2 = Var(11) := -86
+Trigger3 = StateType = A
+Trigger3 = Var(11) := -124
+IgnoreHitPause = 1
+
+[State -2, Null]
+Type = Null
+Trigger1 = StateNO != 220 && StateNO != 250 && StateNO != 310 && StateNO != 420 && StateNO != 450 
+Trigger1 = Var(29) := 0 
+IgnoreHitPause = 1
+
+[State -2, Null] ;In Ultimate
+Type = Null
+Trigger1 = StateNO = [3001,3004]
+Trigger1 = NumTarget
+Trigger1 = Target,AuthorName = "Burako"
+Trigger1 = Target,Cond(1,Var(35) := 1,0)
+IgnoreHitPause = 1
+
+[State -2, Null] ;In Ultimate
+Type = Null
+Trigger1 = StateNO != [3001,3004]
+Trigger1 = NumTarget
+Trigger1 = Target,AuthorName = "Burako"
+Trigger1 = Target,Cond(1,Var(35) := 0,0)
+IgnoreHitPause = 1
+
+[State -2, Null] ;In Ultimate
+Type = Null
+Trigger1 = MoveType != H
+Trigger1 = StateNO != [3001,3004]
+Trigger1 = Var(35) := 0 
+IgnoreHitPause = 1
+
+[State -2, Null] ;In Ultimate
+Type = Null
+Trigger1 = MoveType != H
+Trigger1 = StateNO = [3001,3004]
+Trigger1 = Var(35) := 1
+IgnoreHitPause = 1
+
+
+[State -2, VarAdd]
+Type = VarAdd
+Trigger1 = Var(52) > 0
+Trigger1 = StateNO != [250,251]
+var(52) = -1
+IgnoreHitPause = 1
+
+[State -2, VarAdd]
+Type = VarAdd
+Trigger1 = Var(53) > 0
+Trigger1 = StateNO != [1000,1002]
+Trigger1 = StateNO != [1100,1101]
+var(53) = -1
+IgnoreHitPause = 1
+
+[State -2, VarAdd]
+Type = VarAdd
+Trigger1 = Var(54) > 0
+Trigger1 = StateNO != [1000,1002]
+Trigger1 = StateNO != [1100,1101]
+var(54) = -1
+IgnoreHitPause = 1
+
+[State -2, Null]
+Type = Null
+Trigger1 = StateNO = 1000
+Trigger1 = Var(55) := 1
+IgnoreHitPause = 1
+
+[State -2, Null]
+Type = Null
+Trigger1 = StateNO != [1000,1002] 
+Trigger1 = StateNO != [1100,1101]
+Trigger1 = StateNO != [1200,1202]
+Trigger1 = Var(55) := 0
+IgnoreHitPause = 1
+
+[State -2, VarSet]
+Type = VarSet
+Trigger1 = Var(56)
+Trigger1 = StateNO != [1550,1551]
+Trigger1 = Pos Y = 0
+var(56) = 0
+IgnoreHitPause = 1
+
+[State -2, VarSet]
+Type = VarSet
+Trigger1 = Var(57)
+Trigger1 = StateNO != [450,451]
+Trigger1 = Pos Y = 0
+var(57) = 0
+IgnoreHitPause = 1
+
+[State -2, VarAdd]
+Type = VarAdd
+Trigger1 = Var(58) > 0
+Trigger1 = StateNO != 220
+var(58) = -1
+IgnoreHitPause = 1
+
+
+;===============================================================================
+;Hitspark
+;===============================================================================
+
+[State -2, Null]
+Type = Null
+Trigger1 = MoveContact && Var(28) < 0
+Trigger1 = Var(28) := (HitPauseTime)
+IgnoreHitPause = 1
+
+[State -2, Null]
+Type = Null
+Trigger1 = Var(28) := -1
+
+[State -2, Helper ]
+Type = Helper 
+Trigger1 = Var(25) = [0,2]
+Trigger1 = Var(28) = (HitPauseTime)
+Name = "Physical Hitspark"
+ID = 12000
+StateNO = 12000
+OwnPal = 1
+PauseMoveTime = 99999
+Size.XScale = ID
+Size.YScale = 0
+IgnoreHitPause = 1
+
+[State -2, Helper]
+Type = Helper 
+Trigger1 = Var(25) = [3,5]
+Trigger1 = Var(28) = (HitPauseTime)
+Name = "Slash Hitspark"
+ID = 12010
+StateNO = 12010
+OwnPal = 1
+PauseMoveTime = 99999
+Size.XScale = ID
+Size.YScale = 0 ;0 - Nothing, 1 - Hit Effect, 2 - Guard Effect
+Size.Height = Cond((StateNO = 250 || StateNO = 450 || (StateNO = [1000,1002]) || (StateNO = 1201 && Var(55)) || StateNO = 1500 || StateNO = 1550),9,12) ;PalNO (Check the sprite tab)
+IgnoreHitPause = 1
+
+;===============================================================================
+;SHIELD
+;===============================================================================
+
+[State -2, ChangeState] ;ChangeState to Parry State
+Type = ChangeState
+TriggerAll = Var(12)
+TriggerAll = Var(13)
+TriggerAll = Var(14) >= 1
+TriggerAll = StateNO != [1500,1501]
+TriggerAll = Power >= 1000
+TriggerAll = (StateNO = 150 || StateNO = 152 || StateNO = 154)
+TriggerAll = StateType != A && Pos Y = 0
+TriggerAll = GetHitVar(Guarded)  
+TriggerAll = MoveType = H
+TriggerAll = PlayerIDExist(Var(16))
+TriggerAll = !HitOver
+Trigger1 = !AiLevel
+Trigger1 = Command = "c"
+Trigger2 = AiLevel && NumEnemy
+Trigger2 = RoundState = 2
+Trigger2 = PlayerIDExist(Var(16))
+Trigger2 = PlayerID(Var(16)),StateType != A
+Trigger2 = Var(20) = [(6 * AiLevel),(10 * AiLevel)]
+Trigger2 = Fvar(39) <= 660
+Trigger2 = EnemyNear,Pos Y >= Const(Size.Mid.Pos.Y)
+Trigger2 = EnemyNear,StateType != L
+Value = 1500
+IgnoreHitPause = 1
+
+[State -2, ChangeState]
+Type = ChangeState
+Trigger1 = Var(16) != 0
+Trigger1 = Var(12)
+Trigger1 = Var(13)
+Trigger1 = Var(5)
+Trigger1 = Var(6)
+Trigger1 = PlayerIDExist(Var(16))
+Trigger1 = Power = PowerMax
+Trigger1 = SelfAnimExist(3500)
+Trigger1 = !(CameraZoom > 1.0)
+Trigger1 = (StateNO != [3000,3004]) || (StateNO != [3500,3501])
+Trigger1 = (StateNO = [130,132]) || (StateNO = [150,155])
+Trigger1 = StateType != A && Pos Y = 0
+Trigger1 = GetHitVar(Guarded)  = 1
+Trigger1 = MoveType = H
+Trigger1 = GetHitVar(HitShakeTime) > 0
+Trigger1 = !HitOver
+Value = 3500
+IgnoreHitPause = 1
+
+;===============================================================================
+;VOICES
+;===============================================================================
+
+[State -2, PlaySnd]
+Type = PlaySnd
+Trigger1 = Random%2 = 0
+Trigger1 = StateNO = 100 || StateNO = 110
+Trigger1 = Time = 2
+Value = S100,0 + Random%2
+VolumeScale = 80
+IgnoreHitPause = 1
+
+[State -2, PlaySnd]
+Type = PlaySnd
+Trigger1 = Random%2 = 0
+Trigger1 = StateNO = 105 ||  StateNO = 115
+Trigger1 = Time = 2
+Value = S105,0
+VolumeScale = 80
+IgnoreHitPause = 1
+
+[State -2, PlaySnd] ;Shield
+Type = PlaySnd
+Trigger1 = StateNO = 120
+Trigger1 = Var(12)
+Trigger1 = Var(13)
+Trigger1 = Time = 2
+Value = S120, 0 + Random%2
+VolumeScale = 80
+IgnoreHitPause = 1
+
+[State -2, PlaySnd] ;Recovery
+Type = PlaySnd
+TriggerAll = Random < 500
+TriggerAll= Time = 2
+Trigger1 = StateNO = 5040
+Trigger1 = Anim = 5040
+Trigger2 = StateNO = 5201 || StateNO = 5210
+Value = S5040, 0 + Random%2
+VolumeScale = 80
+IgnoreHitPause = 1
+
+[State -2, PlaySnd] ;Get Up
+Type = PlaySnd
+Trigger1 = StateNO = 5120
+Trigger1 = Anim = 5120
+Trigger1 = Time = 2
+Value = S5120, 0 + Random%3
+VolumeScale = 80
+IgnoreHitPause = 1
+
+;===============================================================================
+;TARGET EFFECTS
+;===============================================================================
+
+;Target 420
+
+[State -2, Helper]
+Type = Helper
+Trigger1 = !NumHelper(422)
+Trigger1 = NumTarget(420)
+Trigger1 = Target(420),StateNO = 5100
+Trigger1 = Target(420),Time = 1
+Name = "Floor Smash"
+ID = 422
+StateNO = 422
+Pos = (Target(420),Pos X - Pos X) * Facing, (Target(420),Pos Y - Pos Y)
+OwnPal = 1
+PauseMoveTime = 99999
+Size.XScale = .6
+Size.YScale = .6
+IgnoreHitPause = 1
+
+;Target 1002
+
+[State -2, PlaySnd]
+Type = PlaySnd
+Trigger1 = !NumExplod(11006)
+Trigger1 = !NumExplod(11008)
+Trigger1 = NumTarget(1002)
+Trigger1 = Target(1002),StateNO = 5401 || Target(1002),StateNO = 5402 && Target(1002),Time = 1
+Trigger1 = Target(1002),BackEdgeBodyDist < (Target(1002),Const(Size.Ground.Back) + Target(1002),Const(Size.Ground.Front)) || Target(1002),StateNO = 5402 && Target(1002),Time = 1
+Value = S5400, 500
+IgnoreHitPause = 1
+
+[State -2, Explod]
+Type = Explod
+Trigger1 = !NumExplod(11006)
+Trigger1 = NumTarget(1002)
+Trigger1 = Target(1002),StateNO = 5401 || Target(1002),StateNO = 5402 && Target(1002),Time = 1
+Trigger1 = Target(1002),BackEdgeBodyDist < (Target(1002),Const(Size.Ground.Back) + Target(1002),Const(Size.Ground.Front)) || Target(1002),StateNO = 5402 && Target(1002),Time = 1
+Anim = 11006
+ID = 11006
+Pos = Cond(Target, Facing = 1,0,ScreenWidth), (Target,ScreenPos Y) * CameraZoom
+Space = Screen
+Facing = Target,Facing
+Scale = .8 * CameraZoom, .8 * CameraZoom
+SprPriority = 3
+Shadow = 0, 0, 0
+OwnPal = 1
+Trans = Add
+Angle = -90
+IgnoreHitPause = 1
+
+[State -2, Explod]
+Type = Explod
+Trigger1 = !NumExplod(11008)
+Trigger1 = NumTarget(1002)
+Trigger1 = Target(1002),StateNO = 5401 || Target(1002),StateNO = 5402 && Target(1002),Time = 1
+Trigger1 = Target(1002),BackEdgeBodyDist < (Target(1002),Const(Size.Ground.Back) + Target(1002),Const(Size.Ground.Front)) || Target(1002),StateNO = 5402 && Target(1002),Time = 1
+Anim = 11008
+ID = 11008
+Pos = Cond(Target, Facing = 1,0,ScreenWidth), (Target,ScreenPos Y) * CameraZoom
+Space = Screen
+Facing = Target,Facing
+Scale = .8 * CameraZoom, .8 * CameraZoom
+SprPriority = 3
+Shadow = 0, 0, 0
+OwnPal = 1
+Trans = Add
+IgnoreHitPause = 1
+
+;===============================================================================
+;HELPER TO CREATE CONNECTIONS IN COMBO
+;===============================================================================
+
+[State -2, Helper] ;Ground
+Type = Helper
+Trigger1 = MoveContact && ((StateNO = [1000,1002]) || StateNO = 1101)
+Trigger2 = NumHelper(1410)
+Trigger2 = Helper(1410),MoveContact && StateNO = 1400
+Name = "Combo Connections MoveContact"
+ID = 6000
+StateNO = 6000
+OwnPal = 1
+PauseMoveTime = 99999
+IgnoreHitPause = 1
+
+[State -2, Helper] ;Air
+Type = Helper
+Trigger1 = MoveContact && (StateNO = 1100 && UniqHitCount = 2)
+Name = "Combo Connections MoveContact"
+ID = 6050
+StateNO = 6050
+OwnPal = 1
+PauseMoveTime = 99999
+IgnoreHitPause = 1
+
+[State -2, Helper] ;Ground
+Type = Helper
+Trigger1 = MoveHit && ((StateNO = [1000,1002]) || StateNO = 1101)
+Trigger2 = NumHelper(1410)
+Trigger2 = Helper(1410),MoveHit && StateNO = 1400
+Name = "Combo Connections MoveHit"
+ID = 6100
+StateNO = 6100
+OwnPal = 1
+PauseMoveTime = 99999
+IgnoreHitPause = 1
+
+[State -2, Helper] ;Air
+Type = Helper
+Trigger1 = MoveHit && (StateNO = 1100 && UniqHitCount = 2)
+Name = "Combo Connections MoveHit"
+ID = 6150
+StateNO = 6150
+OwnPal = 1
+PauseMoveTime = 99999
+IgnoreHitPause = 1
+
+[State -2, Helper] ;Ground
+Type = Helper
+Trigger1 = MoveHit && (StateNO = 1501)
+Name = "Combo Connections Skills MoveHit"
+ID = 6200
+StateNO = 6200
+OwnPal = 1
+PauseMoveTime = 99999
+IgnoreHitPause = 1
+
+[State -2, Helper] ;Air
+Type = Helper
+Trigger1 = MoveHit && ((StateNO = 1201 && (Pos Y < - 100 * (AiLevel > 0))) || StateNO = 1551)
+Name = "Combo Connections Skills MoveHit"
+ID = 6250
+StateNO = 6250
+OwnPal = 1
+PauseMoveTime = 99999
+IgnoreHitPause = 1
+
+;===============================================================================
+;COMMANDS
+;===============================================================================
+
+;---------------------------------------------------------------------------
+
+
+;---------------------------------------------------------------------------
+; 236BC
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll =  !AiLevel
+TriggerAll = Command = "236BC"
+TriggerAll = StateNO != [2000,2003]
+TriggerAll = StateType != A && Pos Y = 0
+TriggerAll = Power >= 3000
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 || StateNO = 210 || StateNO = 220 || StateNO = 251 || StateNO = 300 ||StateNO = 310 ||StateNO = 320 || StateNO = 801)
+Trigger3 = !Var(32) && NumHelper(6000)
+Trigger4 = Var(32) < 2 && NumHelper(6200)
+Value = 2000
+
+;---------------------------------------------------------------------------
+; 236C
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll =  !AiLevel
+TriggerAll = Command = "623C"
+TriggerAll = StateNO != [1500,1501]
+TriggerAll = Power >= 1000
+TriggerAll = StateType != A && Pos Y = 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 || StateNO = 210 || StateNO = 220 || StateNO = 300 ||StateNO = 310 ||StateNO = 320 || StateNO = 801)
+Trigger3 = !Var(32) && NumHelper(6000)
+Trigger4 = Var(32) < 2 && NumHelper(6200)
+Value = 1500
+
+;---------------------------------------------------------------------------
+; j.236C
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll =  !AiLevel
+TriggerAll = Command = "623C"
+TriggerAll = StateNO != [1550,1551]
+TriggerAll = Power >= 1000
+TriggerAll = StateType = A && Pos Y < 0
+TriggerAll = !Var(56)
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 280 || StateNO = 400 || StateNO = 410 || StateNO = 420)
+Trigger3 = !Var(32) && NumHelper(6050)
+Trigger4 = Var(32) < 2 && NumHelper(6250)
+Value = (1549 + (Var(56) := 1))
+
+;---------------------------------------------------------------------------
+; 236A
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll =  !AiLevel
+TriggerAll = Command = "236A"
+TriggerAll = StateNO != [1000,1002]
+TriggerAll = StateType != A && Pos Y = 0
+TriggerAll = !Var(53)
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 || StateNO = 210 || StateNO = 220 || StateNO = 251 || StateNO = 300 ||StateNO = 310 ||StateNO = 320 || StateNO = 801)
+Trigger3 = Var(31) < 2 && NumHelper(6000)
+Value = 1000
+
+;---------------------------------------------------------------------------
+; 236B
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll =  !AiLevel
+TriggerAll = Command = "236B"
+TriggerAll = (StateNO != [1100,1101]) && PrevStateNO != 1101
+TriggerAll = StateType != A && Pos Y = 0
+TriggerAll = !Var(54)
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 || StateNO = 210 || StateNO = 220 || StateNO = 251 || StateNO = 300 ||StateNO = 310 ||StateNO = 320 || StateNO = 801)
+Trigger3 = Var(31) < 2 && NumHelper(6000)
+Value = 1100
+
+;---------------------------------------------------------------------------
+; 236C
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll =  !AiLevel
+TriggerAll = Command = "236C"
+TriggerAll = StateNO != [1200,1202]
+TriggerAll = Power >= 1000
+TriggerAll = StateType != A && Pos Y = 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 || StateNO = 210 || StateNO = 220 || StateNO = 251 || StateNO = 300 ||StateNO = 310 ||StateNO = 320 || StateNO = 801)
+Trigger3 = !Var(32) && NumHelper(6000)
+Trigger4 = Var(32) < 2 && NumHelper(6200)
+Value = 1200
+
+;---------------------------------------------------------------------------
+; 22C
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll =  !AiLevel
+TriggerAll = Command = "22C"
+TriggerAll = StateNO != [1300,1301]
+TriggerAll = !NumHelper(1310) && !NumHelper(1320) && !NumHelper(1321)
+TriggerAll = Power >= 1500
+TriggerAll = StateType != A && Pos Y = 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 || StateNO = 210 || StateNO = 220 || StateNO = 251 || StateNO = 300 ||StateNO = 310 ||StateNO = 320 || StateNO = 801)
+Trigger3 = !Var(32) && NumHelper(6000)
+Trigger4 = Var(32) < 2 && NumHelper(6200)
+Value = 1300
+
+;---------------------------------------------------------------------------
+; 214A
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll =  !AiLevel
+TriggerAll = Command = "214A"
+TriggerAll = StateNO != 1400 && PrevStateNO != 1400
+TriggerAll = StateType != A && Pos Y = 0
+TriggerAll = !NumHelper(1410)
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 || StateNO = 210 || StateNO = 220 || StateNO = 251 || StateNO = 300 ||StateNO = 310 ||StateNO = 320 || StateNO = 801)
+Trigger3 = Var(31) < 2 && NumHelper(6000)
+Value = 1400
+
+;---------------------------------------------------------------------------
+; 5AC
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll = Var(3)
+TriggerAll = Power >= 500
+TriggerAll = SelfAnimExist(600)
+TriggerAll = StateNO != [600,605]
+TriggerAll =  !AiLevel
+TriggerAll = Command != "5ABC"
+TriggerAll = Command = "5AC"
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 || StateNO = 210 || StateNO = 220 || StateNO = 251 || (StateNO = 280 || StateNO = 1201) || StateNO = 300 ||StateNO = 310 ||StateNO = 320 || StateNO = 801 || StateNO = 400  ||StateNO = 410 || StateNO = 420  || StateNO = 451)
+Trigger3 = (StateType != A && Pos Y = 0) && !Var(32) && NumHelper(6000)
+Trigger4 = (StateType = A && Pos Y < 0) && !Var(32) && NumHelper(6050)
+Value = Cond(StateType = A && Pos Y < 0,605,600)
+
+;---------------------------------------------------------------------------
+; 6C
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll =  !AiLevel
+TriggerAll = Command != "holddown"
+TriggerAll = Command = "holdfwd"
+TriggerAll = Command = "c"
+TriggerAll = StateNO != [250,251]
+TriggerAll = StateType != A && Pos Y = 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 || StateNO = 210 ||  StateNO = 220 || StateNO = 300 || StateNO = 310 || StateNO = 320)
+Value = 250
+
+;---------------------------------------------------------------------------
+; 4C
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll =  !AiLevel
+TriggerAll = Command != "holddown"
+TriggerAll = Command = "holdback"
+TriggerAll = Command = "c" || (StateNO = [250,251]) && Command = "holdc"
+TriggerAll = StateNO != [280,281]
+TriggerAll = StateType != A && Pos Y = 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 || StateNO = 210 ||  StateNO = 220 ||  StateNO = 251 || StateNO = 300 || StateNO = 310 || StateNO = 320)
+Value = 280
+
+;---------------------------------------------------------------------------
+; 5A
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll =  !AiLevel
+TriggerAll = Command != "holddown"
+TriggerAll = Command = "a"
+TriggerAll = StateNO != 200
+TriggerAll = Cond(NumHelper(6500),Cond(NumHelper(6500),!(Helper(6500),Var(0)),0),1)
+TriggerAll = StateType != A && Pos Y = 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 210 ||  StateNO = 220 || StateNO = 300 || StateNO = 310 || StateNO = 320)
+Value = 200
+
+;---------------------------------------------------------------------------
+; 5B
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll =  !AiLevel
+TriggerAll = Command != "holddown"
+TriggerAll = Command = "b"
+TriggerAll = StateNO != 210
+TriggerAll = Cond(NumHelper(6500),Cond(NumHelper(6500),!(Helper(6500),Var(1)),0),1)
+TriggerAll = StateType != A && Pos Y = 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 ||  StateNO = 220 || StateNO = 300 || StateNO = 310 || StateNO = 320)
+Value = 210
+
+;---------------------------------------------------------------------------
+; 5C
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll =  !AiLevel
+TriggerAll = Command != "holddown"
+TriggerAll = Command = "c"
+TriggerAll = StateNO != 220
+TriggerAll = Cond(NumHelper(6500),Cond(NumHelper(6500),!(Helper(6500),Var(2)),0),1)
+TriggerAll = StateType != A && Pos Y = 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 ||  StateNO = 210 || StateNO = 300 || StateNO = 310 || StateNO = 320)
+Value = 220
+
+;---------------------------------------------------------------------------
+; 2A
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll =  !AiLevel
+TriggerAll = Command = "holddown"
+TriggerAll = Command = "a"
+TriggerAll = StateNO != 300
+TriggerAll = Cond(NumHelper(6500),Cond(NumHelper(6500),!(Helper(6500),Var(3)),0),1)
+TriggerAll = StateType != A && Pos Y = 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 ||  StateNO = 210 || StateNO = 220 || StateNO = 310 || StateNO = 320)
+Value = 300
+
+;---------------------------------------------------------------------------
+; 2B
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll =  !AiLevel
+TriggerAll = Command = "holddown"
+TriggerAll = Command = "b"
+TriggerAll = StateNO != 310
+TriggerAll = Cond(NumHelper(6500),Cond(NumHelper(6500),!(Helper(6500),Var(4)),0),1)
+TriggerAll = StateType != A && Pos Y = 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 ||  StateNO = 210 || StateNO = 220 || StateNO = 300 || StateNO = 320)
+Value = 310
+
+;---------------------------------------------------------------------------
+; 2C
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll =  !AiLevel
+TriggerAll = Command = "holddown"
+TriggerAll = Command != "holdfwd"
+TriggerAll = Command = "c"
+TriggerAll = StateNO != 320
+TriggerAll = Cond(NumHelper(6500),Cond(NumHelper(6500),!(Helper(6500),Var(5)),0),1)
+TriggerAll = StateType != A && Pos Y = 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 ||  StateNO = 210 || StateNO = 220 || StateNO = 300 || StateNO = 310)
+Value = 320
+
+;---------------------------------------------------------------------------
+; 3C
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll =  !AiLevel
+TriggerAll = Command = "holddown"
+TriggerAll = Command = "holdfwd"
+TriggerAll = Command = "c"
+TriggerAll = StateNO != 350
+TriggerAll = StateType != A && Pos Y = 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 || StateNO = 210 ||  StateNO = 220 ||  StateNO = 251 || StateNO = 300 || StateNO = 310 || StateNO = 320)
+Value = 350
+
+;---------------------------------------------------------------------------
+; j.6C
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll =  !AiLevel
+TriggerAll = Command != "holddown"
+TriggerAll = Command = "holdfwd"
+TriggerAll = Command = "c"
+TriggerAll = StateNO != [450,451]
+TriggerAll = StateType = A && Pos Y < 0
+TriggerAll = !Var(57)
+Trigger1 = Ctrl
+Trigger2 = MoveContact && ((StateNO = 280 || StateNO = 1201) || StateNO = 400 || StateNO = 410 || StateNO = 420)
+Value = (449 + (Var(57) := 1))
+
+;---------------------------------------------------------------------------
+; j.5A
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll =  !AiLevel
+TriggerAll = Command = "a" 
+TriggerAll = StateNO != 400
+TriggerAll = Cond(NumHelper(6500),Cond(NumHelper(6500),!(Helper(6500),Var(0)),0),1)
+TriggerAll = StateType = A && Pos Y < 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && ((StateNO = 280 || StateNO = 1201) || StateNO = 410 ||  StateNO = 420)
+Value = 400
+
+;---------------------------------------------------------------------------
+; j.5B
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll =  !AiLevel
+TriggerAll = Command = "b" 
+TriggerAll = StateNO != 410
+TriggerAll = Cond(NumHelper(6500),Cond(NumHelper(6500),!(Helper(6500),Var(1)),0),1)
+TriggerAll = StateType = A && Pos Y < 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && ((StateNO = 280 || StateNO = 1201) || StateNO = 400 ||  StateNO = 420)
+Value = 410
+
+;---------------------------------------------------------------------------
+; j.5C
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll =  !AiLevel
+TriggerAll = Command = "c" 
+TriggerAll = StateNO != 420
+TriggerAll = Cond(NumHelper(6500),Cond(NumHelper(6500),!(Helper(6500),Var(2)),0),1)
+TriggerAll = StateType = A && Pos Y < 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && ((StateNO = 280 || StateNO = 1201) || StateNO = 400 || StateNO = 410)
+Value = 420
+
+;---------------------------------------------------------------------------
+; 5Y
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll =  !AiLevel
+TriggerAll = Command = "y"
+TriggerAll = StateNO != [800,801]
+TriggerAll = StateType != A && Pos Y = 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 || StateNO = 210 || StateNO = 220 || StateNO = 251 || StateNO = 300 || StateNO = 310 || StateNO = 320)
+Value = 800
+
+;===============================================================================
+;AI
+;===============================================================================
+
+;---------------------------------------------------------------------------
+; 5ABC
+
+;---------------------------------------------------------------------------
+; 5A
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll  = AiLevel && NumEnemy
+TriggerAll  = RoundState = 2
+TriggerAll  = StateNO != 200
+TriggerAll = Cond(NumHelper(6500),Cond(NumHelper(6500),!(Helper(6500),Var(0)),0),1)
+TriggerAll  = Fvar(39) <= 120
+TriggerAll  = Cond(NumTarget,Target,Pos Y,EnemyNear,Pos Y) >= Const(Size.Mid.Pos.Y)
+TriggerAll  = Cond(NumTarget,Target,StateType != L,EnemyNear,StateType != L)
+TriggerAll  = Var(20) = [(0 * AiLevel),(6 * AiLevel)]
+TriggerAll  = StateType != A && Pos Y = 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 210 ||  StateNO = 220 || StateNO = 300 || StateNO = 310 || StateNO = 320)
+Value = 200
+
+;---------------------------------------------------------------------------
+; 5B
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll = AiLevel && NumEnemy
+TriggerAll = RoundState = 2
+TriggerAll = StateNO != 210
+TriggerAll = Cond(NumHelper(6500),Cond(NumHelper(6500),!(Helper(6500),Var(1)),0),1)
+TriggerAll = Fvar(39) <= 200
+TriggerAll = Cond(NumTarget,Target,Pos Y,EnemyNear,Pos Y) >= Const(Size.Mid.Pos.Y)
+TriggerAll = Cond(NumTarget,Target,StateType != L,EnemyNear,StateType != L)
+TriggerAll = Var(20) = [(0 * AiLevel),(6 * AiLevel)]
+TriggerAll = StateType != A && Pos Y = 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 ||  StateNO = 220 || StateNO = 300 || StateNO = 310 || StateNO = 320)
+Value = 210
+
+;---------------------------------------------------------------------------
+; 5C
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll = AiLevel && NumEnemy
+TriggerAll = RoundState = 2
+TriggerAll = StateNO != 220
+TriggerAll = Cond(NumHelper(6500),Cond(NumHelper(6500),!(Helper(6500),Var(2)),0),1)
+TriggerAll = Fvar(39) <= 220
+TriggerAll = Cond(NumTarget,Target,Pos Y,EnemyNear,Pos Y) >= Const(Size.Mid.Pos.Y)
+TriggerAll = Cond(NumTarget,Target,StateType != L,EnemyNear,StateType != L)
+TriggerAll = (Var(20) = [(0 * AiLevel),(6 * AiLevel)]) 
+TriggerAll = StateType != A && Pos Y = 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 ||  StateNO = 210 || StateNO = 300 || StateNO = 310 || StateNO = 320)
+Value = 220
+
+;---------------------------------------------------------------------------
+; 6C
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll = AiLevel && NumEnemy
+TriggerAll = RoundState = 2
+TriggerAll = StateNO != [250,251]
+TriggerAll = Fvar(39) <= 400
+TriggerAll = Cond(NumTarget,Target,Pos Y,EnemyNear,Pos Y) >= Const(Size.Mid.Pos.Y)
+TriggerAll = Cond(NumTarget,Target,StateType != L,EnemyNear,StateType != L)
+TriggerAll = Var(20) = [(0 * AiLevel),(6 * AiLevel)]
+TriggerAll = StateType != A && Pos Y = 0
+TriggerAll = !Var(52)
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 || StateNO = 210 ||  StateNO = 220 || StateNO = 300 || StateNO = 310 || StateNO = 320)
+Value = 250
+
+;---------------------------------------------------------------------------
+; 4C
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll = AiLevel && NumEnemy
+TriggerAll = RoundState = 2
+TriggerAll = StateNO != 280
+TriggerAll = Fvar(39) <= 180
+TriggerAll = Cond(NumTarget,Target,Pos Y,EnemyNear,Pos Y) >= Const(Size.Mid.Pos.Y)
+TriggerAll = Cond(NumTarget,Target,StateType != L,EnemyNear,StateType != L)
+TriggerAll = Var(20) = [(0 * AiLevel),(6 * AiLevel)]
+TriggerAll = StateType != A && Pos Y = 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 || StateNO = 210 ||  StateNO = 220 ||  StateNO = 251 || StateNO = 300 || StateNO = 310 || StateNO = 320)
+Value = 280
+
+;---------------------------------------------------------------------------
+; 2A
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll = AiLevel && NumEnemy
+TriggerAll = RoundState = 2
+TriggerAll = StateNO != 300
+TriggerAll = Cond(NumHelper(6500),Cond(NumHelper(6500),!(Helper(6500),Var(3)),0),1)
+TriggerAll = Fvar(39) <= 160
+TriggerAll = Cond(NumTarget,Target,Pos Y,EnemyNear,Pos Y) >= Const(Size.Mid.Pos.Y)
+TriggerAll = Cond(NumTarget,Target,StateType != L,EnemyNear,StateType != L)
+TriggerAll = (Var(20) = [(0 * AiLevel),(6 * AiLevel)]) || EnemyNear,MoveType = H && EnemyNear,StateType = S && (EnemyNear,StateNO = [120,155])
+TriggerAll = StateType != A && Pos Y = 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 ||  StateNO = 210 || StateNO = 220 || StateNO = 310 || StateNO = 320)
+Value = 300
+
+;---------------------------------------------------------------------------
+; 2B
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll = AiLevel && NumEnemy
+TriggerAll = RoundState = 2
+TriggerAll = StateNO != 310
+TriggerAll = Cond(NumHelper(6500),Cond(NumHelper(6500),!(Helper(6500),Var(4)),0),1)
+TriggerAll = Fvar(39) <= 180
+TriggerAll = Cond(NumTarget,Target,Pos Y,EnemyNear,Pos Y) >= Const(Size.Mid.Pos.Y)
+TriggerAll = Cond(NumTarget,Target,StateType != L,EnemyNear,StateType != L)
+TriggerAll = (Var(20) = [(0 * AiLevel),(6 * AiLevel)]) 
+TriggerAll = StateType != A && Pos Y = 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 ||  StateNO = 210 || StateNO = 220 || StateNO = 300 || StateNO = 320)
+Value = 310
+
+;---------------------------------------------------------------------------
+; 2C
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll = AiLevel && NumEnemy
+TriggerAll = RoundState = 2
+TriggerAll = StateNO != 320
+TriggerAll = Cond(NumHelper(6500),Cond(NumHelper(6500),!(Helper(6500),Var(5)),0),1)
+TriggerAll = Fvar(39) <= 220
+TriggerAll = Cond(NumTarget,Target,Pos Y,EnemyNear,Pos Y) >= Const(Size.Mid.Pos.Y)
+TriggerAll = Cond(NumTarget,Target,StateType != L,EnemyNear,StateType != L)
+TriggerAll = (Var(20) = [(0 * AiLevel),(6 * AiLevel)])
+TriggerAll = StateType != A && Pos Y = 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 ||  StateNO = 210 || StateNO = 220 || StateNO = 300 || StateNO = 310)
+Value = 320
+
+;---------------------------------------------------------------------------
+; 3C 
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll = AiLevel && NumEnemy
+TriggerAll = RoundState = 2
+TriggerAll = StateNO != 350
+TriggerAll = Fvar(39) <= 160
+TriggerAll = Cond(NumTarget,Target,Pos Y,EnemyNear,Pos Y) >= Const(Size.Mid.Pos.Y)
+TriggerAll = Cond(NumTarget,Target,StateType != L,EnemyNear,StateType != L)
+TriggerAll = Var(20) = [(0 * AiLevel),(6 * AiLevel)] 
+TriggerAll = StateType != A && Pos Y = 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 || StateNO = 210 ||  StateNO = 220 ||  StateNO = 251 || StateNO = 300 || StateNO = 310 || StateNO = 320)
+Value = 350
+
+;---------------------------------------------------------------------------
+; j.5A
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll= AiLevel && NumEnemy
+TriggerAll = RoundState = 2
+TriggerAll = StateNO != 400
+TriggerAll = Cond(NumHelper(6500),Cond(NumHelper(6500),!(Helper(6500),Var(0)),0),1)
+TriggerAll = Fvar(39) <= 160
+TriggerAll =  Pos Y < Const(Size.Mid.Pos.Y)
+TriggerAll = Cond(NumTarget,Target,Pos Y,EnemyNear,Pos Y) = [(Pos Y - Const(Size.Height)),(Pos Y + Const(Size.Height))]
+TriggerAll = Cond(NumTarget,Target,StateType != L,EnemyNear,StateType != L)
+TriggerAll = Var(20) = [(0 * AiLevel),(6 * AiLevel)]
+TriggerAll = StateType = A && Pos Y < 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 410 ||  StateNO = 420)
+Value = 400
+
+;---------------------------------------------------------------------------
+;  j.5B
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll = AiLevel && NumEnemy
+TriggerAll = RoundState = 2
+TriggerAll = StateNO != 410
+TriggerAll = Cond(NumHelper(6500),Cond(NumHelper(6500),!(Helper(6500),Var(1)),0),1)
+TriggerAll = Fvar(39) <= 120
+TriggerAll =  Pos Y < Const(Size.Mid.Pos.Y)
+TriggerAll = Cond(NumTarget,Target,Pos Y,EnemyNear,Pos Y) = [(Pos Y - Const(Size.Height)),(Pos Y + Const(Size.Height))]
+TriggerAll = Cond(NumTarget,Target,StateType != L,EnemyNear,StateType != L)
+TriggerAll = (Var(20) = [(0 * AiLevel),(6 * AiLevel)])  || EnemyNear,MoveType = H && EnemyNear,StateType = C && (EnemyNear,StateNO = [120,155])
+TriggerAll = StateType = A && Pos Y < 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (((StateNO = 280 || StateNO = 1201) && Pos Y < - 100) || StateNO = 400 || StateNO = 420)
+Value = 410
+
+;---------------------------------------------------------------------------
+; j.5C
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll = AiLevel && NumEnemy
+TriggerAll = RoundState = 2
+TriggerAll = StateNO != 420
+TriggerAll = Cond(NumHelper(6500),Cond(NumHelper(6500),!(Helper(6500),Var(2)),0),1)
+TriggerAll = Fvar(39) <= 160
+TriggerAll =  Pos Y < Const(Size.Mid.Pos.Y)
+TriggerAll = Cond(NumTarget,Target,Pos Y,EnemyNear,Pos Y) = [(Pos Y - Const(Size.Height)),(Pos Y + Const(Size.Height))]
+TriggerAll = Cond(NumTarget,Target,StateType != L,EnemyNear,StateType != L)
+TriggerAll = (Var(20) = [(0 * AiLevel),(6 * AiLevel)])   || EnemyNear,MoveType = H && EnemyNear,StateType = C && (EnemyNear,StateNO = [120,155])
+TriggerAll = StateType = A && Pos Y < 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (((StateNO = 280 || StateNO = 1201) && Pos Y < - 100) || StateNO = 400 || StateNO = 410)
+Value = 420
+
+;---------------------------------------------------------------------------
+; j.6C
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll = AiLevel && NumEnemy
+TriggerAll = RoundState = 2
+TriggerAll = StateNO != [450,451]
+TriggerAll = Fvar(39) <= 400
+TriggerAll =  Pos Y < Const(Size.Mid.Pos.Y)
+TriggerAll = Cond(NumTarget,Target,Pos Y,EnemyNear,Pos Y) = [(Pos Y - Const(Size.Height)),(Pos Y + Const(Size.Height))]
+TriggerAll = Cond(NumTarget,Target,StateType != L,EnemyNear,StateType != L)
+TriggerAll = Var(20) = [(0 * AiLevel),(6 * AiLevel)]
+TriggerAll = StateType = A && Pos Y < 0
+TriggerAll = !Var(57)
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (((StateNO = 280 || StateNO = 1201) && Pos Y < - 100) || StateNO = 400 || StateNO = 410 || (StateNO = 420 && Var(29)))
+Value = (449 + (Var(57) := 1))
+
+;---------------------------------------------------------------------------
+; 5AC
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll= AiLevel && NumEnemy
+TriggerAll = RoundState = 2
+TriggerAll = StateNO != [600,605]
+TriggerAll = Var(3)
+TriggerAll = Power >= 1000
+TriggerAll = SelfAnimExist(600)
+TriggerAll= Fvar(39) = [-240,240]
+TriggerAll = Cond(NumTarget,Target,StateType != L,EnemyNear,StateType != L)
+TriggerAll = Random >= (950 - EnemyNear,GetHitVar(HitCount) * 10)  && Var(20) = [(6 * AiLevel),(10 * AiLevel)]
+Trigger1 = Ctrl
+
+Trigger2 = MoveContact && (StateNO = 200 || StateNO = 210 || StateNO = 220 || StateNO = 251 || ((StateNO = 280 || StateNO = 1201) && Pos Y < - 100) || StateNO = 300 || StateNO = 310 || StateNO = 320 || StateNO = 801 || StateNO = 400 || StateNO = 410  || StateNO = 420 || StateNO = 451)
+
+Trigger4 = (StateType != A && Pos Y = 0) && !Var(32) && NumHelper(6000)
+Trigger5 = (StateType = A && Pos Y < 0) && !Var(32) && NumHelper(6050)
+
+Value = Cond(StateType = A && Pos Y < 0,605,600)
+
+;---------------------------------------------------------------------------
+; 5Y
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll = AiLevel && NumEnemy
+TriggerAll = RoundState = 2
+TriggerAll = StateNO != [800,801]
+TriggerAll = Fvar(39) <= 140
+TriggerAll = Cond(NumTarget,Target,Pos Y,EnemyNear,Pos Y) >= Const(Size.Mid.Pos.Y)
+TriggerAll = Cond(NumTarget,Target,StateType != L,EnemyNear,StateType != L)
+TriggerAll = (Var(20) = [(0 * AiLevel),(6 * AiLevel)]) || Cond(NumTarget,Target,MoveType = H,EnemyNear,MoveType = H) && (EnemyNear,StateNO = [120,155])
+TriggerAll = StateType != A && Pos Y = 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 || StateNO = 210 || StateNO = 220 || StateNO = 251 || StateNO = 300 || StateNO = 310 || StateNO = 320)
+Value = 800
+
+;---------------------------------------------------------------------------
+; 214A
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll = AiLevel && NumEnemy
+TriggerAll = RoundState = 2
+TriggerAll = StateNO != 1400 && PrevStateNO != 1400
+TriggerAll = !NumHelper(1410)
+TriggerAll = Fvar(39) = [400,1000]
+TriggerAll = Cond(NumTarget,Target,Pos Y,EnemyNear,Pos Y) >= Const(Size.Mid.Pos.Y)
+TriggerAll = Cond(NumTarget,Target,StateType != L,EnemyNear,StateType != L)
+TriggerAll = Random%2 = 0 && (Var(20) = [(6 * AiLevel),(10 * AiLevel)])
+TriggerAll = StateType != A && Pos Y = 0
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 || StateNO = 210 || StateNO = 220 || StateNO = 251 || StateNO = 300 || StateNO = 310 || StateNO = 320 || StateNO = 801)
+Trigger3 = Var(31) < 2 && NumHelper(6000)
+Value = 1400
+
+;---------------------------------------------------------------------------
+; 236A
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll = AiLevel && NumEnemy
+TriggerAll = RoundState = 2
+TriggerAll = StateNO != [1000,1002]
+TriggerAll = Fvar(39) <= 220
+TriggerAll = Cond(NumTarget,Target,Pos Y,EnemyNear,Pos Y) >= Const(Size.Mid.Pos.Y)
+TriggerAll = Cond(NumTarget,Target,StateType != L,EnemyNear,StateType != L)
+TriggerAll = Random%2 = 0 && (Var(20) = [(6 * AiLevel),(10 * AiLevel)])
+TriggerAll = StateType != A && Pos Y = 0
+TriggerAll = !Var(53)
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 || StateNO = 210 || StateNO = 220 || StateNO = 251 || StateNO = 300 || StateNO = 310 || StateNO = 320 || StateNO = 801)
+Trigger3 = Var(31) < 2 && NumHelper(6000)
+Value = 1000
+
+;---------------------------------------------------------------------------
+; 236B
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll = AiLevel && NumEnemy
+TriggerAll = RoundState = 2
+TriggerAll = (StateNO != [1100,1101]) && PrevStateNO != 1101
+TriggerAll = Fvar(39) <= 600
+TriggerAll = Cond(NumTarget,Target,Pos Y,EnemyNear,Pos Y) >= Const(Size.Mid.Pos.Y)
+TriggerAll = Cond(NumTarget,Target,StateType != L,EnemyNear,StateType != L)
+TriggerAll = Random%2 = 0 && (Var(20) = [(6 * AiLevel),(10 * AiLevel)])
+TriggerAll = StateType != A && Pos Y = 0
+TriggerAll = !Var(54)
+Trigger1 = Ctrl
+Trigger2 = MoveContact && (StateNO = 200 || StateNO = 210 || StateNO = 220 || StateNO = 251 || StateNO = 300 || StateNO = 310 || StateNO = 320 || StateNO = 801)
+Trigger3 = Var(31) < 2 && NumHelper(6000)
+Value = 1100
+
+;---------------------------------------------------------------------------
+; 22C
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll = AiLevel && NumEnemy
+TriggerAll = RoundState = 2
+TriggerAll = StateNO != [1300,1301]
+TriggerAll = !NumHelper(1310) && !NumHelper(1320) && !NumHelper(1321)
+TriggerAll = Power = [1500,2000]
+TriggerAll = Fvar(39) <= 600
+TriggerAll = Cond(NumTarget,Target,Pos Y,EnemyNear,Pos Y) >= Const(Size.Mid.Pos.Y)
+TriggerAll = Cond(NumTarget,Target,StateType != L,EnemyNear,StateType != L)
+TriggerAll = Random%2 = 0 && (Var(20) = [(6 * AiLevel),(10 * AiLevel)])
+TriggerAll = StateType != A && Pos Y = 0
+Trigger1 = Ctrl
+Trigger2 = MoveHit && (StateNO = 200 || StateNO = 210 || StateNO = 220 || StateNO = 251 || StateNO = 300 || StateNO = 310 || StateNO = 320 || StateNO = 801)
+Trigger3 = !Var(32) && NumHelper(6100)
+Trigger4 = Var(32) < 2 && NumHelper(6200)
+Value = 1300
+
+;---------------------------------------------------------------------------
+; 236C
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll = AiLevel && NumEnemy
+TriggerAll = RoundState = 2
+TriggerAll = StateNO != [1200,1202]
+TriggerAll = Power >= 1000;Power >= 1000
+TriggerAll = Fvar(39) <= 200
+TriggerAll = Cond(NumTarget,Target,Pos Y,EnemyNear,Pos Y) >= Const(Size.Mid.Pos.Y)
+TriggerAll = Cond(NumTarget,Target,StateType != L,EnemyNear,StateType != L)
+TriggerAll = Var(20) = [(6 * AiLevel),(10 * AiLevel)]
+TriggerAll = StateType != A && Pos Y = 0
+Trigger1 = Ctrl
+Trigger2 = MoveHit && (StateNO = 200 || StateNO = 210 || StateNO = 220 || StateNO = 251 || StateNO = 300 || StateNO = 310 || StateNO = 320 || StateNO = 801)
+Trigger3 = !Var(32) && NumHelper(6100)
+Trigger4 = Var(32) < 2 && NumHelper(6200)
+Value = 1200
+
+;---------------------------------------------------------------------------
+; 623C
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll = AiLevel && NumEnemy
+TriggerAll = RoundState = 2
+TriggerAll = StateNO != [1500,1501]
+TriggerAll = Power >= 1000;Power >= 1000
+TriggerAll = Fvar(39) <= 660
+TriggerAll = Cond(NumTarget,Target,Pos Y,EnemyNear,Pos Y) >= Const(Size.Mid.Pos.Y)
+TriggerAll = Cond(NumTarget,Target,StateType != L,EnemyNear,StateType != L)
+TriggerAll = Random%2 = 0 && (Var(20) = [(6 * AiLevel),(10 * AiLevel)])
+TriggerAll = StateType != A && Pos Y = 0
+Trigger1 = Ctrl
+Trigger2 = MoveHit && (StateNO = 200 || StateNO = 210 || StateNO = 220 || StateNO = 300 || StateNO = 310 || StateNO = 320 || StateNO = 801)
+Trigger3 = !Var(32) && NumHelper(6100)
+Trigger4 = Var(32) < 2 && NumHelper(6200)
+Value = 1500
+
+;---------------------------------------------------------------------------
+; j.623C
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll = AiLevel && NumEnemy
+TriggerAll = RoundState = 2
+TriggerAll = StateNO != [1550,1551]
+TriggerAll = Power >= 1000;Power >= 1000
+TriggerAll = Fvar(39) <= 660
+TriggerAll = Cond(NumTarget,Target,Pos Y,EnemyNear,Pos Y) >= Const(Size.Mid.Pos.Y)
+TriggerAll = Cond(NumTarget,Target,Pos Y,EnemyNear,Pos Y) = [(Pos Y - Const(Size.Height)),(Pos Y + Const(Size.Height))]
+TriggerAll = Cond(NumTarget,Target,StateType != L,EnemyNear,StateType != L)
+TriggerAll = Random%2 = 0 && (Var(20) = [(6 * AiLevel),(10 * AiLevel)])
+TriggerAll = StateType = A && Pos Y < 0
+TriggerAll = !Var(56)
+Trigger1 = Ctrl
+Trigger2 = MoveHit && ((StateNO = 280 && Pos Y < - 100) || StateNO = 400 || StateNO = 410 || StateNO = 420)
+Trigger3 = !Var(32) && NumHelper(6150)
+Trigger4 = Var(32) < 2 && NumHelper(6250)
+Value = (1549 + (Var(56) := 1))
+
+;---------------------------------------------------------------------------
+; 236BC
+[State -2, ChangeState]
+Type = ChangeState
+TriggerAll = AiLevel && NumEnemy
+TriggerAll = RoundState = 2
+TriggerAll = StateNO != [2000,2003]
+TriggerAll = Power >= 3000
+TriggerAll = Fvar(39) <= 480
+TriggerAll = Cond(NumTarget,Target,Pos Y,EnemyNear,Pos Y) >= Const(Size.Mid.Pos.Y)
+TriggerAll = Cond(NumTarget,Target,StateType != L,EnemyNear,StateType != L)
+TriggerAll = (Var(20) = [(0 * AiLevel),(5 * AiLevel)]) 
+TriggerAll = StateType != A && Pos Y = 0
+Trigger1 = Ctrl
+Trigger2 = MoveHit && (StateNO = 200 || StateNO = 210 || StateNO = 220 || StateNO = 300 || StateNO = 310 || StateNO = 320 || StateNO = 801)
+Trigger3 = !Var(32) && NumHelper(6100)
+Trigger4 = Var(32) < 2 && NumHelper(6200)
+Value = 2000

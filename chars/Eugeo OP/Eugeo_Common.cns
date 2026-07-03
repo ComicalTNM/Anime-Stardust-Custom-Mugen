@@ -1,0 +1,812 @@
+;---------------------------------------------------------------------------
+; Stand
+[StateDef 0]
+Type = S
+Physics = S
+SprPrioritY = 0
+
+[State 0, ChangeState]
+Type = ChangeState
+Trigger1 = RoundState = 2
+Trigger1 = Time > 240
+Trigger1 = Random%500 = 0
+Value = 900
+Ctrl = 1
+IgnoreHitPause = 1
+
+[State 0, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = Anim != 0 && Anim != 5
+Trigger2 = Anim = 5 && !AnimTime 
+Value = 0
+
+[State 0, VelSet]
+Type = VelSet
+Trigger1 = !Time
+Y = 0
+
+[State 0, VelSet] 
+Type = VelSet
+Trigger1 = Abs(Vel x) < Const(Movement.Stand.Friction.Threshold)
+Trigger2 = Time = 4
+X = 0
+
+[State 0, ChangeState] 
+Type = ChangeState
+Trigger1 = !alive
+Value = 5050
+Ctrl = 0
+;---------------------------------------------------------------------------
+; Walk
+[StateDef 20]
+Type    = S
+Physics = S
+SprPrioritY = 0
+
+[State 20, PlaySnd]
+Type = PlaySnd
+Trigger1 = AnimElemTime(4) = 1
+Trigger2 = AnimElemTime(9) = 1
+Value = S20,500 + Random%2
+IgnoreHitPause = 1
+
+[State 20, VelSet]
+Type = VelSet
+Trigger1 = Command = "holdfwd"
+X = Const(Velocity.Walk.Fwd.X)
+
+[State 20, VelSet]
+Type = VelSet
+Trigger1 = Command = "holdback"
+X = Const(Velocity.Walk.Back.X)
+
+[State 20, AngleDraw]
+Type = AngleDraw
+Trigger1 = Command = "holdback"
+Value = 0
+Scale = -1.0, 1.0
+IgnoreHitPause = 1
+
+[State 20, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = Anim != 20
+Value = 20
+Persistent = 0
+
+
+;---------------------------------------------------------------------------
+; Jump Start
+[StateDef 40]
+Type    = S
+Physics = S
+Anim = Cond(Cond(!AiLevel,PrevStateNO = 350,(PrevStateNO = 350 || PrevStateNO = 310)),(Cond(!Var(5),39 + (Var(30) := 1),37 + (Var(30) := 3))),40)
+Ctrl = 0
+SprPrioritY = 1
+FaceP2 = 1
+
+[State 40, ChangeState]
+Type = ChangeState
+Trigger1 = AiLevel
+Trigger1 = RoundState = 2
+Trigger1 = !Time
+Trigger1 = Ctrl 
+Value = 0
+Ctrl = 1
+
+[State 40, CtrlSet]
+Type = CtrlSet
+Trigger1 = !Time
+Value = 0
+IgnoreHitPause = 1
+
+[State 40, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimTime
+Value = S40,500
+IgnoreHitPause = 1
+
+[State 40, VarSet]
+Type = VarSet
+Trigger1 = AiLevel && NumEnemy
+Trigger1 = RoundState = 2
+Trigger1 = PrevStateNO = 310
+sysvar(1) = 1
+
+[State 40, VarSet]
+Type = VarSet
+Trigger1 = PrevStateNO = 350
+sysvar(1) = 1
+
+[State 40, VarSet]
+Type = VarSet
+TriggerAll = PrevStateNO != 350
+TriggerAll = !Time
+Trigger1 = !AiLevel
+Trigger2 = PrevStateNO != 310
+Trigger2 = AiLevel && NumEnemy
+Trigger2 = RoundState = 2
+Trigger2 = Var(20) = [(0 *AiLevel),(2 *AiLevel)]
+sysvar(1) = 0
+
+[State 40, VarSet]
+Type = VarSet
+TriggerAll = PrevStateNO != 350
+Trigger1 = !AiLevel
+Trigger1 = Command = "holdfwd" 
+Trigger2 = AiLevel && NumEnemy
+Trigger2 = RoundState = 2
+Trigger2 = Var(20) = [(2 *AiLevel),(6 *AiLevel)]
+sysvar(1) = 1
+
+[State 40, VarSet]
+Type = VarSet
+TriggerAll = PrevStateNO != 350
+Trigger1 = !AiLevel
+Trigger1 = Command = "holdback"
+Trigger2 = PrevStateNO != 310
+Trigger2 = AiLevel && NumEnemy
+Trigger2 = RoundState = 2
+Trigger2 = Var(20) = [(6 *AiLevel),(10 *AiLevel)]
+sysvar(1) = -1
+
+[State 40, VelSet]
+Type = VelSet
+Trigger1 = !AnimTime
+X = Cond(sysvar(1)=0, Const(Velocity.Jump.Neu.X), Cond(sysvar(1)=1, Const(Velocity.Jump.Fwd.X) + Cond(PrevStateNO = 350,5,0), Const(Velocity.Jump.Back.X)))
+Y = Const(Velocity.Jump.Y)
+IgnoreHitPause = 1
+
+[State 40, VelAdd]
+Type = VelAdd
+Trigger1 = PrevStateNO = 100
+Trigger1 = !AnimTime
+X = Cond(SysVar(1) = 1,Const(Velocity.RunJump.Fwd.X),Cond(SysVar(1) = -1,Const(Velocity.RunJump.Back.X),0))
+IgnoreHitPause = 1
+
+[State 40, Explod]
+Type = Explod
+Trigger1 = !AnimTime
+Anim = 11005
+ID = 11005
+Pos = (Pos X + CameraPos X) + (0 * Facing), (Pos Y)
+Space = Stage 
+Facing = Facing
+Scale = .4 ,.4
+SprPrioritY = 3
+Shadow = 0, 0, 0
+OwnPal = 1
+Trans = Add
+Angle = Cond(SysVar(1) = 1,Cond(PrevStateNO = 100,-25,-15),Cond(SysVar(1) = -1,Cond(PrevStateNO = 100,25,15),0))
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 40, ChangeState]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = Cond((PrevStateNO = 100),49+(Var(0) := 1),Cond(PrevStateNO = 350,48 + (Var(0) := 2),50))
+Ctrl = Cond(PrevStateNO = 350,0,1)
+;---------------------------------------------------------------------------
+; AirJump Start
+[StateDef 45]
+Type    = A
+Physics = N
+Ctrl = 0
+VelSet = 0,0
+Anim = 40 + (Var(1) := 1)
+
+[State 45, PalFX]
+Type = PalFX
+Trigger1 = !Time
+Time = 5
+Add = 256, 256, 256
+SinAdd = -256, -256, -256, 20
+IgnoreHitPause = 1
+
+[State 45, VarSet]
+Type = VarSet
+TriggerAll = !Time
+Trigger1 = !AiLevel
+;Trigger2 = PrevStateNO != 420
+Trigger2 = AiLevel && NumEnemy
+Trigger2 = RoundState = 2
+Trigger2 = Var(20) = [(0 *AiLevel),(2 *AiLevel)]
+sysvar(1) = 0
+
+[State 45, VarSet]
+Type = VarSet
+Trigger1 = !AiLevel
+Trigger1 = Command = "holdfwd" 
+Trigger2 = AiLevel && NumEnemy
+Trigger2 = RoundState = 2
+Trigger2 = Var(20) = [(2 *AiLevel),(6 *AiLevel)]
+sysvar(1) = 1
+
+[State 45, VarSet]
+Type = VarSet
+Trigger1 = !AiLevel
+Trigger1 = Command = "holdback"
+;Trigger2 = PrevStateNO != 420
+Trigger2 = AiLevel && NumEnemy
+Trigger2 = RoundState = 2
+Trigger2 = Var(20) = [(6 *AiLevel),(10 *AiLevel)]
+sysvar(1) = -1
+
+[State 45, 6]
+Type = VelSet
+Trigger1 = Time = 2
+X = Cond(SysVar(1)=0, Const(Velocity.AirJump.Neu.X), Cond(SysVar(1)=1, Const(Velocity.AirJump.Fwd.X), Const(Velocity.AirJump.Back.X)))
+Y = Const(Velocity.AirJump.Y)
+
+[State 45, Explod]
+Type = Explod
+Trigger1 = Time = 2
+Anim = 11004
+ID = 11004
+Pos = (Pos X + CameraPos X) + (0 * Facing), (Pos Y) + (0)
+Space = Stage 
+Facing = Facing
+Scale = .5, .5
+SprPrioritY = 3
+Shadow = 0, 0, 0
+OwnPal = 1
+Trans = Add
+Angle = Cond(SysVar(1) = 1,75,Cond(SysVar(1) = -1,105,90))
+IgnoreHitPause = 1
+
+[State 45, Explod]
+Type = Explod
+Trigger1 = Time = 2
+Anim = 11005
+ID = 11005
+Pos = (Pos X + CameraPos X) + (0 * Facing), (Pos Y)
+Space = Stage 
+Facing = Facing
+Scale = .4,.4
+SprPrioritY = 3
+Shadow = 0, 0, 0
+OwnPal = 1
+Trans = Add
+Angle = Cond(SysVar(1) = 1,-15,Cond(SysVar(1) = -1,15,0))
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 45, ChangeState]
+Type = ChangeState
+Trigger1 = Time = 2
+Value = 50
+Ctrl = 1
+;---------------------------------------------------------------------------
+; Jump Up
+[StateDef 50]
+Type    = A
+Physics = A
+
+[State 50, AngleDraw]
+Type = AngleDraw
+Trigger1 = Vel X != 0
+Value = Cond(Vel X > 0,-5,5)
+IgnoreHitPause = 1
+
+[State 50, Helper]
+Type = Helper
+Trigger1 = Var(0) = 1
+Trigger1 = Time%4 = 0 
+Trigger2 = Var(0) = 2
+Trigger2 = Time%4 = 0 
+Trigger2 = Vel Y < 0
+Name = "AfterImage FX"
+ID = 102
+StateNO = 102
+OwnPal = 1
+IgnoreHitPause = 1
+
+[State 50, Explod]
+Type = Explod
+Trigger1 = Var(0) = 1
+Trigger1 = Time%4 = 0
+Trigger2 = Var(0) = 2
+Trigger2 = Time%4 = 0 
+Trigger2 = Vel Y < 0
+Anim = 11003
+ID = 11003
+Pos = (Pos X + CameraPos X) + (0 * Facing),(Pos Y) + (-35 - Random%(Const(Size.Height) - 35))
+Space = Stage 
+Facing = Facing
+Scale = 0.0875, 0.0425
+SprPrioritY = 1
+Shadow = 0, 0, 0
+OwnPal = 1
+Angle = Cond(Vel X != 0,((ATan((-1 * Vel Y) / Vel X)) * (180 / PI)),0)
+IgnoreHitPause = 1
+
+[State 50, CtrlSet]
+Type = CtrlSet
+Trigger1 = !Ctrl
+Trigger1 = Vel Y >= 0
+Value = 1
+IgnoreHitPause = 1
+
+[State 50, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = !Time
+Value = 41
+
+[State 50, VarSet]
+Type = VarSet
+Trigger1 = !Time
+sysvar(1) = 0
+
+[State 50, ChangeAnim]
+Type = ChangeAnim
+;Trigger1 = PrevStateNO = 40 ||  PrevStateNO = 45
+Trigger1 = Vel Y  >  -5
+Trigger1 = SelfAnimExist(44)
+Persistent = 0
+Value = 44
+;---------------------------------------------------------------------------
+; Jump Down (empty state for compatibility)
+[StateDef 51]
+Type    = A
+Physics = A
+
+[State 51, Null]
+Type = Null
+Trigger1 = 1
+;---------------------------------------------------------------------------
+; Jump Land
+[StateDef 52]
+Type    = S
+Physics = S
+Ctrl = 0
+Anim = 47
+
+[State 52, VelSet]
+Type = VelSet
+Trigger1 = !Time
+Y = 0
+IgnoreHitPause = 1
+
+[State 52, Offset]
+Type = Offset
+Trigger1 = !Time
+Trigger2 = Pos Y >= 0
+Y = 0
+IgnoreHitPause = 1
+
+[State 52, PosSet]
+Type = PosSet
+Trigger1 = !Time
+Trigger2 = Pos Y >= 0
+Y = 0
+IgnoreHitPause = 1
+
+[State 52, VelSet]
+Type = VelSet
+Trigger1 = Abs(Vel X) < Const(Movement.Stand.Friction.Threshold)
+X = 0
+
+[State 52, Explod]
+Type = Explod
+Trigger1 = !Time
+Anim = 11002
+ID = 11002
+Pos = (Pos X + CameraPos X) + (0 * Facing), (Pos Y)
+Space = Stage 
+Facing = Facing
+Scale = 1.6,1.6
+SprPrioritY = 3
+Shadow = 0, 0, 0
+OwnPal = 1
+IgnoreHitPause = 1
+
+[State 52, PlaySnd]
+Type = PlaySnd
+Trigger1 = !Time
+Value = S52,500
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 52, ChangeState]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = 0
+Ctrl = 1
+
+;---------------------------------------------------------------------------
+;Dash Backward
+[StateDef 105]
+Type = S
+MoveType = I
+Physics = S
+VelSet = 0,0
+Ctrl = 0
+Anim = 105
+SprPrioritY = 2
+
+[State 105, PalFX]
+Type = PalFX
+Trigger1 = !AnimElemTime(1)
+Time = 15
+Add = 256, 256, 256
+SinAdd = -256, -256, -256, 60
+IgnoreHitPause = 1
+
+[State 105, EnvShake]
+Type = EnvShake
+Trigger1 = !AnimElemTime(1)
+Time = 8
+Freq = 50
+Ampl = -4
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 105, Helper]
+Type = Helper
+Trigger1 = AnimElemTime(2) >= 0
+Trigger1 = Time%4 = 0
+Name = "AfterImage FX"
+ID = 102
+StateNO = 102
+OwnPal = 1
+IgnoreHitPause = 1
+
+[State 105, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(1)
+Value = S105,500
+IgnoreHitPause = 1
+
+[State 105, Explod]
+Type = Explod
+Trigger1 = !AnimElemTime(2)
+Anim = 11000
+ID = 11000
+Pos = (Pos X + CameraPos X) + (0 * Facing), (Pos Y)
+Space = Stage 
+Facing = Facing
+Scale = -.85,.85
+SprPrioritY = 3
+Shadow = 0, 0, 0
+OwnPal = 1
+IgnoreHitPause = 1
+
+[State 105, VelSet]
+Type = VelSet
+Trigger1 = !AnimElemTime(2)
+X = Const(Velocity.Run.Back.X)
+Y = Const(Velocity.Run.Back.Y)
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 105, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = !AnimElemTime(2)
+StateType = A
+Physics = N
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 105, Gravity]
+Type = Gravity
+Trigger1 = AnimElemTime(2) > 0
+IgnoreHitPause = 1
+
+[State 105, PosSet]
+Type = PosSet
+Trigger1 = AnimElemTime(2) > 0
+Trigger1 = Pos Y >= 0
+Y = 0
+IgnoreHitPause = 1
+
+[State 105, VelSet]
+Type = VelSet
+Trigger1 = AnimElemTime(2) > 0
+Trigger1 = Pos Y >= 0
+Y = 0
+IgnoreHitPause = 1
+
+[State 105, ChangeState]
+type = ChangeState
+Trigger1 = AnimElemTime(2) > 0
+Trigger1 = Pos Y >= 0
+Value = 52
+;---------------------------------------------------------------------------
+;Lose
+[StateDef 170]
+Type = S
+MoveType = I
+Physics = S
+Ctrl = 0
+Anim = 170
+SprPriority = 2
+
+[State 170, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = Time = [0,60]
+Flag = RoundNotOver
+IgnoreHitPause = 1
+
+;---------------------------------------------------------------------------
+;Lose - Draw
+[StateDef 175]
+Type = S
+MoveType = I
+Physics = S
+Ctrl = 0
+Anim = 170
+SprPriority = 2
+
+[State 175, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = Time = [0,60]
+Flag = RoundNotOver
+IgnoreHitPause = 1
+;---------------------------------------------------------------------------
+;Win
+[StateDef 180]
+Type = S
+MoveType = I
+Physics = S
+Ctrl = 0
+SprPriority = 2
+
+[State 180, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = !Time
+Value = Cond(Random%2 = 0,182,180)
+IgnoreHitPause = 1
+
+;Anim 180
+
+[State 180, PlaySnd]
+Type = PlaySnd
+Trigger1 = Anim = 180
+Trigger1 = !AnimElemTime(13)
+Trigger1 = !MatchOver
+Value = S180, (Var(33) := 0)
+VolumeScale = 80
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 180, PlaySnd]
+Type = PlaySnd
+Trigger1 = Anim = 180
+Trigger1 = !AnimElemTime(13)
+Trigger1 = MatchOver
+Value = S180, (Var(33) := 1 + Random%2)
+VolumeScale = 80
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 180, PlaySnd]
+Type = PlaySnd
+TriggerAll = Anim = 180
+Trigger1 = !AnimElemTime(3)
+Trigger2 = !AnimElemTime(7)
+Value = S6000, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 180, PlaySnd]
+Type = PlaySnd
+TriggerAll = Anim = 180
+Trigger1 = !AnimElemTime(3)
+Trigger2 = !AnimElemTime(7)
+Value = S6001, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 180, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = Anim = 180
+Trigger1 = Var(33) = 0
+Trigger1= Time = [45,155]
+Trigger2 = Anim = 180
+Trigger2 = Var(33) = 1
+Trigger2= Time = [45,240]
+Trigger3 = Anim = 180
+Trigger3 = Var(33) = 2
+Trigger3= Time = [45,210]
+Flag = RoundNotOver
+IgnoreHitPause = 1
+
+;Anim 182
+
+[State 180, PlaySnd]
+Type = PlaySnd
+Trigger1 = Anim = 182
+Trigger1 = !AnimElemTime(1)
+Value = S180, (Var(33) := 3 + Random%2)
+VolumeScale = 80
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 180, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = Anim = 182
+Trigger1 = Var(33) = 3
+Trigger1 = Time = [0,105]
+Trigger2 = Anim = 182
+Trigger2 = Var(33) = 4
+Trigger2 = Time = [0,110]
+Flag = RoundNotOver
+IgnoreHitPause = 1
+
+
+;---------------------------------------------------------------------------
+;Intro
+[StateDef 190]
+Type = S
+MoveType = I
+Physics = S
+Ctrl = 0
+SprPriority = 2
+
+[State 190, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = StateNO = StateNO
+Flag = Intro
+IgnoreHitPause = 1
+
+[State 190, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = !Time
+Value = Cond(Random%2 = 0,Cond(Random%5 = 0,196,192),190)
+IgnoreHitPause = 1
+
+;Anim 190
+
+[State 190, PlaySnd]
+Type = PlaySnd
+Trigger1 = Anim = 190
+Trigger1 = !AnimElemTime(15)
+Value = S190, (Var(33) :=  0 + Random%2)
+VolumeScale = 80
+Channel = 15
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 190, PlaySnd]
+Type = PlaySnd
+Trigger1 = Anim != 196
+Trigger1 = !AnimElemTime(1)
+Value = S190, 500
+VolumeScale = 100
+IgnoreHitPause = 1
+
+[State 190, ChangeAnim]
+Type = ChangeAnim
+TriggerAll = Anim = 190
+TriggerAll = AnimElemTime(24) = 5
+Trigger1 = Var(33) = 0
+Trigger1 = Time = [82,180]
+Trigger2 = Var(33) = 1
+Trigger2 = Time = [82,240]
+Value = Anim
+Elem = 15
+IgnoreHitPause = 1
+
+[State 190, ChangeAnim]
+Type = ChangeAnim
+TriggerAll = Anim = 190
+Trigger1 = Var(33) = 0
+Trigger1 = Time = 180
+Trigger2 = Var(33) = 1
+Trigger2 = Time = 240
+Value = Anim
+Elem = 25
+IgnoreHitPause = 1
+
+[State 190, Helper]
+Type = Helper
+Trigger1 = Anim = 190
+Trigger1= !AnimElemTime(12)
+Name = "Scabbard"
+ID = 194
+StateNO = 194
+Pos = 24, -52
+OwnPal = 1
+IgnoreHitPause = 1
+
+;Anim 192
+
+[State 190, PlaySnd]
+Type = PlaySnd
+Trigger1 = Anim = 192
+Trigger1 = !AnimElemTime(11)
+Value = S190, (Var(33) :=  2 + Random%2)
+VolumeScale = 80
+Channel = 15
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 190, ChangeAnim]
+Type = ChangeAnim
+TriggerAll = Anim = 192
+Trigger1 = Var(33) = 2
+Trigger1 = Time = [47,140]
+Trigger2 = Var(33) = 3
+Trigger2 = Time = [47,260]
+Value = Anim
+Elem = 11
+IgnoreHitPause = 1
+
+[State 190, ChangeAnim]
+Type = ChangeAnim
+TriggerAll = Anim = 192
+Trigger1 = Var(33) = 2
+Trigger1 = Time = 140
+Trigger2 = Var(33) = 3
+Trigger2 = Time = 260
+Value = Anim
+Elem = 12
+IgnoreHitPause = 1
+
+[State 190, Helper]
+Type = Helper
+Trigger1 = Anim = 192
+Trigger1= !AnimElemTime(12)
+Name = "Scabbard"
+ID = 194
+StateNO = 194
+Pos = 24, -52
+OwnPal = 1
+IgnoreHitPause = 1
+
+;Anim 196
+
+[State 190, PlaySnd]
+Type = PlaySnd
+Trigger1 = Anim = 196
+Trigger1 = !AnimElemTime(1)
+Value = S190, (Var(33) :=  4 + Random%2)
+VolumeScale = 80
+Channel = 15
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 190, ChangeAnim]
+Type = ChangeAnim
+TriggerAll = Anim = 196
+Trigger1 = Var(33) = 4
+Trigger1 = Time = [0,240]
+Trigger2 = Var(33) = 5
+Trigger2 = Time = [0,180]
+Value = Anim
+Elem = 1
+IgnoreHitPause = 1
+
+[State 190, Explod]
+Type = Explod
+TriggerAll = Anim = 196
+TriggerAll = AnimElemTime(2) < 0
+TriggerAll = !NumExplod(197)
+TriggerAll = Time%5 = 0
+Trigger1 = Var(33) = 4
+Trigger1 = Time != [72,126]
+Trigger2= Var(33) = 5
+Trigger2 = Time != [36,60]
+Anim = 197
+ID = 197
+Pos = 0 * Facing, 0
+Space = Stage 
+Facing = Facing
+BindTime = -1
+BindID = ID
+Scale = 4.0, 4.0
+SprPriority = 3
+Shadow = 0, 0, 0
+OwnPal = 1
+RemoveOnGetHit = 1
+IgnoreHitPause = 1
+
+[State 190, RemoveExplod]
+Type = RemoveExplod
+Trigger1 = Anim = 196
+Trigger1 = !AnimElemTime(2)
+Trigger1 = NumExplod(197)
+ID = 197
+IgnoreHitPause = 1
+
+[State 190, ChangeState]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = 0

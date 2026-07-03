@@ -1,0 +1,4476 @@
+
+
+[Data]
+Life = 2100
+Power = 4000		
+Attack = 150
+Defence = 150	
+Fall.Defence_Up = 50	
+LieDown.Time = 60		
+AirJuggle = 15		
+SparkNO = 00408 ;Run Type, Step 1 Frame, Step 2 Frame		
+Guard.SparkNO = 165 ;Run Anim Height
+KO.Echo = 0			
+VolumeScale = 100			
+IntPersistIndex = 0
+FloatPersistIndex = 0
+
+[Size]
+XScale = 4.0			
+YScale = 4.0	
+Ground.Back = 45		
+Ground.Front = 45
+Air.Back = 35
+Air.Front = 35
+Height = 190				
+Head.Pos = 0, -150
+Mid.Pos = 0, -90
+Attack.Dist = 160
+Proj.Attack.Dist = 90		
+
+[Velocity]
+Walk.Fwd  = 7		
+Walk.Back = -7
+	
+Run.Fwd  = 25, 0		
+Run.Back = -25,-12
+
+Jump.Neu = 0,-26
+Jump.Back = -10 ;12	
+Jump.Fwd = 10 ;12	
+	
+RunJump.Back = -5,0
+RunJump.Fwd = 10,0	
+
+AirJump.Neu = 0,-22
+AirJump.Back = -10
+AirJump.Fwd = 10
+
+Air.GetHit.GroundRecover = -10,-15
+Air.GetHit.AirRecover.Mul = .5,.2     
+Air.GetHit.AirRecover.Add = 0,-18 
+Air.GetHit.AirRecover.Back = -4       
+Air.GetHit.AirRecover.Fwd = 0        
+Air.GetHit.AirRecover.Up = -8    
+Air.GetHit.AirRecover.Down = 6		
+
+
+[Movement]
+Airjump.Num = 0		
+Airjump.Height = -120	
+YAccel = 1.76		
+Stand.Friction = .85	
+Crouch.Friction = .82
+
+Air.GetHit.Groundlevel = 100      
+Air.GetHit.GroundRecover.Ground.Threshold = -80 
+Air.GetHit.GroundRecover.Groundlevel = 40
+Air.GetHit.AirRecover.Threshold = -4
+Air.GetHit.AirRecover.YAccel = 1.4	
+Air.Gethit.Trip.GroundLevel =  60
+
+Down.Bounce.Offset = 0, 80            
+Down.Bounce.YAccel = 1.6              
+Down.Bounce.GroundLevel = 48       
+Down.Friction.Threshold = .2  
+
+[Constants]
+switchAttack = 220 ; ANIM: Switch attack. 
+I highly recommend to clone your favorite animation in Fighter Factory and extend the frametime of the animelem that has the red box.
+switchAirAttack = 611 ; ANIM: switch air attack.
+snapBackAttack = 300 ; ANIM: snapback attack
+snapBackHit = 228 ; this is the ANIMATION used when the char get hit by the snapback attack
+StateTagAssistSuper = 800 ; STATENO: normal assist attack
+StateTagAssistHyper = 2100 ; STATENO: Super assist attack, cost 1500 of power.
+tauntWhileWaitingForPartners = 195 ; ANIM: If mvc1switch is on, taunt after switch. Used on switch attack or triple menace.
+
+;---------------------------------------------------------------------------
+;5A
+[StateDef 200]
+Type = S
+MoveType = A
+Physics = S
+Ctrl = 0
+Anim = 200
+SprPriority = 2
+FaceP2 = 1
+
+[State 200, Helper]
+Type = Helper
+Trigger1 = !NumHelper(6500)
+Trigger1 = !AnimElemTime(1)
+Name = "Save Previous State for Reverse Beat"
+ID = 6500
+StateNO = 6500
+OwnPal = 1
+Size.XScale = 200 ;Var(0)
+Size.YScale = 210 ;Var(1)
+Size.Mid.Pos = 220,300 ;Var(2),Var(3)
+Size.Head.Pos = 310,320 ;Var(4),Var(5)
+Size.Height = 0
+Size.ShadowOffset = 0
+Size.Ground.Back = 0
+Size.Ground.Front = 0
+Size.Air.Back = 0
+Size.Air.Front = 0
+IgnoreHitPause = 1
+
+[State 200, VelSet]
+Type = VelSet
+Trigger1 = PrevStateNO != 100
+Trigger1 = !AnimElemTime(1)
+X = 0
+Y = 0
+IgnoreHitPause = 1
+
+[State 200, Null]
+Type = Null
+Trigger1 = !AnimElemTime(1)
+Trigger1 = PrevStateNO != StateNO
+Trigger1 = Var(59) := 0
+IgnoreHitPause = 1
+[State 200, VarAdd]
+Type = VarAdd
+Trigger1 = !AnimElemTime(1)
+var(59) = 1
+IgnoreHitPause = 1
+
+[State 200, VelSet]
+Type = VelSet
+Trigger1 = !AnimElemTime(3)
+X = 6.5
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 200, PosAdd]
+Type = PosAdd
+Trigger1 = AnimElemTime(3) < 0
+X = -1.45
+IgnoreHitPause = 1
+
+[State 200, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(3)
+Value = S200, 0 + Random%4
+VolumeScale = 80
+IgnoreHitPause = 1
+
+[State 200, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(3)
+Value = S6000, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 200, Explod]
+Type = Explod
+Trigger1 = !AnimElemTime(3)
+Anim = 11001
+ID = 11001
+Pos = (Pos X + CameraPos X) + (10 * Facing), (Pos Y)
+Space = Stage 
+Facing = Facing
+Scale = .65,.65
+SprPrioritY = 3
+Shadow = 0, 0, 0
+OwnPal = 1
+IgnoreHitPause = 1
+
+[State 200, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = ((Pos X - EnemyNear,Pos X) * EnemyNear,Facing) < 0
+Flag = UnGuardable
+IgnoreHitPause = 1
+
+[State 200, HitDef]
+Type = HitDef
+Trigger1 = AnimElemTime(3) >= 0
+Trigger1 = AnimElemTime(4) < 0
+Attr = S,NA      
+HitFlag = MAFD     
+GuardFlag = MA          
+AnimType = Light    
+Priority = 3,Hit
+Damage = (10 / Cond(Var(22),(1+(Var(21) - Var(22))),1)),Ceil(10/4)
+PauseTime = 4,8
+Guard.PauseTime = 4,4
+Sparkno = -1 + (0 * (Var(25) := 0))
+HitSound = S12000,4
+GuardSound = S12100,0
+Ground.Type = High
+Air.Type = High
+Ground.SlideTime = 15
+Ground.HitTime = 12
+Air.HitTime = 12
+Ground.Velocity = (-2 - (Var(59) * 1.85)),0
+Air.Velocity = (-2 - (Var(59) * 1.85)),-4
+Ground.Cornerpush.VelOff = 0
+Air.Cornerpush.VelOff = 0
+Down.Cornerpush.VelOff = 0
+Guard.Cornerpush.VelOff = 0
+AirGuard.Cornerpush.VelOff = 0
+P1SprPriority = 2
+P2SprPriority = 1
+Fall = 0
+Fall.YVelocity = 0
+Fall.Recover = 0
+Fall.RecoverTime = 12
+Fall.Damage = 0
+ID = StateNO
+HitOnce = 1
+Getpower = 100,50
+Givepower = 20,5
+EnvShake.Time = 8
+EnvShake.Freq = 50
+EnvShake.Ampl = -4
+Persistent = 0
+
+[State 200, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = AnimElemTime(4) >= 0
+MoveType = I
+IgnoreHitPause = 1
+
+[State 200, Null]
+Type = Null
+Trigger1 = Var(26) :=  75
+Trigger1 = Var(27) :=  -45
+IgnoreHitPause = 1
+
+[State 200, ChangeState]
+Type = ChangeState
+TriggerAll = MoveContact 
+TriggerAll= Var(59) < 3
+Trigger1 =  !AiLevel
+Trigger1 = Command != "holddown"
+Trigger1 = Command = "a"
+
+Trigger2 = AiLevel && NumEnemy
+Trigger2 = RoundState = 2
+Trigger2 = FVar(39)  < 120
+Trigger2  = Cond(NumTarget,Target,Pos Y,EnemyNear,Pos Y) >= Const(Size.Mid.Pos.Y)
+Trigger2  = Cond(NumTarget,Target,StateType != L,EnemyNear,StateType != L)
+Trigger2 = Var(20) = [(0 * AiLevel),(6 * AiLevel)]
+Value = 200
+IgnoreHitPause = 1
+
+[State 200, ChangeState]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = 0
+Ctrl = 1
+;---------------------------------------------------------------------------
+;5B
+[StateDef 210]
+Type = S
+MoveType = A
+Physics = S
+Ctrl = 0
+Anim = 210
+SprPriority = 2
+FaceP2 = 1
+
+[State 210, Helper]
+Type = Helper
+Trigger1 = !NumHelper(6500)
+Trigger1 = !AnimElemTime(1)
+Name = "Save Previous State for Reverse Beat"
+ID = 6500
+StateNO = 6500
+OwnPal = 1
+Size.XScale = 200 ;Var(0)
+Size.YScale = 210 ;Var(1)
+Size.Mid.Pos = 220,300 ;Var(2),Var(3)
+Size.Head.Pos = 310,320 ;Var(4),Var(5)
+Size.Height = 0
+Size.ShadowOffset = 0
+Size.Ground.Back = 0
+Size.Ground.Front = 0
+Size.Air.Back = 0
+Size.Air.Front = 0
+IgnoreHitPause = 1
+
+[State 210, VelSet]
+Type = VelSet
+Trigger1 = PrevStateNO != 100
+Trigger1 = !AnimElemTime(1)
+X = 0
+Y = 0
+IgnoreHitPause = 1
+
+[State 210, VelSet]
+Type = VelSet
+Trigger1 = !AnimElemTime(5)
+X = 7.5
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 210, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(5)
+Value = S210, 0 + Random%3
+VolumeScale = 80
+IgnoreHitPause = 1
+
+[State 210, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(5)
+Value = S6000, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 210, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(5)
+Value = S6001, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 210, Explod]
+Type = Explod
+Trigger1 = !AnimElemTime(5)
+Anim = 11001
+ID = 11001
+Pos = (Pos X + CameraPos X) + (10 * Facing), (Pos Y)
+Space = Stage 
+Facing = Facing
+Scale = .65,.65
+SprPrioritY = 3
+Shadow = 0, 0, 0
+OwnPal = 1
+IgnoreHitPause = 1
+
+[State 210, Helper]
+Type = Helper
+Trigger1 = !AnimElemTime(5)
+Name = "Slash Effect"
+ID = 211
+StateNO = 211
+OwnPal = 1
+Size.XScale = 1
+Size.YScale = 1
+Size.Mid.Pos = -45,-95
+IgnoreHitPause = 1
+
+[State 210, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = ((Pos X - EnemyNear,Pos X) * EnemyNear,Facing) < 0
+Flag = UnGuardable
+IgnoreHitPause = 1
+
+[State 210, HitDef]
+Type = HitDef
+Trigger1 = AnimElemTime(5) >= 0
+Trigger1 = AnimElemTime(6) < 0
+Attr = S,NA      
+HitFlag = MAFD     
+GuardFlag = MA          
+AnimType = Medium 
+Priority = 4,Hit
+Damage = (20 / Cond(Var(22),(1+(Var(21) - Var(22))),1)),Ceil(20/4)
+PauseTime = 8,10
+Guard.PauseTime = 8,8
+Sparkno = -1 + (0 * (Var(25) := 4))
+HitSound = S12010,2
+GuardSound = S12100,0
+Ground.Type = High
+Air.Type = High
+Ground.SlideTime = 15
+Ground.HitTime = 17
+Air.HitTime = 17
+Ground.Velocity = -8,0
+Air.Velocity = -8,-4
+Ground.Cornerpush.VelOff = 0
+Air.Cornerpush.VelOff = 0
+Down.Cornerpush.VelOff = 0
+Guard.Cornerpush.VelOff = 0
+AirGuard.Cornerpush.VelOff = 0
+P1SprPriority = 2
+P2SprPriority = 1
+Fall = 0
+Fall.YVelocity = 0
+Fall.Recover = 0
+Fall.RecoverTime = 12
+Fall.Damage = 0
+ID = StateNO
+HitOnce = 1
+Getpower = 100,50
+Givepower = 20,5
+EnvShake.Time = 8
+EnvShake.Freq = 55
+EnvShake.Ampl = -6
+Persistent = 0
+
+[State 210, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = AnimElemTime(6) >= 0
+MoveType = I
+IgnoreHitPause = 1
+
+[State 210, Null]
+Type = Null
+Trigger1 = NumTarget(StateNO)
+Trigger1 = Var(26) :=  Ceil((Target(StateNO),Pos X - Pos X)  * Facing)
+Trigger1 = Var(27) :=  Const(Size.Mid.Pos.Y)
+Trigger2 = !NumTarget(StateNO)
+Trigger2 = Var(26) :=  Ceil((EnemyNear,Pos X - Pos X)  * Facing)
+Trigger2 = Var(27) :=  Const(Size.Mid.Pos.Y)
+IgnoreHitPause = 1
+
+[State 210, ChangeState]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = 0
+Ctrl = 1
+;---------------------------------------------------------------------------
+;5C
+[StateDef 220]
+Type = S
+MoveType = A
+Physics = S
+Ctrl = 0
+Anim = 220
+SprPriority = 2
+FaceP2 = 1
+
+[State 220, Helper]
+Type = Helper
+Trigger1 = !NumHelper(6500)
+Trigger1 = !AnimElemTime(1)
+Name = "Save Previous State for Reverse Beat"
+ID = 6500
+StateNO = 6500
+OwnPal = 1
+Size.XScale = 200 ;Var(0)
+Size.YScale = 210 ;Var(1)
+Size.Mid.Pos = 220,300 ;Var(2),Var(3)
+Size.Head.Pos = 310,320 ;Var(4),Var(5)
+Size.Height = 0
+Size.ShadowOffset = 0
+Size.Ground.Back = 0
+Size.Ground.Front = 0
+Size.Air.Back = 0
+Size.Air.Front = 0
+IgnoreHitPause = 1
+
+[State 220, Null]
+Type = Null
+Trigger1 = !AnimElemTime(1)
+Trigger1 = Var(29) := 0
+IgnoreHitPause = 1
+[State 220, ChangeAnim]
+Type = ChangeAnim
+TriggerAll = !Var(58)
+TriggerAll = !Var(29)
+TriggerAll = AnimElemTime(2) >= 0 && AnimElemTime(3) < 0
+TriggerAll = Time = [3,18]
+Trigger1 = !AiLevel
+Trigger1 = Command = "holdc"
+Trigger2= AiLevel && NumEnemy
+Trigger2 = RoundState = 2
+Trigger2 = Fvar(39) <= 220
+Trigger2 = Var(20)  = [(0 * AiLevel),(8 * AiLevel)]
+Value = ((Anim - Cond((Time = [11,18]),1,0)) + Cond((Time = [11,18]),(Var(29) := 1),0))
+Elem = 2
+IgnoreHitPause = 1
+
+[State 220, Null]
+Type = Null
+Trigger1 = Var(29) && MoveHit
+Trigger1 = Var(58) := 120
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 220, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = Var(29)
+Value = Anim
+Elem = 3
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 220, Helper]
+Type = Helper
+Trigger1 = Var(29)
+Name = "Hold Button Charge Effect"
+ID = 11010
+StateNO = 11010
+OwnPal = 1
+Size.XScale = 0.685
+Size.YScale = 0.685
+Size.Mid.Pos = 26, -74
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 220, VelSet]
+Type = VelSet
+Trigger1 = PrevStateNO != 100
+Trigger1 = !AnimElemTime(1)
+X = 0
+Y = 0
+IgnoreHitPause = 1
+
+[State 220, VelSet]
+Type = VelSet
+Trigger1 = !AnimElemTime(3)
+X = 8.5 + (Var(29) * 4.5)
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 220, PosAdd]
+Type = PosAdd
+Trigger1 = AnimElemTime(3) < 0
+X = -1.65
+IgnoreHitPause = 1
+
+[State 220, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(3)
+Value = S220, 0 + Random%3
+VolumeScale = 80
+IgnoreHitPause = 1
+
+[State 220, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(3)
+Value = S6000, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 220, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(3)
+Value = S6001, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 220, Explod]
+Type = Explod
+Trigger1 = !AnimElemTime(3)
+Anim = 11001
+ID = 11001
+Pos = (Pos X + CameraPos X) + (20 * Facing), (Pos Y)
+Space = Stage 
+Facing = Facing
+Scale = .65,.65
+SprPrioritY = 3
+Shadow = 0, 0, 0
+OwnPal = 1
+IgnoreHitPause = 1
+
+[State 220, Helper]
+Type = Helper
+Trigger1 = !AnimElemTime(3)
+Name = "Slash Effect"
+ID = 221
+StateNO = 221
+OwnPal = 1
+Size.XScale = .32
+Size.YScale = .32
+Size.Mid.Pos =225,-112
+IgnoreHitPause = 1
+
+[State 220, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = ((Pos X - EnemyNear,Pos X) * EnemyNear,Facing) < 0
+Flag = UnGuardable
+IgnoreHitPause = 1
+
+[State 220, HitDef]
+Type = HitDef
+Trigger1 = !Var(29)
+Trigger1 = AnimElemTime(3) >= 0
+Trigger1 = AnimElemTime(4) < 0
+Attr = S,NA      
+HitFlag = MAFD     
+GuardFlag = MA          
+AnimType = Hard
+Priority = 5,Hit
+Damage = (30 / Cond(Var(22),(1+(Var(21) - Var(22))),1)),Ceil(30/4)
+PauseTime = 10,12
+Guard.PauseTime = 10,10
+Sparkno = -1 + (0 * (Var(25) := 5))
+HitSound = S12010,4
+GuardSound = S12100,0
+Ground.Type = High
+Air.Type = High
+Ground.SlideTime = 15
+Ground.HitTime = 20
+Air.HitTime = 20
+Ground.Velocity = -10,0
+Air.Velocity = -10,-4
+Ground.Cornerpush.VelOff = 0
+Air.Cornerpush.VelOff = 0
+Down.Cornerpush.VelOff = 0
+Guard.Cornerpush.VelOff = 0
+AirGuard.Cornerpush.VelOff = 0
+P1SprPriority = 2
+P2SprPriority = 1
+Fall = 0
+Fall.YVelocity = 0
+Fall.Recover = 0
+Fall.RecoverTime = 12
+Fall.Damage = 0
+ID = StateNO
+HitOnce = 1
+Getpower = 100,50
+Givepower = 20,5
+EnvShake.Time = 12
+EnvShake.Freq = 55
+EnvShake.Ampl = -6
+Persistent = 0
+
+[State 220, HitDef]
+Type = HitDef
+Trigger1 = Var(29)
+Trigger1 = AnimElemTime(3) >= 0
+Trigger1 = AnimElemTime(4) < 0
+Attr = S,NA      
+HitFlag = MAFD     
+GuardFlag = MA          
+AnimType = Hard
+Priority = 5,Hit
+Damage = (40 / Cond(Var(22),(1+(Var(21) - Var(22))),1)),Ceil(40/4)
+PauseTime = 12,60
+Guard.PauseTime = 12,12
+Sparkno = -1 + (0 * (Var(25) := 5))
+HitSound = S12010,5
+GuardSound = S12100,0
+Ground.Type = High
+Air.Type = High
+Ground.SlideTime = 15
+Ground.HitTime = 20
+Air.HitTime = 20
+Ground.Velocity = 0
+Air.Velocity = 0,0
+Ground.Cornerpush.VelOff = 0
+Air.Cornerpush.VelOff = 0
+Down.Cornerpush.VelOff = 0
+Guard.Cornerpush.VelOff = 0
+AirGuard.Cornerpush.VelOff = 0
+P1SprPriority = 2
+P2SprPriority = 1
+Fall = 1
+Fall.YVelocity = 0
+Fall.Recover = 1
+Fall.RecoverTime = 12
+Fall.Damage = 10
+ID = StateNO
+HitOnce = 1
+Getpower = 100,50
+Givepower = 20,5
+EnvShake.Time = 15
+EnvShake.Freq = 55
+EnvShake.Ampl = -8
+Fall.EnvShake.Time = 10
+Fall.EnvShake.Freq = 55
+Fall.EnvShake.Ampl = -8
+Persistent = 0
+
+[State 220, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = AnimElemTime(4) >= 0
+MoveType = I
+IgnoreHitPause = 1
+
+[State 220, Null]
+Type = Null
+Trigger1 = Var(26) :=  215
+Trigger1 = Var(27) :=  -112
+IgnoreHitPause = 1
+
+[State 220, TargetState]
+Type = TargetState
+Trigger1 = Var(29)
+Trigger1 = MoveHit
+Trigger1= NumTarget(StateNO)
+Value = 225
+ID =StateNO
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 220, ChangeState]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = 0
+Ctrl = 1
+;---------------------------------------------------------------------------
+; 5C
+[StateDef 225, TargetState]
+Type = S
+MoveType = H
+Physics = N
+VelSet = 0,0
+Ctrl = 0
+
+[State 225, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = !Time
+Value = 5002
+IgnoreHitPause = 1
+
+[State 225, ScreenBound]
+Type = ScreenBound
+Trigger1 = StateNO = StateNO
+Value = 1
+MoveCamera = 1, 0
+IgnoreHitPause = 1
+
+[State 225, PlayerPush]
+Type = PlayerPush
+Trigger1 = StateNO = StateNO
+Value = 0
+IgnoreHitPause = 1
+
+[State 225, Turn]
+Type = Turn
+Trigger1 = NumEnemy
+Trigger1 = Enemy(0),NumTarget(220)
+Trigger1 = Enemy(0),Cond(1,Target(220),Cond(1,ID = ID,0),0)
+Trigger1 = PlayerIDExist(Enemy(0),ID)
+Trigger1 = Facing = PlayerID(Enemy(0),ID),Facing 
+Trigger2 = NumEnemy = 2
+Trigger2 = Enemy(1),NumTarget(220)
+Trigger2 = Enemy(1),Cond(1,Target(220),Cond(1,ID = ID,0),0)
+Trigger2 = PlayerIDExist(Enemy(1),ID)
+Trigger2 = Facing = PlayerID(Enemy(1),ID),Facing 
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 225, SelfState]
+Type = SelfState
+TriggerAll = Pos Y < 0
+Trigger1 = GetHitVar(HitShakeTime) = 0
+Trigger2 = !Alive
+Value = 5050
+
+[State 225, SelfState]
+Type = SelfState
+TriggerAll = Pos Y = 0
+Trigger1 = GetHitVar(HitShakeTime) = 0
+Trigger2 = !Alive
+Value = 5070
+;---------------------------------------------------------------------------
+;6C
+[StateDef 250]
+Type = S
+MoveType = A
+Physics = S
+Ctrl = 0
+Anim = 250
+SprPriority = 2
+FaceP2 = 1
+
+[State 250, Null]
+Type = Null
+Trigger1 = !AnimElemTime(1)
+Trigger1 = Var(52) := 30
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 250, Null]
+Type = Null
+Trigger1 = !AnimElemTime(1)
+Trigger1 = Var(29) := 0
+IgnoreHitPause = 1
+[State 250, ChangeAnim]
+Type = ChangeAnim
+TriggerAll = AnimElemTime(3) >= 0 && AnimElemTime(4) < 0
+TriggerAll = Time = [10,32]
+Trigger1 = !AiLevel
+Trigger1 = Command = "holdc"
+Trigger2= AiLevel && NumEnemy
+Trigger2 = RoundState = 2
+Trigger2 = Fvar(39) > 240 
+Trigger2 = Var(20)  = [(0 * AiLevel),(5 * AiLevel)]
+Value = Anim
+Elem = 3
+IgnoreHitPause = 1
+
+[State 250, Null]
+Type = Null
+Trigger1 = AnimElemTime(3) >= 0 && AnimElemTime(4) < 0
+Trigger1 = Time = [12,32]
+Trigger1 = Var(29) := (Time - 12)
+IgnoreHitPause = 1
+
+[State 250, PalFX]
+Type = PalFX
+Trigger1 = AnimElemTime(3) >= 0 && AnimElemTime(4) < 0
+Trigger1 = Time = [12,32]
+Time = 1
+Add = 0 + Ceil(Var(29) * 2.5),0 + Ceil(Var(29) * 2.5),0 + Ceil(Var(29) * 2.5)
+IgnoreHitPause = 1
+
+[State 250, VelSet]
+Type = VelSet
+Trigger1 = PrevStateNO != 100
+Trigger1 = !AnimElemTime(1)
+X = 0
+Y = 0
+IgnoreHitPause = 1
+
+[State 250, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(5)
+Value = S250, 0 + Random%3
+VolumeScale = 80
+IgnoreHitPause = 1
+
+[State 250, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(5)
+Value = S6000, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 250, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(5)
+Value = S6001, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 250, Helper]
+Type = Helper
+Trigger1 = !AnimElemTime(1)
+Name = "Sword Glow"
+ID = 252
+StateNO = 252
+OwnPal = 1
+IgnoreHitPause = 1
+
+[State 250, Helper]
+Type = Helper
+Trigger1 = !AnimElemTime(5)
+Name = "Sword Trail"
+ID = 254
+StateNO = 254
+Pos = 0,-96
+OwnPal = 1
+Size.XScale = 0.85
+Size.YScale = 0.65
+IgnoreHitPause = 1
+
+[State 250, Helper]
+Type = Helper
+Trigger1 = !AnimElemTime(5)
+Name = "Slash Effect"
+ID = 255
+StateNO = 255
+OwnPal = 1
+RemapPal = 5,9
+Size.XScale = .40
+Size.YScale = .40
+Size.Mid.Pos = 250,-96
+IgnoreHitPause = 1
+
+[State 250, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = !AnimElemTime(5)
+Physics = N
+IgnoreHitPause = 1
+
+[State 250, VelSet]
+Type = VelSet
+Trigger1 = !AnimElemTime(5)
+X = 45 + (Var(29) * 0.75)
+IgnoreHitPause = 1
+
+[State 250, PlayerPush]
+Type = PlayerPush
+Trigger1 = AnimElemTime(5) >= 0
+Value = 0
+IgnoreHitPause = 1
+
+[State 250, Explod]
+Type = Explod
+Trigger1 = !AnimElemTime(5)
+Anim = 256
+ID = 256
+Pos = (Pos X + CameraPos X) + (-20 * Facing), (Pos Y) + (-95)
+Space = Stage 
+Facing = Facing
+Scale = 0.60,0.60
+SprPrioritY = 3
+Shadow = 0, 0, 0
+OwnPal = 1
+Trans = Add
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 250, Explod]
+Type = Explod
+Trigger1 = AnimElemTime(5) = 0
+Anim = 11001
+ID = 11001
+Pos = (Pos X + CameraPos X) + (10 * Facing), (Pos Y)
+Space = Stage 
+Facing = Facing
+Scale = .65,.65
+SprPrioritY = 3
+Shadow = 0, 0, 0
+OwnPal = 1
+IgnoreHitPause = 1
+Persistent = 0
+[State 250, Explod]
+Type = Explod
+Trigger1 = AnimElemTime(5) = 4
+Anim = 11001
+ID = 11001
+Pos = (Pos X + CameraPos X) + (10 * Facing), (Pos Y)
+Space = Stage 
+Facing = Facing
+Scale = .65,.65
+SprPrioritY = 3
+Shadow = 0, 0, 0
+OwnPal = 1
+IgnoreHitPause = 1
+Persistent = 0
+[State 250, Explod]
+Type = Explod
+Trigger1 = AnimElemTime(6) = 4
+Anim = 11001
+ID = 11001
+Pos = (Pos X + CameraPos X) + (10 * Facing), (Pos Y)
+Space = Stage 
+Facing = Facing
+Scale = .65,.65
+SprPrioritY = 3
+Shadow = 0, 0, 0
+OwnPal = 1
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 250, Explod]
+Type = Explod
+Trigger1 = AnimElemTime(5) >= 0
+Trigger1 = Time%2= 0
+Anim = 11003
+ID = 11003
+Pos = (Pos X + CameraPos X) + ((0 - Random%40) * Facing), (Pos Y) + (-20 - Random%140)
+Space = Stage 
+Facing = Facing
+Vel = -5 * Facing,0
+Scale = 0.0875, 0.0425
+SprPrioritY = 1
+Shadow = 0, 0, 0
+OwnPal = 1
+IgnoreHitPause = 1
+
+[State 250, Explod]
+Type = Explod
+Trigger1 = AnimElemTime(5) >= 0
+Trigger1 = Time%4= 0
+Anim = 11003
+ID = 11003
+Pos = (Pos X + CameraPos X) + ((0 - Random%40) * Facing), (Pos Y) + (-20 - Random%140)
+Space = Stage 
+Facing = Facing
+Vel = -5 * Facing,0
+Scale = 0.0875, 0.0425
+SprPrioritY = 1
+Shadow = 0, 0, 0
+OwnPal = 1
+RemapPal = 5,9
+IgnoreHitPause = 1
+
+[State 250, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = ((Pos X - EnemyNear,Pos X) * EnemyNear,Facing) < 0
+Flag = UnGuardable
+IgnoreHitPause = 1
+
+[State 250, HitDef]
+Type = HitDef
+Trigger1 = AnimElemTime(5) >= 0
+Attr = S,NA      
+HitFlag = MAFD     
+GuardFlag = MA          
+AnimType = Hard   
+Priority = 5,Hit
+Damage = ((35 + Ceil(Var(29) * 0.5)) / Cond(Var(22),(1+(Var(21) - Var(22))),1)),Ceil((35 + Ceil(Var(29) * 0.5))/4)
+PauseTime = 4,15
+Guard.PauseTime = 4,6
+Sparkno = -1 + (0 * (Var(25) := 5))
+HitSound = S12010,5
+GuardSound = S12100,0
+Ground.Type = High
+Air.Type = High
+Ground.SlideTime = 15
+Ground.HitTime = 20
+Air.HitTime = 20
+Ground.Velocity = -10,-12
+Air.Velocity = -10,-12
+Ground.Cornerpush.VelOff = 0
+Air.Cornerpush.VelOff = 0
+Down.Cornerpush.VelOff = 0
+Guard.Cornerpush.VelOff = 0
+AirGuard.Cornerpush.VelOff = 0
+P1SprPriority = 2
+P2SprPriority = 1
+Fall = 1
+Fall.YVelocity = 0
+Fall.Recover = 1
+Fall.RecoverTime = 12
+Fall.Damage = 10
+ID = StateNO
+HitOnce = 1
+Getpower = 100,50
+Givepower = 20,5
+EnvShake.Time = 12
+EnvShake.Freq = 55
+EnvShake.Ampl = -6
+Fall.EnvShake.Time = 10
+Fall.EnvShake.Freq = 55
+Fall.EnvShake.Ampl = -8
+Persistent = 0
+
+[State 250, Null]
+Type = Null
+Trigger1 = NumTarget(StateNO)
+Trigger1 = Var(26) :=  Ceil((Target(StateNO),Pos X - Pos X)  * Facing)
+Trigger1 = Var(27) :=  -108
+Trigger2 = !NumTarget(StateNO)
+Trigger2 = Var(26) :=  Ceil((EnemyNear,Pos X - Pos X)  * Facing)
+Trigger2 = Var(27) :=  -108
+IgnoreHitPause = 1
+
+[State 250, ChangeState]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = 251
+
+;---------------------------------------------------------------------------
+;6C
+[StateDef 251]
+Type = S
+MoveType = I
+Physics = S
+Ctrl = 0
+Anim = 251
+SprPriority = 2
+MoveHitPersist  =1
+
+[State 251, VelAdd]
+Type = VelAdd
+Trigger1 = !AnimElemTime(1)
+X = -(Vel X / 1.5)
+IgnoreHitPause = 1
+
+[State 251, Explod]
+Type = Explod
+Trigger1 = !AnimElemTime(1)
+Anim = 11000
+ID = 11000
+Pos = (Pos X + CameraPos X) + ((Const(Size.Ground.Front) + 20) * Facing), (Pos Y)
+Space = Stage 
+Facing = Facing
+Vel = 2 * Facing,0
+Scale = -.55,.55
+SprPrioritY = 3
+Shadow = 0, 0, 0
+OwnPal = 1
+IgnoreHitPause = 1
+
+[State 251, PlaySnd]
+Type = PlaySnd
+Trigger1 = Anim = Anim
+Value = S101,500
+VolumeScale = 50
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 251, ChangeState]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = 0
+Ctrl = 1
+;---------------------------------------------------------------------------
+;4C
+[StateDef 280]
+Type = S
+MoveType = A
+Physics = S
+Ctrl = 0
+Anim = 280
+SprPriority = 2
+FaceP2 = 1
+
+[State 280, VelSet]
+Type = VelSet
+Trigger1 = PrevStateNO != 100
+Trigger1 = !AnimElemTime(1)
+X = 0
+Y = 0
+IgnoreHitPause = 1
+
+[State 280, VelSet]
+Type = VelSet
+Trigger1 = !AnimElemTime(4)
+X = 8
+Y = Const(Velocity.Jump.Y)
+IgnoreHitPause = 1
+
+[State 280, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = !AnimElemTime(4)
+StateType = A
+Physics = A
+IgnoreHitPause = 1
+
+[State 280, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(4)
+Value = S280, 0 + Random%4
+VolumeScale = 80
+IgnoreHitPause = 1
+
+[State 280, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(4)
+Value = S6000, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 280, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(4)
+Value = S6001, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 280, Explod]
+Type = Explod
+Trigger1 = !AnimElemTime(4)
+Anim = 11005
+ID = 11005
+Pos = (Pos X + CameraPos X) + (-20 * Facing), (Pos Y)
+Space = Stage 
+Facing = Facing
+Scale = .4 ,.4
+SprPrioritY = 3
+Shadow = 0, 0, 0
+OwnPal = 1
+Trans = Add
+Angle = -20
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 280, Helper]
+Type = Helper
+Trigger1 = !AnimElemTime(5)
+Name = "Slash Effect"
+ID = 281
+StateNO = 281
+OwnPal = 1
+Size.XScale = .65
+Size.YScale = .45
+Size.Mid.Pos = 70,-205
+IgnoreHitPause = 1
+
+[State 280, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = ((Pos X - EnemyNear,Pos X) * EnemyNear,Facing) < 0
+Flag = UnGuardable
+IgnoreHitPause = 1
+
+[State 280, HitDef]
+Type = HitDef
+Trigger1 = AnimElemTime(5) >= 0
+Trigger1 = AnimElemTime(6) < 0
+Attr = A,NA      
+HitFlag = MAFD     
+GuardFlag = MA          
+AnimType = Up
+Priority = 5,Hit
+Damage = (35 / Cond(Var(22),(1+(Var(21) - Var(22))),1)),Ceil(35/4)
+PauseTime = 8,10
+Guard.PauseTime = 8,8
+Sparkno = -1 + (0 * (Var(25) := 5))
+HitSound = S12010,6
+GuardSound = S12100,0
+Ground.Type = High
+Air.Type = High
+Ground.SlideTime = 15
+Ground.HitTime = 20
+Air.HitTime = 20
+Ground.Velocity = -6,Const(Velocity.Jump.Y)
+Air.Velocity = -6,Const(Velocity.Jump.Y)
+Ground.Cornerpush.VelOff = 0
+Air.Cornerpush.VelOff = 0
+Down.Cornerpush.VelOff = 0
+Guard.Cornerpush.VelOff = 0
+AirGuard.Cornerpush.VelOff = 0
+P1SprPriority = 2
+P2SprPriority = 1
+Fall = 1
+Fall.YVelocity = 0
+Fall.Recover = 0
+Fall.RecoverTime = 12
+Fall.Damage = 10
+ID = StateNO
+HitOnce = 1
+Getpower = 100,50
+Givepower = 20,5
+EnvShake.Time = 12
+EnvShake.Freq = 50
+EnvShake.Ampl = -8
+Fall.EnvShake.Time = 10
+Fall.EnvShake.Freq = 55
+Fall.EnvShake.Ampl = -8
+Persistent = 0
+
+[State 280, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = AnimElemTime(6) >= 0
+MoveType = I
+IgnoreHitPause = 1
+
+[State 280, Null]
+Type = Null
+Trigger1 = NumTarget(StateNO)
+Trigger1 = Var(26) :=  Ceil((Target(StateNO),Pos X - Pos X)  * Facing)
+Trigger1 = Var(27) :=  Const(Size.Mid.Pos.Y)
+Trigger2 = !NumTarget(StateNO)
+Trigger2 = Var(26) :=  Ceil((EnemyNear,Pos X - Pos X)  * Facing)
+Trigger2 = Var(27) :=  Const(Size.Mid.Pos.Y)
+IgnoreHitPause = 1
+
+[State 280, ChangeState]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = 50
+Ctrl = 1
+;---------------------------------------------------------------------------
+;2A
+[StateDef 300]
+Type = C
+MoveType = A
+Physics = C
+Ctrl = 0
+Anim = 300
+SprPriority = 2
+FaceP2 = 1
+
+[State 300, Helper]
+Type = Helper
+Trigger1 = !NumHelper(6500)
+Trigger1 = !AnimElemTime(1)
+Name = "Save Previous State for Reverse Beat"
+ID = 6500
+StateNO = 6500
+OwnPal = 1
+Size.XScale = 200 ;Var(0)
+Size.YScale = 210 ;Var(1)
+Size.Mid.Pos = 220,300 ;Var(2),Var(3)
+Size.Head.Pos = 310,320 ;Var(4),Var(5)
+Size.Height = 0
+Size.ShadowOffset = 0
+Size.Ground.Back = 0
+Size.Ground.Front = 0
+Size.Air.Back = 0
+Size.Air.Front = 0
+IgnoreHitPause = 1
+
+[State 300, VelSet]
+Type = VelSet
+Trigger1 = PrevStateNO != 100
+Trigger1 = !AnimElemTime(1)
+X = 0
+Y = 0
+IgnoreHitPause = 1
+
+[State 300, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(4)
+Value = S200, 0 + Random%4
+VolumeScale = 80
+IgnoreHitPause = 1
+
+[State 300, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(4)
+Value = S6000, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 300, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(4)
+Value = S6001, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 300, Explod]
+Type = Explod
+Trigger1 = !AnimElemTime(4)
+Anim = 11001
+ID = 11001
+Pos = (Pos X + CameraPos X) + (0 * Facing), (Pos Y)
+Space = Stage 
+Facing = Facing
+Scale = .65,.65
+SprPrioritY = 3
+Shadow = 0, 0, 0
+OwnPal = 1
+IgnoreHitPause = 1
+
+[State 300, Helper]
+Type = Helper
+Trigger1 = !AnimElemTime(4)
+Name = "Slash Effect"
+ID = 301
+StateNO = 301
+OwnPal = 1
+Size.XScale = 1
+Size.YScale = 1
+Size.Mid.Pos = -60,-80
+IgnoreHitPause = 1
+
+[State 300, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = ((Pos X - EnemyNear,Pos X) * EnemyNear,Facing) < 0
+Flag = UnGuardable
+IgnoreHitPause = 1
+
+[State 300, HitDef]
+Type = HitDef
+Trigger1 = AnimElemTime(4) >= 0
+Trigger1 = AnimElemTime(5) < 0
+Attr = C,NA      
+HitFlag = MAFD     
+GuardFlag = L       
+AnimType = Light
+Priority = 3,Hit
+Damage = (10 / Cond(Var(22),(1+(Var(21) - Var(22))),1)),Ceil(10/4)
+PauseTime = 6,8
+Guard.PauseTime = 6,6
+Sparkno = -1 + (0 * (Var(25) := 3))
+HitSound = S12010,1
+GuardSound = S12100,0
+Ground.Type = High
+Air.Type = High
+Ground.SlideTime = 15
+Ground.HitTime = 12
+Air.HitTime = 12
+Ground.Velocity = -4,0
+Air.Velocity = -4,-4
+Ground.Cornerpush.VelOff = 0
+Air.Cornerpush.VelOff = 0
+Down.Cornerpush.VelOff = 0
+Guard.Cornerpush.VelOff = 0
+AirGuard.Cornerpush.VelOff = 0
+P1SprPriority = 2
+P2SprPriority = 1
+Fall = 0
+Fall.YVelocity = 0
+Fall.Recover = 0
+Fall.RecoverTime = 12
+Fall.Damage = 0
+ID = StateNO
+HitOnce = 1
+Getpower = 100,50
+Givepower = 20,5
+EnvShake.Time = 8
+EnvShake.Freq = 50
+EnvShake.Ampl = -4
+Persistent = 0
+
+[State 300, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = AnimElemTime(5) >= 0
+MoveType = I
+IgnoreHitPause = 1
+
+[State 300, Null]
+Type = Null
+Trigger1 = NumTarget(StateNO)
+Trigger1 = Var(26) :=  Ceil((Target(StateNO),Pos X - Pos X)  * Facing)
+Trigger1 = Var(27) :=  Ceil(Const(Size.Mid.Pos.Y) / 2)
+Trigger2 = !NumTarget(StateNO)
+Trigger2 = Var(26) :=  Ceil((EnemyNear,Pos X - Pos X)  * Facing)
+Trigger2 = Var(27) :=  Ceil(Const(Size.Mid.Pos.Y) / 2)
+IgnoreHitPause = 1
+
+[State 300, ChangeState]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = 11
+Ctrl = 1
+
+;---------------------------------------------------------------------------
+;2B
+[StateDef 310]
+Type = S
+MoveType = A
+Physics = S
+Ctrl = 0
+Anim = 310
+SprPriority = 2
+FaceP2 = 1
+
+[State 310, Helper]
+Type = Helper
+Trigger1 = !NumHelper(6500)
+Trigger1 = !AnimElemTime(1)
+Name = "Save Previous State for Reverse Beat"
+ID = 6500
+StateNO = 6500
+OwnPal = 1
+Size.XScale = 200 ;Var(0)
+Size.YScale = 210 ;Var(1)
+Size.Mid.Pos = 220,300 ;Var(2),Var(3)
+Size.Head.Pos = 310,320 ;Var(4),Var(5)
+Size.Height = 0
+Size.ShadowOffset = 0
+Size.Ground.Back = 0
+Size.Ground.Front = 0
+Size.Air.Back = 0
+Size.Air.Front = 0
+IgnoreHitPause = 1
+
+[State 310, Null]
+Type = Null
+Trigger1 = !AnimElemTime(1)
+Trigger1 = Var(29) := 0
+IgnoreHitPause = 1
+[State 310, ChangeAnim]
+Type = ChangeAnim
+TriggerAll = !Var(29)
+TriggerAll = AnimElemTime(2) >= 0 && AnimElemTime(3) < 0
+TriggerAll = Time = [4,19]
+Trigger1 = !AiLevel
+Trigger1 = Command = "holdb"
+Trigger2= AiLevel && NumEnemy
+Trigger2 = RoundState = 2
+Trigger2 = Fvar(39) <= 180
+Trigger2 = Var(20)  = [(0 * AiLevel),(5 * AiLevel)]
+Value = ((Anim - Cond((Time = [12,19]),1,0)) + Cond((Time = [12,19]),(Var(29) := 1),0))
+Elem = 2
+IgnoreHitPause = 1
+
+[State 310, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = Var(29)
+Value = Anim
+Elem = 3
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 310, Helper]
+Type = Helper
+Trigger1 = Var(29)
+Name = "Hold Button Charge Effect"
+ID = 11010
+StateNO = 11010
+OwnPal = 1
+Size.XScale = 0.685
+Size.YScale = 0.685
+Size.Mid.Pos = 8, -96
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 310, VelSet]
+Type = VelSet
+Trigger1 = PrevStateNO != 100
+Trigger1 = !AnimElemTime(1)
+X = 0
+Y = 0
+IgnoreHitPause = 1
+
+[State 310, VelSet]
+Type = VelSet
+Trigger1 = !AnimElemTime(4)
+X = 7.5 + (Var(29) * 3.5)
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 310, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(4)
+Value = S210, 0 + Random%3
+VolumeScale = 80
+IgnoreHitPause = 1
+
+[State 310, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(4)
+Value = S6000, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 310, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(4)
+Value = S6001, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 310, Explod]
+Type = Explod
+Trigger1 = !AnimElemTime(4)
+Anim = 11001
+ID = 11001
+Pos = (Pos X + CameraPos X) + (10 * Facing), (Pos Y)
+Space = Stage 
+Facing = Facing
+Scale = .65,.65
+SprPrioritY = 3
+Shadow = 0, 0, 0
+OwnPal = 1
+IgnoreHitPause = 1
+
+[State 310, Helper]
+Type = Helper
+Trigger1 = !AnimElemTime(4)
+Name = "Slash Effect"
+ID = 311
+StateNO = 311
+OwnPal = 1
+Size.XScale = 1
+Size.YScale = 1
+Size.Mid.Pos = -55,-90
+IgnoreHitPause = 1
+
+[State 310, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = ((Pos X - EnemyNear,Pos X) * EnemyNear,Facing) < 0
+Flag = UnGuardable
+IgnoreHitPause = 1
+
+[State 310, HitDef]
+Type = HitDef
+Trigger1 = !Var(29)
+Trigger1 = AnimElemTime(4) >= 0
+Trigger1 = AnimElemTime(5) < 0
+Attr = S,NA      
+HitFlag = MAFD     
+GuardFlag = MA          
+AnimType = Medium 
+Priority = 4,Hit
+Damage = (20 / Cond(Var(22),(1+(Var(21) - Var(22))),1)),Ceil(20/4)
+PauseTime = 10,12
+Guard.PauseTime = 10,10
+Sparkno = -1 + (0 * (Var(25) := 4))
+HitSound = S12010,3
+GuardSound = S12100,0
+Ground.Type = High
+Air.Type = High
+Ground.SlideTime = 15
+Ground.HitTime = 17
+Air.HitTime = 17
+Ground.Velocity = -6,0
+Air.Velocity = -6,-4
+Ground.Cornerpush.VelOff = 0
+Air.Cornerpush.VelOff = 0
+Down.Cornerpush.VelOff = 0
+Guard.Cornerpush.VelOff = 0
+AirGuard.Cornerpush.VelOff = 0
+P1SprPriority = 2
+P2SprPriority = 1
+Fall = 0
+Fall.YVelocity = 0
+Fall.Recover = 0
+Fall.RecoverTime = 12
+Fall.Damage = 0
+ID = StateNO
+HitOnce = 1
+Getpower = 100,50
+Givepower = 20,5
+EnvShake.Time = 10
+EnvShake.Freq = 50
+EnvShake.Ampl = -6
+Persistent = 0
+
+[State 310, HitDef]
+Type = HitDef
+Trigger1 = Var(29)
+Trigger1 = AnimElemTime(4) >= 0
+Trigger1 = AnimElemTime(5) < 0
+Attr = S,NA      
+HitFlag = MAFD     
+GuardFlag = MA          
+AnimType = Medium 
+Priority = 4,Hit
+Damage = (30 / Cond(Var(22),(1+(Var(21) - Var(22))),1)),Ceil(30/4)
+PauseTime = 12,15
+Guard.PauseTime = 12,12
+Sparkno = -1 + (0 * (Var(25) := 4))
+HitSound = S12010,6
+GuardSound = S12100,0
+Ground.Type = High
+Air.Type = High
+Ground.SlideTime = 15
+Ground.HitTime = 17
+Air.HitTime = 17
+Ground.Velocity = -8,Const(Velocity.Jump.Y)
+Air.Velocity = -8,Const(Velocity.Jump.Y)
+Ground.Cornerpush.VelOff = 0
+Air.Cornerpush.VelOff = 0
+Down.Cornerpush.VelOff = 0
+Guard.Cornerpush.VelOff = 0
+AirGuard.Cornerpush.VelOff = 0
+P1SprPriority = 2
+P2SprPriority = 1
+Fall = 1
+Fall.YVelocity = 0
+Fall.Recover = 1
+Fall.RecoverTime = 12
+Fall.Damage = 10
+ID = StateNO
+HitOnce = 1
+Getpower = 100,50
+Givepower = 20,5
+EnvShake.Time = 12
+EnvShake.Freq = 55
+EnvShake.Ampl = -6
+Fall.EnvShake.Time = 10
+Fall.EnvShake.Freq = 55
+Fall.EnvShake.Ampl = -8
+Persistent = 0
+
+[State 310, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = AnimElemTime(5) >= 0
+MoveType = I
+IgnoreHitPause = 1
+
+[State 310, Null]
+Type = Null
+Trigger1 = NumTarget(StateNO)
+Trigger1 = Var(26) :=  Ceil((Target(StateNO),Pos X - Pos X)  * Facing)
+Trigger1 = Var(27) :=  Const(Size.Head.Pos.Y)
+Trigger2 = !NumTarget(StateNO)
+Trigger2 = Var(26) :=  Ceil((EnemyNear,Pos X - Pos X)  * Facing)
+Trigger2 = Var(27) :=  Const(Size.Head.Pos.Y)
+IgnoreHitPause = 1
+
+[State 310, ChangeState]
+Type = ChangeState
+TriggerAll = NumTarget(StateNO)
+TriggerAll = Var(29)
+Trigger1 = !AiLevel
+Trigger1 = Command = "holdup" || Command = "up"
+Trigger2 = AiLevel && NumEnemy
+Trigger2 = RoundState = 2
+Trigger2 = Target(StateNO),Pos Y >= Const(Size.Mid.Pos.Y)
+Trigger2 = !(Target(StateNO),GetHitVar(Guarded))
+Value = 40
+
+[State 310, ChangeState]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = 0
+Ctrl = 1
+
+;---------------------------------------------------------------------------
+;2C
+[StateDef 320]
+Type = S
+MoveType = A
+Physics = S
+Ctrl = 0
+Anim = 320
+SprPriority = 2
+FaceP2 = 1
+
+[State 320, Helper]
+Type = Helper
+Trigger1 = !NumHelper(6500)
+Trigger1 = !AnimElemTime(1)
+Name = "Save Previous State for Reverse Beat"
+ID = 6500
+StateNO = 6500
+OwnPal = 1
+Size.XScale = 200 ;Var(0)
+Size.YScale = 210 ;Var(1)
+Size.Mid.Pos = 220,300 ;Var(2),Var(3)
+Size.Head.Pos = 310,320 ;Var(4),Var(5)
+Size.Height = 0
+Size.ShadowOffset = 0
+Size.Ground.Back = 0
+Size.Ground.Front = 0
+Size.Air.Back = 0
+Size.Air.Front = 0
+IgnoreHitPause = 1
+
+[State 320, VelSet]
+Type = VelSet
+Trigger1 = PrevStateNO != 100
+Trigger1 = !AnimElemTime(1)
+X = 0
+Y = 0
+IgnoreHitPause = 1
+
+[State 320, VelSet]
+Type = VelSet
+Trigger1 = !AnimElemTime(4)
+X = 6.0
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 320, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(4)
+Value = S220, 0 + Random%3
+VolumeScale = 80
+IgnoreHitPause = 1
+
+[State 320, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(4)
+Value = S6000, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 320, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(4)
+Value = S6001, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 320, Explod]
+Type = Explod
+Trigger1 = !AnimElemTime(4)
+Anim = 11001
+ID = 11001
+Pos = (Pos X + CameraPos X) + (10 * Facing), (Pos Y)
+Space = Stage 
+Facing = Facing
+Scale = .65,.65
+SprPrioritY = 3
+Shadow = 0, 0, 0
+OwnPal = 1
+IgnoreHitPause = 1
+
+[State 320, Helper]
+Type = Helper
+Trigger1 = !AnimElemTime(4)
+Name = "Slash Effect"
+ID = 321
+StateNO = 321
+OwnPal = 1
+Size.XScale = 1
+Size.YScale = 1
+Size.Mid.Pos = 10,-88
+IgnoreHitPause = 1
+
+[State 320, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = ((Pos X - EnemyNear,Pos X) * EnemyNear,Facing) < 0
+Flag = UnGuardable
+IgnoreHitPause = 1
+
+[State 320, HitDef]
+Type = HitDef
+Trigger1 = AnimElemTime(4) >= 0
+Trigger1 = AnimElemTime(5) < 0
+Attr = S,NA      
+HitFlag = MAFD     
+GuardFlag = MA          
+AnimType = Hard
+Priority = 5,Hit
+Damage = (30 / Cond(Var(22),(1+(Var(21) - Var(22))),1)),Ceil(30/4)
+PauseTime = 12,15
+Guard.PauseTime = 12,12
+Sparkno = -1 + (0 * (Var(25) := 5))
+HitSound = S12010,6
+GuardSound = S12100,0
+Ground.Type = High
+Air.Type = High
+Ground.SlideTime = 15
+Ground.HitTime = 20
+Air.HitTime = 20
+Ground.Velocity = -10,-8
+Air.Velocity = -10,-8
+Ground.Cornerpush.VelOff = 0
+Air.Cornerpush.VelOff = 0
+Down.Cornerpush.VelOff = 0
+Guard.Cornerpush.VelOff = 0
+AirGuard.Cornerpush.VelOff = 0
+P1SprPriority = 2
+P2SprPriority = 1
+Fall = 1
+Fall.YVelocity = 0
+Fall.Recover = 1
+Fall.RecoverTime = 12
+Fall.Damage = 10
+ID = StateNO
+HitOnce = 1
+Getpower = 100,50
+Givepower = 20,5
+EnvShake.Time = 12
+EnvShake.Freq = 55
+EnvShake.Ampl = -6
+Fall.EnvShake.Time = 10
+Fall.EnvShake.Freq = 55
+Fall.EnvShake.Ampl = -8
+Persistent = 0
+
+[State 320, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = AnimElemTime(5) >= 0
+MoveType = I
+IgnoreHitPause = 1
+
+[State 320, Null]
+Type = Null
+Trigger1 = NumTarget(StateNO)
+Trigger1 = Var(26) :=  Ceil((Target(StateNO),Pos X - Pos X)  * Facing)
+Trigger1 = Var(27) :=  Const(Size.Mid.Pos.Y)
+Trigger2 = !NumTarget(StateNO)
+Trigger2 = Var(26) :=  Ceil((EnemyNear,Pos X - Pos X)  * Facing)
+Trigger2 = Var(27) :=  Const(Size.Mid.Pos.Y)
+IgnoreHitPause = 1
+
+[State 320, ChangeState]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = 0
+Ctrl = 1
+;---------------------------------------------------------------------------
+;3C 
+[StateDef 350]
+Type = S
+MoveType = A
+Physics = S
+Ctrl = 0
+Anim = 350
+SprPriority = 2
+FaceP2 = 1
+
+[State 350, Null]
+Type = Null
+Trigger1 = PrevStateNO = [150,152]
+Trigger1 = !Time
+Trigger1 = Var(14) := (Var(14) - 1)
+IgnoreHitPause = 1
+
+[State 350, PowerAdd]
+Type = PowerAdd
+Trigger1 = PrevStateNO = [150,152]
+Trigger1 = !Time
+Value = 500
+IgnoreHitPause = 1
+
+[State 350 NotHitBy]
+Type = NotHitBy
+Trigger1 = PrevStateNO = [150,152]
+Trigger1 = AnimElemTime(7) < 0
+Value = SCA
+IgnoreHitPause = 1
+
+[State 350, Pause]
+Type = Pause
+Trigger1 = PrevStateNO = [150,152]
+Trigger1 = !Time
+Time = 5
+MoveTime = 5
+PauseBG = 1
+IgnoreHitPause = 1
+
+[State 350, BGPalFX]
+Type = BGPalFX
+Trigger1 = PrevStateNO = [150,152]
+Trigger1 = !Time
+Time = 10
+Add = -40,-40, -40
+Color = 256
+IgnoreHitPause = 1
+
+[State 350, BGPalFX]
+Type = BGPalFX
+Trigger1 = PrevStateNO = [150,152]
+Trigger1 = Time = 10
+Time = 5
+Add = -40,-40,-40
+SinAdd = 40,40,40, 20
+Color = 256
+IgnoreHitPause = 1
+
+[State 350,  PlaySnd]
+Type = PlaySnd
+Trigger1 = PrevStateNO = [150,152]
+Trigger1 = !Time
+Value = S4000,500
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 350, VelSet]
+Type = VelSet
+Trigger1 = PrevStateNO != 100
+Trigger1 = !AnimElemTime(1)
+X = 0
+Y = 0
+IgnoreHitPause = 1
+
+[State 350, VelSet]
+Type = VelSet
+Trigger1 = !AnimElemTime(4)
+X = 8
+IgnoreHitPause = 1
+
+[State 350, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(4)
+Value = S350, 0 + Random%3
+VolumeScale = 80
+IgnoreHitPause = 1
+
+[State 350, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(4) 
+Value = S6000, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 350, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(4) 
+Value = S6001, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 350, Explod]
+Type = Explod
+Trigger1 = !AnimElemTime(4)
+Anim = 11001
+ID = 11001
+Pos = (Pos X + CameraPos X) + (30 * Facing), (Pos Y)
+Space = Stage 
+Facing = Facing
+Scale = .65,.65
+SprPrioritY = 3
+Shadow = 0, 0, 0
+OwnPal = 1
+IgnoreHitPause = 1
+
+[State 350, Helper]
+Type = Helper
+Trigger1 = !AnimElemTime(5)
+Name = "Slash Effect"
+ID = 351
+StateNO = 351
+OwnPal = 1
+Size.XScale = 1
+Size.YScale = 1
+Size.Mid.Pos = 40,-105
+IgnoreHitPause = 1
+
+[State 350, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = ((Pos X - EnemyNear,Pos X) * EnemyNear,Facing) < 0
+Flag = UnGuardable
+IgnoreHitPause = 1
+
+[State 350, HitDef]
+Type = HitDef
+Trigger1 = PrevStateNO != [120,152]
+Trigger1 = AnimElemTime(6) >= 0
+Trigger1 = AnimElemTime(7) < 0
+Attr = S,NA      
+HitFlag = MAFD     
+GuardFlag = MA          
+AnimType = Hard
+Priority = 5,Hit
+Damage = (35 / Cond(Var(22),(1+(Var(21) - Var(22))),1)),Ceil(35/4)
+PauseTime = 28,28
+Guard.PauseTime = 10,10
+Sparkno = -1 + (0 * (Var(25) := 5))
+HitSound = S12010,6
+GuardSound = S12100,0
+Ground.Type = High
+Air.Type = High
+Ground.SlideTime = 15
+Ground.HitTime = 20
+Air.HitTime = 20
+Ground.Velocity = -10,Const(Velocity.Jump.Y)
+Air.Velocity = -10,Const(Velocity.Jump.Y)
+Ground.Cornerpush.VelOff = 0
+Air.Cornerpush.VelOff = 0
+Down.Cornerpush.VelOff = 0
+Guard.Cornerpush.VelOff = 0
+AirGuard.Cornerpush.VelOff = 0
+P1SprPriority = 2
+P2SprPriority = 1
+Fall = 1
+Fall.YVelocity = 0
+Fall.Recover = 0
+Fall.RecoverTime = 12
+Fall.Damage = 10
+ID = StateNO
+HitOnce = 1
+Kill = 0
+Getpower = 100,50
+Givepower = 20,5
+EnvShake.Time = 10
+EnvShake.Freq = 55
+EnvShake.Ampl = -8
+Fall.EnvShake.Time = 10
+Fall.EnvShake.Freq = 55
+Fall.EnvShake.Ampl = -8
+Persistent = 0
+
+[State 350, HitDef]
+Type = HitDef
+Trigger1 = PrevStateNO = [120,152]
+Trigger1 = AnimElemTime(6) >= 0
+Trigger1 = AnimElemTime(7) < 0
+Attr = S,HA      
+HitFlag = MAFD     
+GuardFlag = MA          
+AnimType = Hard
+Priority = 10,Hit
+Damage = (35 / Cond(Var(22),(1+(Var(21) - Var(22))),1)),Ceil(35/4)
+PauseTime = 28,28
+Guard.PauseTime = 10,10
+Sparkno = -1 + (0 * (Var(25) := 5))
+HitSound = S12010,6
+GuardSound = S12100,0
+Ground.Type = High
+Air.Type = High
+Ground.SlideTime = 15
+Ground.HitTime = 20
+Air.HitTime = 20
+Ground.Velocity = -10,Const(Velocity.Jump.Y)
+Air.Velocity = -10,Const(Velocity.Jump.Y)
+Ground.Cornerpush.VelOff = 0
+Air.Cornerpush.VelOff = 0
+Down.Cornerpush.VelOff = 0
+Guard.Cornerpush.VelOff = 0
+AirGuard.Cornerpush.VelOff = 0
+P1SprPriority = 2
+P2SprPriority = 1
+Fall = 1
+Fall.YVelocity = 0
+Fall.Recover = 0
+Fall.RecoverTime = 12
+Fall.Damage = 10
+ID = StateNO
+HitOnce = 1
+Kill = 0
+Getpower = 100,50
+Givepower = 20,5
+EnvShake.Time = 10
+EnvShake.Freq = 55
+EnvShake.Ampl = -8
+Fall.EnvShake.Time = 10
+Fall.EnvShake.Freq = 55
+Fall.EnvShake.Ampl = -8
+Persistent = 0
+
+[State 350, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = AnimElemTime(7) >= 0
+MoveType = I
+IgnoreHitPause = 1
+
+[State 350, Null]
+Type = Null
+Trigger1 = NumTarget(StateNO)
+Trigger1 = Var(26) :=  Ceil((Target(StateNO),Pos X - Pos X)  * Facing)
+Trigger1 = Var(27) :=  Const(Size.Head.Pos.Y)
+Trigger2 = !NumTarget(StateNO)
+Trigger2 = Var(26) :=  Ceil((EnemyNear,Pos X - Pos X)  * Facing)
+Trigger2 = Var(27) :=  Const(Size.Head.Pos.Y)
+IgnoreHitPause = 1
+
+[State 350, Helper]
+Type = Helper
+Trigger1 = MoveHit
+Trigger1 = NumTarget(StateNO)
+Name = "Zoom"
+ID = 30000
+StateNO = 30000
+OwnPal = 1
+Size.XScale = 0.4 ;Zoom In
+Size.Ground.Back = 20 ;StandBy Time
+Size.Air.Back = 2 ;Fadein Time
+Size.Air.Front = 6 ;Fadeout Time
+Size.Mid.Pos = 25,0
+Size.ShadowOffset = ID
+PauseMoveTime = 99999
+IgnoreHitPause = 1
+Persistent  = 0
+
+[State 350, ChangeState]
+Type = ChangeState
+Trigger1 = MoveHit
+Trigger1 = NumTarget(StateNO)
+Trigger1 = Target(StateNO),Pos Y >= Const(Size.Mid.Pos.Y)
+Value = 40
+
+[State 350, ChangeState]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = 0
+Ctrl = 1
+;---------------------------------------------------------------------------
+;j.5A
+[StateDef 400]
+Type = A
+MoveType = A
+Physics = A
+Ctrl = 0
+Anim = 400
+SprPriority = 2
+FaceP2 = 1
+
+[State 400, Helper]
+Type = Helper
+Trigger1 = !NumHelper(6500)
+Trigger1 = !AnimElemTime(1)
+Name = "Save Previous State for Reverse Beat"
+ID = 6500
+StateNO = 6500
+OwnPal = 1
+Size.XScale = 400
+Size.YScale = 410
+Size.Mid.Pos = 420,0
+Size.Head.Pos = 0,0
+Size.Height = 0
+Size.ShadowOffset = 0
+Size.Ground.Back = 0
+Size.Ground.Front = 0
+Size.Air.Back = 0
+Size.Air.Front = 0
+IgnoreHitPause = 1
+
+[State 400, VelAdd]
+Type = VelAdd
+Trigger1 = PrevStateNO = 110 || PrevStateNO = 115
+Trigger1 = !AnimElemTime(1)
+X = Cond(PrevStateNO = 115,Abs(Vel X / 2),-(Vel X / 2))
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 400, VelSet]
+Type = VelSet
+Trigger1 = PrevStateNO = [400,420]
+Trigger1= Time = 0
+X = 2
+Y = -2
+IgnoreHitPause = 1
+Persistent = 0
+[State 400, PosAdd]
+Type = PosAdd
+Trigger1 = NumTarget
+Trigger1 = ((Target,Pos X - Pos X) * Facing) < 150
+Trigger1 = (Target,Pos Y - Pos Y) = [-150,150]
+Trigger1 = PrevStateNO = [400,420]
+Trigger1= Time = [0,5]
+X = ((Target,Pos X - Pos X) * Facing) / 5
+Y = (Target,Pos Y - Pos Y) / 5
+IgnoreHitPause = 1
+Persistent = 0
+[State 400, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = NumTarget
+Trigger1 = ((Target,Pos X - Pos X) * Facing) < 150
+Trigger1 = (Target,Pos Y - Pos Y) = [-150,150]
+Trigger1 = PrevStateNO = [400,420]
+Trigger1= Time = 0
+Physics = N
+IgnoreHitPause = 1
+[State 400, StateTypeSet]
+Type = StateTypeSet
+Trigger1= Time = 5
+Physics = A
+IgnoreHitPause = 1
+
+[State 400, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(4)
+Value = S200, 0 + Random%4
+VolumeScale = 80
+IgnoreHitPause = 1
+
+[State 400, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(4)
+Value = S6000, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 400, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(4)
+Value = S6001, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 400, Helper]
+Type = Helper
+Trigger1 = !AnimElemTime(4)
+Name = "Slash Effect"
+ID = 401
+StateNO = 401
+OwnPal = 1
+Size.XScale = 1
+Size.YScale = 1
+Size.Mid.Pos = -10,-95
+IgnoreHitPause = 1
+
+[State 400, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = ((Pos X - EnemyNear,Pos X) * EnemyNear,Facing) < 0
+Flag = UnGuardable
+IgnoreHitPause = 1
+
+[State 400, HitDef]
+Type = HitDef
+Trigger1 = AnimElemTime(4) >= 0
+Trigger1 = AnimElemTime(5) < 0
+Attr = A,NA       
+HitFlag = MAFD     
+GuardFlag = MA          
+AnimType = Light    
+Priority = 3,Hit
+Damage = (10 / Cond(Var(22),(1+(Var(21) - Var(22))),1)),Ceil(10/4)
+PauseTime = 8,10
+Guard.PauseTime = 8,8
+Sparkno = -1 + (0 * (Var(25) := 3))
+HitSound = S12010,2
+GuardSound = S12100,0
+Ground.Type = High
+Air.Type = High
+Ground.SlideTime = 15
+Ground.HitTime = 12
+Air.HitTime = 12
+Ground.Velocity = -4,0
+Air.Velocity = -4,-4
+Ground.Cornerpush.VelOff = 0
+Air.Cornerpush.VelOff = 0
+Down.Cornerpush.VelOff = 0
+Guard.Cornerpush.VelOff = 0
+AirGuard.Cornerpush.VelOff = 0
+P1SprPriority = 2
+P2SprPriority = 1
+Air.Fall = 1
+Fall = 0
+Fall.YVelocity = 0
+Fall.Recover = 0
+Fall.RecoverTime = 12
+Fall.Damage = 10
+ID = StateNO
+HitOnce = 1
+Getpower = 100,50
+Givepower = 20,5
+EnvShake.Time = 8
+EnvShake.Freq = 50
+EnvShake.Ampl = -4
+Fall.EnvShake.Time = 10
+Fall.EnvShake.Freq = 55
+Fall.EnvShake.Ampl = -8
+Persistent = 0
+
+[State 400, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = AnimElemTime(5) >= 0
+MoveType = I
+IgnoreHitPause = 1
+
+[State 400, Null]
+Type = Null
+Trigger1 = NumTarget(StateNO)
+Trigger1 = Var(26) :=  Ceil((Target(StateNO),Pos X - Pos X)  * Facing)
+Trigger1 = Var(27) :=  Const(Size.Mid.Pos.Y)
+Trigger2 = !NumTarget(StateNO)
+Trigger2 = Var(26) :=  Ceil((EnemyNear,Pos X - Pos X)  * Facing)
+Trigger2 = Var(27) :=  Const(Size.Mid.Pos.Y)
+IgnoreHitPause = 1
+
+[State 400, ChangeState]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = 50
+Ctrl = 1
+;---------------------------------------------------------------------------
+;j.5B
+[StateDef 410]
+Type = A
+MoveType = A
+Physics = A
+Ctrl = 0
+Anim = 410
+SprPriority = 2
+FaceP2 = 1
+
+[State 410, Helper]
+Type = Helper
+Trigger1 = !NumHelper(6500)
+Trigger1 = !AnimElemTime(1)
+Name = "Save Previous State for Reverse Beat"
+ID = 6500
+StateNO = 6500
+OwnPal = 1
+Size.XScale = 400
+Size.YScale = 410
+Size.Mid.Pos = 420,0
+Size.Head.Pos = 0,0
+Size.Height = 0
+Size.ShadowOffset = 0
+Size.Ground.Back = 0
+Size.Ground.Front = 0
+Size.Air.Back = 0
+Size.Air.Front = 0
+IgnoreHitPause = 1
+
+[State 410, VelAdd]
+Type = VelAdd
+Trigger1 = PrevStateNO = 110 || PrevStateNO = 115
+Trigger1 = !AnimElemTime(1)
+X = Cond(PrevStateNO = 115,Abs(Vel X / 2),-(Vel X / 2))
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 410, VelSet]
+Type = VelSet
+Trigger1 = PrevStateNO = [400,420]
+Trigger1= Time = 0
+X = 2
+Y = -2
+IgnoreHitPause = 1
+Persistent = 0
+[State 410, PosAdd]
+Type = PosAdd
+Trigger1 = NumTarget
+Trigger1 = ((Target,Pos X - Pos X) * Facing) < 150
+Trigger1 = (Target,Pos Y - Pos Y) = [-150,150]
+Trigger1 = PrevStateNO = [400,420]
+Trigger1= Time = [0,5]
+X = ((Target,Pos X - Pos X) * Facing) / 5
+Y = (Target,Pos Y - Pos Y) / 5
+IgnoreHitPause = 1
+Persistent = 0
+[State 410, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = NumTarget
+Trigger1 = ((Target,Pos X - Pos X) * Facing) < 150
+Trigger1 = (Target,Pos Y - Pos Y) = [-150,150]
+Trigger1 = PrevStateNO = [400,420]
+Trigger1= Time = 0
+Physics = N
+IgnoreHitPause = 1
+[State 410, StateTypeSet]
+Type = StateTypeSet
+Trigger1= Time = 5
+Physics = A
+IgnoreHitPause = 1
+
+[State 410, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(3)
+Value = S210, 0 + Random%3
+VolumeScale = 80
+IgnoreHitPause = 1
+
+[State 410, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(3)
+Value = S6000, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 410, Helper]
+Type = Helper
+Trigger1 = !AnimElemTime(3)
+Name = "Slash Effect"
+ID = 411
+StateNO = 411
+OwnPal = 1
+Size.XScale = .205
+Size.YScale = .325
+Size.Mid.Pos = 84,-32
+IgnoreHitPause = 1
+
+[State 410, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = ((Pos X - EnemyNear,Pos X) * EnemyNear,Facing) < 0
+Flag = UnGuardable
+IgnoreHitPause = 1
+
+[State 410, HitDef]
+Type = HitDef
+Trigger1 = AnimElemTime(3) >= 0
+Trigger1 = AnimElemTime(4) < 0
+Attr = A,NA       
+HitFlag = MAFD     
+GuardFlag = MA          
+AnimType = Medium 
+Priority = 4,Hit
+Damage = (20 / Cond(Var(22),(1+(Var(21) - Var(22))),1)),Ceil(20/4)
+PauseTime = 10,12
+Guard.PauseTime = 10,10
+Sparkno = -1 + (0 * (Var(25) := 1))
+HitSound = S12000,6
+GuardSound = S12100,0
+Ground.Type = High
+Air.Type = High
+Ground.SlideTime = 15
+Ground.HitTime = 17
+Air.HitTime = 17
+Ground.Velocity = -6,0
+Air.Velocity = -6,-4
+Ground.Cornerpush.VelOff = 0
+Air.Cornerpush.VelOff = 0
+Down.Cornerpush.VelOff = 0
+Guard.Cornerpush.VelOff = 0
+AirGuard.Cornerpush.VelOff = 0
+P1SprPriority = 2
+P2SprPriority = 1
+Air.Fall = 1
+Fall = 0
+Fall.YVelocity = 0
+Fall.Recover = 0
+Fall.RecoverTime = 12
+Fall.Damage = 10
+ID = StateNO
+HitOnce = 1
+Getpower = 100,50
+Givepower = 20,5
+EnvShake.Time = 10
+EnvShake.Freq = 55
+EnvShake.Ampl = -6
+Fall.EnvShake.Time = 10
+Fall.EnvShake.Freq = 55
+Fall.EnvShake.Ampl = -8
+Persistent = 0
+
+[State 410, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = AnimElemTime(4) >= 0
+MoveType = I
+IgnoreHitPause = 1
+
+[State 410, Null]
+Type = Null
+Trigger1 = Var(26) :=  84
+Trigger1 = Var(27) :=  -32
+IgnoreHitPause = 1
+
+[State 410, ChangeState]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = 50
+Ctrl = 1
+
+;---------------------------------------------------------------------------
+;j.5C
+[StateDef 420]
+Type = A
+MoveType = A
+Physics = A
+Ctrl = 0
+Anim = 420
+SprPriority = 2
+FaceP2 = 1
+
+[State 420, Helper]
+Type = Helper
+Trigger1 = !NumHelper(6500)
+Trigger1 = !AnimElemTime(1)
+Name = "Save Previous State for Reverse Beat"
+ID = 6500
+StateNO = 6500
+OwnPal = 1
+Size.XScale = 400
+Size.YScale = 410
+Size.Mid.Pos = 420,0
+Size.Head.Pos = 0,0
+Size.Height = 0
+Size.ShadowOffset = 0
+Size.Ground.Back = 0
+Size.Ground.Front = 0
+Size.Air.Back = 0
+Size.Air.Front = 0
+IgnoreHitPause = 1
+
+[State 420, Null]
+Type = Null
+Trigger1 = !AnimElemTime(1)
+Trigger1 = Var(29) := 0
+IgnoreHitPause = 1
+[State 420, ChangeAnim]
+Type = ChangeAnim
+TriggerAll = !Var(29)
+TriggerAll = AnimElemTime(2) >= 0 && AnimElemTime(3) < 0
+TriggerAll = Time = [2,14]
+Trigger1 = !AiLevel
+Trigger1 = Command = "holdc"
+Trigger2= AiLevel && NumEnemy
+Trigger2 = RoundState = 2
+Trigger2 = Fvar(39) <= 160
+Trigger2 = Var(20)  = [(0 * AiLevel),(8 * AiLevel)]
+Value = ((Anim - Cond((Time = [8,14]),1,0)) + Cond((Time = [8,14]),(Var(29) := 1),0))
+Elem = 2
+IgnoreHitPause = 1
+
+[State 420, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = Var(29)
+Value = Anim
+Elem = 3
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 420, Helper]
+Type = Helper
+Trigger1 = Var(29)
+Name = "Hold Button Charge Effect"
+ID = 11010
+StateNO = 11010
+OwnPal = 1
+Size.XScale = 0.685
+Size.YScale = 0.685
+Size.Mid.Pos = 4, -92
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 420, VelAdd]
+Type = VelAdd
+Trigger1 = PrevStateNO = 110 || PrevStateNO = 115
+Trigger1 = !AnimElemTime(1)
+X = Cond(PrevStateNO = 115,Abs(Vel X / 2),-(Vel X / 2))
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 420, VelSet]
+Type = VelSet
+Trigger1 = PrevStateNO = [400,420]
+Trigger1= Time = 0
+X = 2
+Y = -2
+IgnoreHitPause = 1
+Persistent = 0
+[State 420, PosAdd]
+Type = PosAdd
+Trigger1 = NumTarget
+Trigger1 = ((Target,Pos X - Pos X) * Facing) < 150
+Trigger1 = (Target,Pos Y - Pos Y) = [-150,150]
+Trigger1 = PrevStateNO = [400,420]
+Trigger1= Time = [0,5]
+X = ((Target,Pos X - Pos X) * Facing) / 5
+Y = (Target,Pos Y - Pos Y) / 5
+IgnoreHitPause = 1
+Persistent = 0
+[State 420, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = NumTarget
+Trigger1 = ((Target,Pos X - Pos X) * Facing) < 150
+Trigger1 = (Target,Pos Y - Pos Y) = [-150,150]
+Trigger1 = PrevStateNO = [400,420]
+Trigger1= Time = 0
+Physics = N
+IgnoreHitPause = 1
+[State 420, StateTypeSet]
+Type = StateTypeSet
+Trigger1= Time = 5
+Physics = A
+IgnoreHitPause = 1
+
+[State 420, VelSet]
+Type = VelSet
+Trigger1 = Var(29)
+Trigger1 = MoveHit
+X = -5
+Y = -8
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 420, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(4)
+Value = S220, 0 + Random%3
+VolumeScale = 80
+IgnoreHitPause = 1
+
+[State 420, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(4)
+Value = S6000, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 420, Helper]
+Type = Helper
+Trigger1 = !AnimElemTime(4)
+Name = "Slash Effect"
+ID = 421
+StateNO = 421
+OwnPal = 1
+Size.XScale = .220
+Size.YScale = .365
+Size.Mid.Pos = 90,-2
+IgnoreHitPause = 1
+
+[State 420, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = ((Pos X - EnemyNear,Pos X) * EnemyNear,Facing) < 0
+Flag = UnGuardable
+IgnoreHitPause = 1
+
+[State 420, HitDef]
+Type = HitDef
+Trigger1 = !Var(29)
+Trigger1 = AnimElemTime(5) >= 0
+Trigger1 = AnimElemTime(6) < 0
+Attr = A,NA       
+HitFlag = MAFD     
+GuardFlag = HA    
+AnimType = Hard
+Priority = 5,Hit
+Damage = (30 / Cond(Var(22),(1+(Var(21) - Var(22))),1)),Ceil(30/4)
+PauseTime = 10,12
+Guard.PauseTime = 10,10
+Sparkno = -1 + (0 * (Var(25) := 2))
+HitSound = S12000,5
+GuardSound = S12100,0
+Ground.Type = High
+Air.Type = High
+Ground.SlideTime = 15
+Ground.HitTime = 20
+Air.HitTime = 20
+Ground.Velocity = -8
+Air.Velocity = -8,-4
+Ground.Cornerpush.VelOff = 0
+Air.Cornerpush.VelOff = 0
+Down.Cornerpush.VelOff = 0
+Guard.Cornerpush.VelOff = 0
+AirGuard.Cornerpush.VelOff = 0
+P1SprPriority = 2
+P2SprPriority = 1
+Air.Fall = 1
+Fall = 0
+Fall.YVelocity = 0
+Fall.Recover = 0
+Fall.RecoverTime = 12
+Fall.Damage = 10
+ID = StateNO
+HitOnce = 1
+Getpower = 100,50
+Givepower = 20,5
+EnvShake.Time = 10
+EnvShake.Freq = 55
+EnvShake.Ampl = -6
+Fall.EnvShake.Time = 10
+Fall.EnvShake.Freq = 55
+Fall.EnvShake.Ampl = -8
+Persistent = 0
+
+[State 420, HitDef]
+Type = HitDef
+Trigger1 = Var(29)
+Trigger1 = AnimElemTime(5) >= 0
+Trigger1 = AnimElemTime(6) < 0
+Attr = A,NA       
+HitFlag = MAFD     
+GuardFlag = HA    
+AnimType = Hard
+Priority = 5,Hit
+Damage = (40 / Cond(Var(22),(1+(Var(21) - Var(22))),1)),Ceil(40/4)
+PauseTime = 12,15
+Guard.PauseTime = 12,12
+Sparkno = -1 + (0 * (Var(25) := 2))
+HitSound = S12000,7
+GuardSound = S12100,0
+Ground.Type = High
+Air.Type = High
+Ground.SlideTime = 15
+Ground.HitTime = 20
+Air.HitTime = 20
+Ground.Velocity = -12,15
+Air.Velocity = -12,15
+Ground.Cornerpush.VelOff = 0
+Air.Cornerpush.VelOff = 0
+Down.Cornerpush.VelOff = 0
+Guard.Cornerpush.VelOff = 0
+AirGuard.Cornerpush.VelOff = 0
+P1SprPriority = 2
+P2SprPriority = 1
+Fall = 1
+Fall.XVelocity = -6
+Fall.YVelocity = -32
+Fall.Recover = 0
+Fall.RecoverTime = 12
+Fall.Damage = 10
+ID = StateNO
+HitOnce = 1
+Getpower = 100,50
+Givepower = 20,5
+EnvShake.Time = 12
+EnvShake.Freq = 50
+EnvShake.Ampl = -10
+Fall.EnvShake.Time = 10
+Fall.EnvShake.Freq = 55
+Fall.EnvShake.Ampl = -8
+Persistent = 0
+
+[State 420, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = AnimElemTime(6) >= 0
+MoveType = I
+IgnoreHitPause = 1
+
+[State 420, Null]
+Type = Null
+Trigger1 = Var(26) :=  90
+Trigger1 = Var(27) :=  -2
+IgnoreHitPause = 1
+
+[State 420, ChangeState]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = 50
+Ctrl = 1
+;---------------------------------------------------------------------------
+;j.6C
+[StateDef 450]
+Type = A
+MoveType = A
+Physics = N
+Ctrl = 0
+Anim = 450
+SprPriority = 2
+FaceP2 = 1
+
+[State 450, Null]
+Type = Null
+Trigger1 = !AnimElemTime(1)
+Trigger1 = Var(29) := 0
+IgnoreHitPause = 1
+[State 450, ChangeAnim]
+Type = ChangeAnim
+TriggerAll = AnimElemTime(3) >= 0 && AnimElemTime(4) < 0
+TriggerAll = Time = [10,32]
+Trigger1 = !AiLevel
+Trigger1 = Command = "holdc"
+Trigger2= AiLevel && NumEnemy
+Trigger2 = RoundState = 2
+Trigger2 = Fvar(39) > 240
+Trigger2 = Var(20)  = [(0 * AiLevel),(5 * AiLevel)]
+Value = Anim
+Elem = 3
+IgnoreHitPause = 1
+
+[State 450, Null]
+Type = Null
+Trigger1 = AnimElemTime(3) >= 0 && AnimElemTime(4) < 0
+Trigger1 = Time = [12,32]
+Trigger1 = Var(29) := (Time - 12)
+IgnoreHitPause = 1
+
+[State 450, PalFX]
+Type = PalFX
+Trigger1 = AnimElemTime(3) >= 0 && AnimElemTime(4) < 0
+Trigger1 = Time = [12,32]
+Time = 1
+Add = 0 + Ceil(Var(29) * 2.5),0 + Ceil(Var(29) * 2.5),0 + Ceil(Var(29) * 2.5)
+IgnoreHitPause = 1
+
+[State 450, VelAdd]
+Type = VelAdd
+Trigger1 = PrevStateNO = 110 || PrevStateNO = 115
+Trigger1 = !AnimElemTime(1)
+X = Cond(PrevStateNO = 115,Abs(Vel X / 2),-(Vel X / 2))
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 450, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(5)
+Value = S250, 0 + Random%3
+VolumeScale = 80
+IgnoreHitPause = 1
+
+[State 450, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(5)
+Value = S6000, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 450, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(5)
+Value = S6001, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 450, Helper]
+Type = Helper
+Trigger1 = !AnimElemTime(1)
+Name = "Sword Glow"
+ID = 452
+StateNO = 452
+OwnPal = 1
+IgnoreHitPause = 1
+
+[State 450, Helper]
+Type = Helper
+Trigger1 = !AnimElemTime(5)
+Name = "Sword Trail"
+ID = 454
+StateNO = 454
+Pos = 0,-96
+OwnPal = 1
+Size.XScale = 0.85
+Size.YScale = 0.65
+IgnoreHitPause = 1
+
+[State 450, Helper]
+Type = Helper
+Trigger1 = !AnimElemTime(5)
+Name = "Slash Effect"
+ID = 455
+StateNO = 455
+OwnPal = 1
+RemapPal = 5,9
+Size.XScale = .40
+Size.YScale = .40
+Size.Mid.Pos = 250,-96
+IgnoreHitPause = 1
+
+[State 450, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = !AnimElemTime(5)
+Physics = N
+IgnoreHitPause = 1
+
+[State 450, VelAdd]
+Type = VelAdd
+Trigger1 = AnimElemTime(5) < 0
+Trigger1 = Vel X != 0
+X = -(Vel X / 5.0)
+IgnoreHitPause = 1
+
+[State 450, VelAdd]
+Type = VelAdd
+Trigger1 = AnimElemTime(5) >= 0
+X = -(Vel X / 15.0)
+
+[State 450, VelSet]
+Type = VelSet
+Trigger1 = AnimElemTime(5) < 0
+Y = 0.85
+IgnoreHitPause = 1
+
+[State 450, VelSet]
+Type = VelSet
+Trigger1 = !AnimElemTime(5)
+X = 55 + (Var(29) * 1.0)
+Y = 0
+IgnoreHitPause = 1
+
+[State 450, PlayerPush]
+Type = PlayerPush
+Trigger1 = AnimElemTime(5) >= 0
+Value = 0
+IgnoreHitPause = 1
+
+[State 450, Explod]
+Type = Explod
+Trigger1 = !AnimElemTime(5)
+Anim = 256
+ID = 256
+Pos = (Pos X + CameraPos X) + (-20 * Facing), (Pos Y) + (-95)
+Space = Stage 
+Facing = Facing
+Scale = 0.60,0.60
+SprPrioritY = 3
+Shadow = 0, 0, 0
+OwnPal = 1
+Trans = Add
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 450, Explod]
+Type = Explod
+Trigger1 = AnimElemTime(5) >= 0
+Trigger1 = Time%2= 0
+Anim = 11003
+ID = 11003
+Pos = (Pos X + CameraPos X) + ((0 - Random%40) * Facing), (Pos Y) + (-20 - Random%140)
+Space = Stage 
+Facing = Facing
+Vel = -5 * Facing,0
+Scale = 0.0875, 0.0425
+SprPrioritY = 1
+Shadow = 0, 0, 0
+OwnPal = 1
+IgnoreHitPause = 1
+
+[State 450, Explod]
+Type = Explod
+Trigger1 = AnimElemTime(5) >= 0
+Trigger1 = Time%4= 0
+Anim = 11003
+ID = 11003
+Pos = (Pos X + CameraPos X) + ((0 - Random%40) * Facing), (Pos Y) + (-20 - Random%140)
+Space = Stage 
+Facing = Facing
+Vel = -5 * Facing,0
+Scale = 0.0875, 0.0425
+SprPrioritY = 1
+Shadow = 0, 0, 0
+OwnPal = 1
+RemapPal = 5,9
+IgnoreHitPause = 1
+
+[State 450, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = ((Pos X - EnemyNear,Pos X) * EnemyNear,Facing) < 0
+Flag = UnGuardable
+IgnoreHitPause = 1
+
+[State 450, HitDef]
+Type = HitDef
+Trigger1 = AnimElemTime(5) >= 0
+Attr = A,NA      
+HitFlag = MAFD     
+GuardFlag = MA          
+AnimType = Hard   
+Priority = 5,Hit
+Damage = ((35 + Ceil(Var(29) * 0.5)) / Cond(Var(22),(1+(Var(21) - Var(22))),1)),Ceil((35 + Ceil(Var(29) * 0.5))/4)
+PauseTime = 4,15
+Guard.PauseTime = 4,6
+Sparkno = -1 + (0 * (Var(25) := 5))
+HitSound = S12010,5
+GuardSound = S12100,0
+Ground.Type = High
+Air.Type = High
+Ground.SlideTime = 15
+Ground.HitTime = 20
+Air.HitTime = 20
+Ground.Velocity = -12,-12
+Air.Velocity = -12,-12
+Ground.Cornerpush.VelOff = 0
+Air.Cornerpush.VelOff = 0
+Down.Cornerpush.VelOff = 0
+Guard.Cornerpush.VelOff = 0
+AirGuard.Cornerpush.VelOff = 0
+P1SprPriority = 2
+P2SprPriority = 1
+Fall = 1
+Fall.YVelocity = 0
+Fall.Recover = 1
+Fall.RecoverTime = 12
+Fall.Damage = 10
+ID = StateNO
+HitOnce = 1
+Getpower = 100,50
+Givepower = 20,5
+EnvShake.Time = 12
+EnvShake.Freq = 55
+EnvShake.Ampl = -6
+Fall.EnvShake.Time = 10
+Fall.EnvShake.Freq = 55
+Fall.EnvShake.Ampl = -8
+Persistent = 0
+
+[State 450, Null]
+Type = Null
+Trigger1 = NumTarget(StateNO)
+Trigger1 = Var(26) :=  Ceil((Target(StateNO),Pos X - Pos X)  * Facing)
+Trigger1 = Var(27) :=  -108
+Trigger2 = !NumTarget(StateNO)
+Trigger2 = Var(26) :=  Ceil((EnemyNear,Pos X - Pos X)  * Facing)
+Trigger2 = Var(27) :=  -108
+IgnoreHitPause = 1
+
+[State 450, ChangeState]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = 451
+;---------------------------------------------------------------------------
+;j.6C
+[StateDef 451]
+Type = A
+MoveType = I
+Physics = N
+Ctrl = 0
+Anim = 451
+SprPriority = 2
+MoveHitPersist  =1
+
+[State 451, VelAdd]
+Type = VelAdd
+Trigger1 = !AnimElemTime(1)
+X = -(Vel X / 1.25)
+IgnoreHitPause = 1
+
+[State 451, ChangeState]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = 50
+Ctrl = 1
+
+;---------------------------------------------------------------------------
+; 2AB
+[StateDef 500]
+Type = S
+MoveType = I
+Physics = S
+VelSet = 0,0
+Ctrl = 0
+Anim = 500
+SprPriority = 2
+
+[State 500, ChangeAnim]
+Type = ChangeAnim
+TriggerAll = AnimElemTime(17) = 2
+TriggerAll = Power < Cond(Var(4),PowerMax,3000)
+Trigger1 = !AiLevel
+Trigger1 = Command = "holddown"
+Trigger1 = Command = "holda" && Command = "holdb"
+Trigger2 = AiLevel && NumEnemy
+Trigger2 = RoundState = 2
+Trigger2 = Fvar(39) >= 300 && EnemyNear,MoveType != A && EnemyNear,NumProj = 0  && !InGuardDist
+Value = Anim
+Elem = 6
+IgnoreHitPause = 1
+
+[State 500, ChangeAnim]
+Type = ChangeAnim
+TriggerAll = Time > 12
+TriggerAll = Power = Cond(Var(4),PowerMax,3000)
+Trigger1 = !AiLevel
+Trigger1 = Command != "holddown" || Command != "holda" || Command != "holdb"
+Trigger2 = AiLevel && NumEnemy
+Trigger2 = RoundState = 2
+Trigger2 = Fvar(39) < 300 || EnemyNear,MoveType = A || EnemyNear,NumProj > 0 || InGuardDist
+Value = Anim
+Elem = 18
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 500, PowerAdd]
+Type = PowerAdd
+Trigger1 = AnimElemTime(6) >= 0
+Trigger1 = Time%2 = 0
+Value = Cond((Power = [0,1000]),Cond(!Var(5),30,35),Cond((Power = [1000,2000]),Cond(!Var(5),35,40),Cond((Power = [2000,3000]),Cond(!Var(5),40,45),Cond(!Var(5),45,50))))
+IgnoreHitPause = 1
+
+[State 500, VarAdd] ;Add 1 for each hit
+Type = VarAdd
+Trigger1 = Var(3) || Var(6) || Var(12) 
+Trigger1 = Var(14) = [0,9]
+Trigger1 = !Var(5)
+Trigger1 = NumHelper(4050)
+Trigger1 = AnimElemTime(6) >= 0
+Trigger1 = Time%60 = 0
+var(14) = 1
+IgnoreHitPause = 1
+
+[State 500, EnvShake]
+Type = EnvShake
+Trigger1 = AnimElemTime(6) >= 0
+Trigger1 = AnimElemTime(18) < 0
+Trigger1 = Time%4 = 0
+Time = 6
+IgnoreHitPause = 1
+
+[State 500, Helper]
+Type = Helper
+Trigger1 = AnimElemTime(6) >= 0
+Trigger1 = AnimElemTime(18) < 0
+Trigger1 = Time%4 = 0
+Name = "PoweUp FX"
+ID = 516
+StateNO = 516
+OwnPal = 1
+IgnoreHitPause = 1
+
+[State 500, Helper]
+Type = Helper
+Trigger1 = !NumHelper(510)
+Trigger1 = !AnimElemTime(6)
+Name = "Effects"
+ID = 510
+StateNO = 510
+OwnPal = 1
+Size.XScale = 0.5
+Size.YScale = 0.5
+Size.Height = 18 ;End of 2AB Anim
+Size.ShadowOffset = 0 ;0 - Normal 1 - Ki 2 - Chakra
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 500, ChangeState]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = 0
+Ctrl = 1
+
+;---------------------------------------------------------------------------
+; 5AC
+[StateDef 600]
+Type = A
+MoveType = U
+Physics = N
+VelSet = 0,0
+Ctrl = 0
+Anim = 600
+SprPriority = 2
+FaceP2 = 1
+
+[State 600, PowerAdd]
+Type = PowerAdd
+Trigger1 = !Time
+Trigger1 = MoveType != H
+Value = -500
+IgnoreHitPause = 1
+
+[State 600, Null]
+Type = Null
+Trigger1 = !Time
+Trigger1 = MoveType = H
+Trigger1 = Var(14) := (Var(14) - 5)
+IgnoreHitPause = 1
+
+[State 600, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = !AnimElemTime(1)
+MoveType = A
+IgnoreHitPause = 1
+
+[State 600, VarSet] ;Skills used
+Type = VarSet
+Trigger1 = !AnimElemTime(1)
+var(32) = 1
+IgnoreHitPause = 1
+
+[State 600, BGPalFX]
+Type = BGPalFX
+Trigger1 = Time < 30
+Time = 1
+Add = -100,-100, -100
+Color = 256
+IgnoreHitPause = 1
+
+[State 600, BGPalFX]
+Type = BGPalFX
+Trigger1 = Time = 30
+Time = 10
+Add = -100,-100, -100
+SinAdd = 100, 100, 100, 40
+Color = 256
+IgnoreHitPause = 1
+
+[State 600, Pause]
+Type = Pause
+Trigger1 = !AnimElemTime(1)
+Time = 10
+MoveTime = 10
+PauseBG = 1
+IgnoreHitPause = 1
+
+[State 600, NotHitBy]
+Type = NotHitBy
+Trigger1 = !AnimElemTime(1) 
+Value = SCA
+Time = 30
+IgnoreHitPause = 1
+
+[State 600, PlaySnd]
+Type = PlaySnd
+Trigger1 =  !AnimElemTime(1) 
+Value = S600, 0 + Random%2
+VolumeScale = 80
+IgnoreHitPause = 1
+
+[State 600, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = Time < 10
+Trigger1 = AnimElemTime(2) >= 0
+Value = Anim
+Elem = 2
+IgnoreHitPause = 1
+
+[State 600, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = Time = 10
+Trigger2 = Time = [10,30]
+Trigger2 = AnimElemTime(4) = 4
+Value = Anim
+Elem = 3
+IgnoreHitPause = 1
+
+[State 600, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = Time = 30
+Value = Anim
+Elem = 5
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 600, PosAdd]
+Type = PosAdd
+Trigger1 = Time < 10
+Y = (-200 - Pos Y) / 10
+IgnoreHitPause = 1
+
+[State 600, PalFX]
+Type = PalFX
+Trigger1 =  !AnimElemTime(1)
+Time = 2
+Add = 256, 256, 256
+IgnoreHitPause = 1
+
+[State 600, PalFX]
+Type = PalFX
+Trigger1 = Time = 2
+Time = 8
+Add = 256, 256, 256
+SinAdd = -256, -256,-256,32
+IgnoreHitPause = 1
+
+[State 600, Helper]
+Type = Helper
+Trigger1 = !AnimElemTime(1)
+Name = "Push Helper"
+ID = 608
+StateNO = 608
+OwnPal = 1
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 600, PlayerPush]
+Type = PlayerPush
+Trigger1 = NumHelper(608)
+Value = 0
+IgnoreHitPause = 1
+
+[State 600, Helper]
+Type = Helper
+Trigger1 = !AnimElemTime(3)
+Name = "Effects"
+ID = 610
+StateNO = 610
+Pos = 0,Const(Size.Mid.Pos.Y)
+OwnPal = 1
+PauseMoveTime = 99999
+Size.XSCale = 0.95
+Size.YSCale = 0.95
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 600, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = !AnimElemTime(5)
+Physics = A
+IgnoreHitPause = 1
+
+[State 600, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = ((Pos X - EnemyNear,Pos X) * EnemyNear,Facing) < 0
+Flag = UnGuardable
+IgnoreHitPause = 1
+
+[State 600, HitDef]
+Type = HitDef
+Trigger1 = AnimElemTime(3) >= 0
+Trigger1 = AnimElemTime(5) < 0
+Attr = A,SP        
+HitFlag = MAFD     
+GuardFlag = MA              
+AnimType = Hard      
+Priority = 6,Hit
+Damage = Cond((PrevStateNO != [5000,5999]),20,0),Ceil(Cond((PrevStateNO != [5000,5999]),20,0)/4)
+PauseTime = 2,16
+Guard.PauseTime = 2,12
+Sparkno = -1 + (0 * (Var(25) := 2))
+HitSound = S12000,3
+GuardSound = S12100,0
+YAccel = Const(Movement.YAccel)
+Ground.Type = High
+Air.Type = High
+Ground.SlideTime = 15
+Ground.HitTime = 20
+Air.HitTime = 20
+Ground.Velocity = Cond((PrevStateNO != [5000,5999]),-45,-25),Cond((PrevStateNO != [5000,5999]),-24,-16)
+Air.Velocity = Cond((PrevStateNO != [5000,5999]),-45,-25),Cond((PrevStateNO != [5000,5999]),-24,-16)
+Guard.Velocity = 0
+AirGuard.Velocity = 0,0
+Ground.Cornerpush.VelOff = 0
+Air.Cornerpush.VelOff = 0
+Down.Cornerpush.VelOff = 0
+Guard.Cornerpush.VelOff = 0
+AirGuard.Cornerpush.VelOff = 0
+P1SprPriority = 2
+P2SprPriority = 1
+P2Facing = 1
+Fall = 1
+Fall.YVelocity = 0
+Fall.Recover = 0
+Fall.RecoverTime = 12
+Fall.Damage = 10
+ID = StateNO
+HitOnce = 1
+Getpower = 0,0
+Givepower = 10,5
+EnvShake.Time = 15
+EnvShake.Freq = 50
+EnvShake.Ampl = -10
+Fall.EnvShake.Time = 10
+Fall.EnvShake.Freq = 55
+Fall.EnvShake.Ampl = -8
+Persistent = 0
+
+[State 600, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = AnimElemTime(5) >= 0
+MoveType = I
+IgnoreHitPause = 1
+
+[State 600, Null]
+Type = Null
+Trigger1 = NumTarget(StateNO)
+Trigger1 = Var(26) := Ceil((Target(StateNO),Pos X - Pos X) * Facing)
+Trigger1 = Var(27) := Ceil((Pos Y * -1) + (Target(StateNO),Pos Y +  (Target(StateNO),Const(Size.Mid.Pos.Y))))
+Trigger2 = !NumTarget(StateNO)
+Trigger2 = Var(26) := Ceil((EnemyNear,Pos X - Pos X) * Facing)
+Trigger2 = Var(27) := Ceil((Pos Y * -1) + (EnemyNear,Pos Y +  (EnemyNear,Const(Size.Mid.Pos.Y))))
+IgnoreHitPause = 1
+
+[State 600, TargetState]
+Type = TargetState
+Trigger1 = MoveHit
+Trigger1 = PrevStateNO != [5000,5999]
+Trigger1 = NumTarget(StateNO)
+Value = 5400
+ID = StateNO
+Persistent = 0
+
+[State 600, ChangeState]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = 50
+Ctrl = 1
+;---------------------------------------------------------------------------
+; j.5AC
+[StateDef 605]
+Type = A
+MoveType = U
+Physics = N
+VelSet = 0,0
+Ctrl = 0
+Anim = 600
+SprPriority = 2
+FaceP2 = 1
+
+[State 605, VelAdd]
+Type = VelAdd
+Trigger1 = PrevStateNO = 110 || PrevStateNO = 115
+Trigger1 = !AnimElemTime(1)
+X = Cond(PrevStateNO = 115,Abs(Vel X / 2),-(Vel X / 2))
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 605, PowerAdd]
+Type = PowerAdd
+Trigger1 = !Time
+Trigger1 = MoveType != H
+Value = -500
+IgnoreHitPause = 1
+
+[State 605, Null]
+Type = Null
+Trigger1 = !Time
+Trigger1 = MoveType = H
+Trigger1 = Var(14) := (Var(14) - 5)
+IgnoreHitPause = 1
+
+[State 605, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = !AnimElemTime(1)
+MoveType = A
+IgnoreHitPause = 1
+
+[State 605, VarSet] ;Skills used
+Type = VarSet
+Trigger1 = !AnimElemTime(1)
+var(32) = 1
+IgnoreHitPause = 1
+
+[State 605, BGPalFX]
+Type = BGPalFX
+Trigger1 = Time < 30
+Time = 1
+Add = -100,-100, -100
+Color = 256
+IgnoreHitPause = 1
+
+[State 605, BGPalFX]
+Type = BGPalFX
+Trigger1 = Time = 30
+Time = 10
+Add = -100,-100, -100
+SinAdd = 100, 100, 100, 40
+Color = 256
+IgnoreHitPause = 1
+
+[State 605, Pause]
+Type = Pause
+Trigger1 = !AnimElemTime(1)
+Time = 10
+MoveTime = 10
+PauseBG = 1
+IgnoreHitPause = 1
+
+[State 605, NotHitBy]
+Type = NotHitBy
+Trigger1 = !AnimElemTime(1) 
+Value = SCA
+Time = 30
+IgnoreHitPause = 1
+
+[State 605, PlaySnd]
+Type = PlaySnd
+Trigger1 =  !AnimElemTime(1) 
+Value = S600, 0 + Random%2
+VolumeScale = 80
+IgnoreHitPause = 1
+
+[State 605, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = Time < 10
+Trigger1 = AnimElemTime(2) >= 0
+Value = Anim
+Elem = 2
+IgnoreHitPause = 1
+
+[State 605, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = Time = 10
+Trigger2 = Time = [10,30]
+Trigger2 = AnimElemTime(4) = 4
+Value = Anim
+Elem = 3
+IgnoreHitPause = 1
+
+[State 605, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = Time = 30
+Value = Anim
+Elem = 5
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 605, PalFX]
+Type = PalFX
+Trigger1 =  !AnimElemTime(1)
+Time = 2
+Add = 256, 256, 256
+IgnoreHitPause = 1
+
+[State 605, PalFX]
+Type = PalFX
+Trigger1 = Time = 2
+Time = 8
+Add = 256, 256, 256
+SinAdd = -256, -256,-256,32
+IgnoreHitPause = 1
+
+[State 605, Helper]
+Type = Helper
+Trigger1 = !AnimElemTime(1)
+Name = "Push Helper"
+ID = 608
+StateNO = 608
+OwnPal = 1
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 605, PlayerPush]
+Type = PlayerPush
+Trigger1 = NumHelper(608)
+Value = 0
+IgnoreHitPause = 1
+
+[State 605, Helper]
+Type = Helper
+Trigger1 = !AnimElemTime(3)
+Name = "Effects"
+ID = 610
+StateNO = 610
+Pos = 0,Const(Size.Mid.Pos.Y)
+OwnPal = 1
+PauseMoveTime = 99999
+Size.XSCale = 0.95
+Size.YSCale = 0.95
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 605, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = !AnimElemTime(5)
+Physics = A
+IgnoreHitPause = 1
+
+[State 605, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = ((Pos X - EnemyNear,Pos X) * EnemyNear,Facing) < 0
+Flag = UnGuardable
+IgnoreHitPause = 1
+
+[State 605, HitDef]
+Type = HitDef
+Trigger1 = AnimElemTime(3) >= 0
+Trigger1 = AnimElemTime(5) < 0
+Attr = A,SP        
+HitFlag = MAFD     
+GuardFlag = MA              
+AnimType = Hard      
+Priority = 6,Hit
+Damage = Cond((PrevStateNO != [5000,5999]),20,0),Ceil(Cond((PrevStateNO != [5000,5999]),20,0)/4)
+PauseTime = 2,16
+Guard.PauseTime = 2,12
+Sparkno = -1 + (0 * (Var(25) := 2))
+HitSound = S12000,3
+GuardSound = S12100,0
+YAccel = Const(Movement.YAccel)
+Ground.Type = High
+Air.Type = High
+Ground.SlideTime = 15
+Ground.HitTime = 20
+Air.HitTime = 20
+Ground.Velocity = Cond((PrevStateNO != [5000,5999]),-45,-25),Cond((PrevStateNO != [5000,5999]),-24,-16)
+Air.Velocity = Cond((PrevStateNO != [5000,5999]),-45,-25),Cond((PrevStateNO != [5000,5999]),-24,-16)
+Guard.Velocity = 0
+AirGuard.Velocity = 0,0
+Ground.Cornerpush.VelOff = 0
+Air.Cornerpush.VelOff = 0
+Down.Cornerpush.VelOff = 0
+Guard.Cornerpush.VelOff = 0
+AirGuard.Cornerpush.VelOff = 0
+P1SprPriority = 2
+P2SprPriority = 1
+P2Facing = 1
+Fall = 1
+Fall.YVelocity = 0
+Fall.Recover = 0
+Fall.RecoverTime = 12
+Fall.Damage = 10
+ID = StateNO
+HitOnce = 1
+Getpower = 0,0
+Givepower = 10,5
+EnvShake.Time = 15
+EnvShake.Freq = 50
+EnvShake.Ampl = -10
+Fall.EnvShake.Time = 10
+Fall.EnvShake.Freq = 55
+Fall.EnvShake.Ampl = -8
+Persistent = 0
+
+[State 605, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = AnimElemTime(5) >= 0
+MoveType = I
+IgnoreHitPause = 1
+
+[State 605, Null]
+Type = Null
+Trigger1 = NumTarget(StateNO)
+Trigger1 = Var(26) := Ceil((Target(StateNO),Pos X - Pos X) * Facing)
+Trigger1 = Var(27) := Ceil((Pos Y * -1) + (Target(StateNO),Pos Y +  (Target(StateNO),Const(Size.Mid.Pos.Y))))
+Trigger2 = !NumTarget(StateNO)
+Trigger2 = Var(26) := Ceil((EnemyNear,Pos X - Pos X) * Facing)
+Trigger2 = Var(27) := Ceil((Pos Y * -1) + (EnemyNear,Pos Y +  (EnemyNear,Const(Size.Mid.Pos.Y))))
+IgnoreHitPause = 1
+
+[State 605, TargetState]
+Type = TargetState
+Trigger1 = MoveHit
+Trigger1 = PrevStateNO != [5000,5999]
+Trigger1 = NumTarget(StateNO)
+Value = 5400
+ID = StateNO
+Persistent = 0
+
+[State 605, ChangeState]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = 50
+Ctrl = 1
+;---------------------------------------------------------------------------
+; 5BC
+[StateDef 700]
+Type = S
+MoveType = A
+Physics = S
+VelSet = 0,0
+Ctrl = 0
+Anim = 700
+SprPriority = 2
+
+[State 700, BGPalFX]
+Type = BGPalFX
+Trigger1 = !AnimElemTime(1)
+Time = 55
+Add = -128, -128, -128
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 700, BGPalFX]
+Type = BGPalFX
+Trigger1 = Time = 55
+Time = 5
+Add = -128, -128, -128
+SinAdd = 128,128,128,20
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 700, Pause]
+Type = Pause
+Trigger1 = !AnimElemTime(1)
+Time = 60
+MoveTime = 60
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 700 Helper]
+Type = Helper
+Trigger1 = !AnimElemTime(1)
+Name = "Super Charge Effect"
+ID = 11400
+StateNO = 11400 
+Pos = 0, 0
+OwnPal = 1
+PauseMoveTime = 99999
+Size.Mid.Pos = 8,-102
+IgnoreHitPause = 1
+
+[State 700, Null]
+Type = Null
+Trigger1 = !AnimElemTime(1)
+Trigger1 = Var(5) := 30
+IgnoreHitPause = 1
+
+[State 700, LifeAdd]
+Type = LifeAdd
+Trigger1 = !AnimElemTime(1)
+Value = 100
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 700, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = AnimElemTime(4) = 2
+Trigger1 = Time = [0,60]
+Value = Anim
+Elem = 1
+IgnoreHitPause = 1
+
+[State 700, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = Time > 60
+Value = Anim
+Elem = 5
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 700, CtrlSet]
+Type = CtrlSet
+Trigger1 = Time > 60
+Value = 1
+IgnoreHitPause = 1
+
+[State 700, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(1)
+Value = S700, 0 + Random%2
+VolumeScale = 80
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 700, ChangeState]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = 0
+Ctrl = 1
+;---------------------------------------------------------------------------
+;5Y
+[StateDef 800]
+Type = S
+MoveType = A
+Physics = S
+Ctrl = 0
+Anim = 800
+SprPriority = 2
+FaceP2 = 1
+
+[State 800, VelSet]
+Type = VelSet
+Trigger1 = PrevStateNO != 100
+Trigger1 = !AnimElemTime(1)
+X = 0
+Y = 0
+IgnoreHitPause = 1
+
+[State 800, VelSet]
+Type = VelSet
+Trigger1 = !AnimElemTime(4)
+X = 6
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 800, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(4)
+Value = S6000, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 800, Explod]
+Type = Explod
+Trigger1 = !AnimElemTime(4)
+Anim = 11001
+ID = 11001
+Pos = (Pos X + CameraPos X) + (25 * Facing), (Pos Y)
+Space = Stage 
+Facing = Facing
+Scale = .65,.65
+SprPrioritY = 3
+Shadow = 0, 0, 0
+OwnPal = 1
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 800, HitDef]
+Type = HitDef
+Trigger1 = AnimElemTime(4) >= 0
+Trigger1 = AnimElemTime(5) < 0
+Attr = S,NT      
+HitFlag = MAFD     
+AnimType = Hard
+Priority = 5,Hit
+Sparkno = -1 + (0 * (Var(25) := 6))
+HitSound = S12020,0
+Ground.Type = High
+Air.Type = High
+Ground.SlideTime = 0
+Ground.HitTime = 0
+Air.HitTime = 0
+Ground.Velocity = 0,0
+Air.Velocity = 0,0
+Ground.Cornerpush.VelOff = 0
+Air.Cornerpush.VelOff = 0
+Down.Cornerpush.VelOff = 0
+Guard.Cornerpush.VelOff = 0
+AirGuard.Cornerpush.VelOff = 0
+P1SprPriority = 2
+P2SprPriority = 1
+ForceNoFall = 1
+Fall = 0
+Fall.YVelocity = 0
+Fall.Recover = 0
+Fall.RecoverTime = 12
+Fall.Damage = 0
+ID = StateNO
+HitOnce = 1
+NumHits = 0
+Getpower = 0,0
+Givepower = 0,0
+EnvShake.Time = 8
+EnvShake.Freq = 60
+EnvShake.Ampl = -4
+Persistent = 0
+
+[State 800, PlayerPush]
+Type = PlayerPush
+Trigger1 = NumTarget(800)
+Value = 0
+IgnoreHitPause = 1
+
+[State 800, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = AnimElemTime(5) >= 0
+MoveType = I
+IgnoreHitPause = 1
+
+[State 800, Null]
+Type = Null
+Trigger1 = Var(26) := 80
+Trigger1 = Var(27) := -135
+IgnoreHitPause = 1
+
+[State 800, Helper ]
+Type = Helper 
+Trigger1 = Var(25) = 6
+Trigger1 = MoveHit
+Trigger1 = NumTarget(800)
+Name = "Grab Hitspark"
+ID = 12020
+StateNO = 12020
+OwnPal = 1
+PauseMoveTime = 99999
+Size.XScale = ID
+Size.YScale = 0
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 800, TargetState]
+Type = TargetState
+Trigger1 = MoveHit
+Trigger1 = NumTarget(800)
+Value = 820
+ID = 800
+IgnoreHitPause = 1
+
+[State 800, ChangeState]
+Type = ChangeState
+Trigger1 = MoveHit
+Trigger1 = NumTarget(800)
+Value = 801
+IgnoreHitPause = 1
+
+[State 800, ChangeState]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = 0
+Ctrl = 1
+;---------------------------------------------------------------------------
+;5Y
+[StateDef 801]
+Type = S
+MoveType = A
+Physics = S
+Ctrl = 0
+Anim = 801
+SprPriority = 2
+
+[State 801, TargetBind]
+Type = TargetBind
+Trigger1 = NumTarget(800)
+ID = 800
+Pos = 80, 0
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 801, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(6)
+Value = S6000, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 801, PosAdd]
+Type = PosAdd
+Trigger1 = !AnimElemTime(3)
+X = (4 * Const(Size.XScale))
+IgnoreHitPause = 1
+Persistent = 0
+[State 801, PosAdd]
+Type = PosAdd
+Trigger1 = !AnimElemTime(4)
+X = ((8 - 4) * Const(Size.XScale))
+IgnoreHitPause = 1
+Persistent = 0
+[State 801, PosAdd]
+Type = PosAdd
+Trigger1 = !AnimElemTime(5)
+X = ((10 - 8) * Const(Size.XScale))
+IgnoreHitPause = 1
+Persistent = 0
+[State 801, PosAdd]
+Type = PosAdd
+Trigger1 = !AnimElemTime(6)
+X = ((5 - 10) * Const(Size.XScale))
+IgnoreHitPause = 1
+Persistent = 0
+[State 801, PosAdd]
+Type = PosAdd
+Trigger1 = !AnimElemTime(7)
+X = ((8  - 5) * Const(Size.XScale))
+IgnoreHitPause = 1
+Persistent = 0
+[State 801, PosAdd]
+Type = PosAdd
+Trigger1 = !AnimElemTime(10)
+X = ((4 - 8) * Const(Size.XScale))
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 801, Helper]
+Type = Helper
+Trigger1 = !AnimElemTime(1)
+Name = "Push Helper"
+ID = 810
+StateNO = 810
+OwnPal = 1
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 801, PlayerPush]
+Type = PlayerPush
+Trigger1 = NumHelper(810)
+Value = 0
+IgnoreHitPause = 1
+
+[State 801, Explod]
+Type = Explod
+Trigger1 = !AnimElemTime(6)
+Anim = 11001
+ID = 11001
+Pos = (Pos X + CameraPos X) + (35 * Facing), (Pos Y)
+Space = Stage 
+Facing = Facing
+Vel = -4 * Facing,0
+Scale = .65,.65
+SprPrioritY = 3
+Shadow = 0, 0, 0
+OwnPal = 1
+IgnoreHitPause = 1
+
+[State 801, Helper]
+Type = Helper
+Trigger1 = !AnimElemTime(6)
+Name = "Slash Effect"
+ID = 805
+StateNO = 805
+OwnPal = 1
+Size.XScale = .205
+Size.YScale = .355
+Size.Mid.Pos = 115,-95
+IgnoreHitPause = 1
+
+[State 801, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = ((Pos X - EnemyNear,Pos X) * EnemyNear,Facing) < 0
+Flag = UnGuardable
+IgnoreHitPause = 1
+
+[State 801, HitDef]
+Type = HitDef
+Trigger1 = AnimElemTime(7) >= 0
+Trigger1 = AnimElemTime(8) < 0
+Attr = S,NA      
+HitFlag = MAFD     
+GuardFlag = MA          
+AnimType = Hard
+Priority = 5,Hit
+Damage = (50 / Cond(Var(22),(1+(Var(21) - Var(22))),1)),Ceil(50/4)
+PauseTime = 10,12
+Guard.PauseTime = 10,12
+Sparkno = -1 + (0 * (Var(25) := 1))
+HitSound = S12000,2
+GuardSound = S12100,0
+Ground.Type = High
+Air.Type = High
+Ground.SlideTime = 15
+Ground.HitTime = 20
+Air.HitTime = 20
+Ground.Velocity = -12,-10
+Air.Velocity = -12,-10
+Ground.Cornerpush.VelOff = 0
+Air.Cornerpush.VelOff = 0
+Down.Cornerpush.VelOff = 0
+Guard.Cornerpush.VelOff = 0
+AirGuard.Cornerpush.VelOff = 0
+P1SprPriority = 2
+P2SprPriority = 1
+Fall = 1
+Fall.YVelocity = 0
+Fall.Recover = 1
+Fall.RecoverTime = 12
+Fall.Damage = 10
+ID = StateNO
+HitOnce = 1
+Getpower = 100,50
+Givepower = 20,5
+EnvShake.Time = 12
+EnvShake.Freq = 55
+EnvShake.Ampl = -10
+Fall.EnvShake.Time = 10
+Fall.EnvShake.Freq = 55
+Fall.EnvShake.Ampl = -8
+Persistent = 0
+
+[State 801, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = AnimElemTime(8) >= 0
+MoveType = I
+IgnoreHitPause = 1
+
+[State 801, Null]
+Type = Null
+Trigger1 = AnimElemTime(7) >= 0
+Trigger1 = Var(26) :=  105
+Trigger1 = Var(27) :=  -98
+IgnoreHitPause = 1
+
+[State 801, ChangeState]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = 0
+Ctrl = 1
+;---------------------------------------------------------------------------
+; 5Y
+[StateDef 820, TargetState]
+Type = S
+MoveType = H
+Physics = N
+VelSet = 0,0
+Ctrl = 0
+
+[State 820, ChangeAnim]
+Type = ChangeAnim2
+Trigger1 = !Time
+Value = 820
+IgnoreHitPause = 1
+
+[State 820, ScreenBound]
+Type = ScreenBound
+Trigger1 = StateNO = StateNO
+Value = 1
+MoveCamera = 1, 0
+IgnoreHitPause = 1
+
+[State 820, NotHitBy]
+Type = NotHitBy
+Trigger1 = NumEnemy 
+Trigger1 = Enemy(0),NumTarget(800)
+Trigger1 = Enemy(0),Cond(1,Target(800),Cond(1,ID = ID,0),0)
+Trigger1 = PlayerIDExist(Enemy(0),ID)
+Trigger1 = PlayerID(Enemy(0),ID),StateNO = 801
+Trigger1 = PlayerID(Enemy(0),ID),AnimElemTime(7) < 0
+Trigger2 = NumEnemy = 2
+Trigger2 = Enemy(1),NumTarget(800)
+Trigger2 = Enemy(1),Cond(1,Target(800),Cond(1,ID = ID,0),0)
+Trigger2 = PlayerIDExist(Enemy(1),ID)
+Trigger2 = PlayerID(Enemy(1),ID),StateNO = 801
+Trigger2 = PlayerID(Enemy(1),ID),AnimElemTime(7) < 0
+Value = SCA
+IgnoreHitPause = 1
+
+;[State 820, PlayerPush]
+;Type = PlayerPush
+;Trigger1 = StateNO = StateNO
+;Value = 0
+;IgnoreHitPause = 1
+
+[State 820, Turn]
+Type = Turn
+Trigger1 = NumEnemy
+Trigger1 = Enemy(0),NumTarget(800)
+Trigger1 = Enemy(0),Cond(1,Target(800),Cond(1,ID = ID,0),0)
+Trigger1 = PlayerIDExist(Enemy(0),ID)
+Trigger1 = Facing = PlayerID(Enemy(0),ID),Facing 
+Trigger2 = NumEnemy = 2
+Trigger2 = Enemy(1),NumTarget(800)
+Trigger2 = Enemy(1),Cond(1,Target(800),Cond(1,ID = ID,0),0)
+Trigger2 = PlayerIDExist(Enemy(1),ID)
+Trigger2 = Facing = PlayerID(Enemy(1),ID),Facing 
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 820, SelfState]
+Type = SelfState
+Trigger1 = NumEnemy 
+Trigger1 = Enemy(0),NumTarget(800)
+Trigger1 = Enemy(0),Cond(1,Target(800),Cond(1,ID = ID,0),0)
+Trigger1 = PlayerIDExist(Enemy(0),ID)
+Trigger1 = PlayerID(Enemy(0),ID),StateNO != [800,801]
+Trigger2 = NumEnemy = 2
+Trigger2 = Enemy(1),NumTarget(800)
+Trigger2 = Enemy(1),Cond(1,Target(800),Cond(1,ID = ID,0),0)
+Trigger2 = PlayerIDExist(Enemy(1),ID)
+Trigger2 = PlayerID(Enemy(1),ID),StateNO != [800,801]
+Value = 5070
+;---------------------------------------------------------------------------
+; Standby Taunt
+[StateDef 900]
+Type = S
+MoveType = I
+Physics = S
+Anim = 900
+SprPriority = 2
+FaceP2 = 1
+
+[State 900, PlaySnd]
+Type = PlaySnd
+Trigger1 = !AnimElemTime(1)
+Value = S900, Var(33) := (0 + Random%2)
+VolumeScale = 80
+Channel = 16
+IgnoreHitPause = 1
+
+[State 900, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = Var(33) = 0
+Trigger1 = Time = [6,65]
+Trigger2 = Var(33) = 1
+Trigger2 = Time = [6,200]
+Value = Anim
+Elem = 4
+IgnoreHitPause = 1
+
+[State 900, ChangeState]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = 0
+Ctrl = 1
+;---------------------------------------------------------------------------
+;Shield Counter
+[StateDef 4010]
+Type = U
+MoveType = H
+Physics = N
+Ctrl = 0
+Anim = Anim
+SprPriority = 2
+FaceP2 = 1
+
+[State 4010, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = Time = [0,5]
+Value = Anim
+Elem = 1
+IgnoreHitPause = 1
+
+[State 4010, Null]
+Type = Null
+Trigger1 = !Time
+Trigger1 = Var(14) := (Var(14) - 1)
+IgnoreHitPause = 1
+
+[State 4010, PowerAdd]
+Type = PowerAdd
+Trigger1 = !Time
+Value = 500
+IgnoreHitPause = 1
+
+[State 4010, Null]
+Type = Null
+Trigger1 = !Time
+Trigger1 = PlayerIDExist(Var(16))
+Trigger1 = Var(18) := (Ceil(PlayerID(Var(16)),Pos X))
+IgnoreHitPause = 1
+
+[State 4010, Null]
+Type = Null
+Trigger1 = !Time
+Trigger1 = PlayerIDExist(Var(16))
+Trigger1 = Var(19) := Ceil(((PlayerID(Var(16)),Const(Size.Ground.Back)) + (PlayerID(Var(16)),Const(Size.Ground.Front))) * 1.5)
+IgnoreHitPause = 1
+
+[State 4010, Pause]
+Type = Pause
+Trigger1 = !Time
+Time = 10
+MoveTime = 10
+PauseBG = 1
+IgnoreHitPause = 1
+
+[State 4010, BGPalFX]
+Type = BGPalFX
+Trigger1 = !Time
+Time = 5
+Add = -32,-32, -32
+Color = 256
+IgnoreHitPause = 1
+
+[State 4010]
+Type = BGPalFX
+Trigger1 = Time = 5
+Time = 5
+Add = -32,-32, -32
+SinAdd = 32, 32, 32, 20
+Color = 256
+IgnoreHitPause = 1
+
+[State 4010, NotHitBy]
+Type = NotHitBy
+Trigger1 = !Time
+Value = SCA
+Time = 10
+IgnoreHitPause = 1
+
+[State 4010, NotHitBy]
+Type = NotHitBy
+Trigger1 = Anim = 4010
+Trigger1 = AnimElemTime(4) < 0
+Value = SCA
+IgnoreHitPause = 1
+
+[State 4010, PosAdd]
+Type = PosAdd
+Trigger1 = Time = [0,5]
+X = -8
+IgnoreHitPause = 1
+
+[State 4010,  PlaySnd]
+Type = PlaySnd
+Trigger1 = Time
+Value = S4000,500
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 4010,  PlaySnd]
+Type = PlaySnd
+Trigger1 = Time
+Value = S4000,501
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 4010, EnvShake]
+Type = EnvShake
+Trigger1 = !Time
+Time = 8
+Ampl = -6
+IgnoreHitPause = 1
+
+[State 4010,  Trans]
+Type = Trans
+Trigger1 = Time = [0,5]
+Trans = AddAlpha
+Alpha = 256 - Ceil(Time * (256/5)) , 0 +  Ceil(Time * (256/5))
+IgnoreHitPause = 1 
+
+[State 4010,  PlayerPush]
+Type = PlayerPush
+Trigger1 = Anim != 4010 && Time = [0,10]
+Trigger2 = Anim = 4010 && AnimElemTime(6) < 0
+Value = 0
+IgnoreHitPause = 1
+
+[State 4010, PosAdd]
+Type = PosAdd
+Trigger1 = Time = 5
+X = ((Var(18) - Pos X) * Facing) + Var(19)
+Y = 0
+IgnoreHitPause = 1
+
+[State 4010, PosAdd]
+Type = PosAdd
+Trigger1 = Time = 5 && PlayerIDExist(Var(16))
+Y = (PlayerID(Var(16)),Pos Y - 100)
+IgnoreHitPause = 1
+
+[State 4010, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = Time = 5
+MoveType = A
+Physics = A
+IgnoreHitPause = 1
+
+[State 4010, Turn]
+Type = Turn
+Trigger1 = PlayerIDExist(Var(16))
+Trigger1 = Facing != PlayerID(Var(16)),Facing
+Trigger1 = Time = 5
+IgnoreHitPause = 1
+
+[State 4010, Trans]
+Type = Trans
+Trigger1 = Time = [5,10]
+Trans = AddAlpha
+Alpha = 0 + Ceil((Time-5) * (256/5)) ,256 -  Ceil((Time-5) * (256/5))
+IgnoreHitPause = 1 
+
+[State 4010, ChangeAnim]
+Type = ChangeAnim
+Trigger1 = Time = 5
+Value = 4010
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 4010, VelSet]
+Type = VelSet
+Trigger1 = Anim = 4010
+Trigger1= !AnimElemTime(1)
+X = 6
+Y = -6
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 4010, VelAdd]
+Type = VelAdd
+Trigger1 =  Anim = 4010
+Trigger1= AnimElemTime(4) < 0
+Y = -(Const(Movement.YAccel) / 2)
+IgnoreHitPause = 1
+
+[State 4010, PlaySnd]
+Type = PlaySnd
+Trigger1 = Anim = 4010
+Trigger1 = !AnimElemTime(4)
+Trigger1 = (Random%2 = 0)
+Value = S200, 0 + Random%4
+VolumeScale = 80
+IgnoreHitPause = 1
+
+[State 4010, PlaySnd]
+Type = PlaySnd
+Trigger1 = Anim = 4010
+Trigger1 = !AnimElemTime(4)
+Trigger1 = !(Random%2 = 0)
+Value = S(Cond(Random%5 = 0,210,220)),0 + Random%3
+VolumeScale = 80
+IgnoreHitPause = 1
+
+[State 4010, PlaySnd]
+Type = PlaySnd
+Trigger1 = Anim = 4010
+Trigger1 = !AnimElemTime(4)
+Value = S6000, 0 + Random%4
+IgnoreHitPause = 1
+
+[State 4010, Helper]
+Type = Helper
+Trigger1 = Anim = 4010
+Trigger1 = !AnimElemTime(4)
+Name = "Slash Effect"
+ID = 4011
+StateNO = 4011
+OwnPal = 1
+Size.XScale = 1
+Size.YScale = 1
+Size.Mid.Pos = -5,-75
+IgnoreHitPause = 1
+
+[State 4010, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = Anim = 4010
+Trigger1 = ((Pos X - EnemyNear,Pos X) * EnemyNear,Facing) < 0
+Flag = UnGuardable
+IgnoreHitPause = 1
+
+[State 4010, HitDef]
+Type = HitDef
+Trigger1 = Anim = 4010
+Trigger1 = AnimElemTime(4) >= 0
+Trigger1 = AnimElemTime(5) < 0
+Attr = A,HA       
+HitFlag = MAFD     
+GuardFlag = MA          
+AnimType = Hard
+Priority = 10,Hit
+Damage = (40 / Cond(Var(22),(1+(Var(21) - Var(22))),1)),Ceil(40/4)
+PauseTime = 12,16
+Guard.PauseTime = 12,12
+Sparkno = -1 + (0 * (Var(25) := 5))
+HitSound = S12010,4
+GuardSound = S12100,0
+Ground.Type = High
+Air.Type = High
+Ground.SlideTime = 15
+Ground.HitTime = 20
+Air.HitTime = 20
+Ground.Velocity = -10,-10
+Air.Velocity = -10,10
+Ground.Cornerpush.VelOff = 0
+Air.Cornerpush.VelOff = 0
+Down.Cornerpush.VelOff = 0
+Guard.Cornerpush.VelOff = 0
+AirGuard.Cornerpush.VelOff = 0
+P1SprPriority = 2
+P2SprPriority = 1
+Fall = 1
+Fall.YVelocity = 0
+Fall.Recover = 0
+Fall.RecoverTime = 12
+Fall.Damage = 10
+ID = StateNO
+HitOnce = 1
+Getpower = 0,0
+Givepower = 20,10
+EnvShake.Time = 10
+EnvShake.Freq = 55
+EnvShake.Ampl = -8
+Fall.EnvShake.Time = 10
+Fall.EnvShake.Freq = 55
+Fall.EnvShake.Ampl = -8
+Persistent = 0
+
+[State 4010, StateTypeSet]
+Type = StateTypeSet
+Trigger1 = Anim = 4010
+Trigger1 = AnimElemTime(5) >= 0
+MoveType = I
+IgnoreHitPause = 1
+
+[State 4010, Null]
+Type = Null
+Trigger1 = Anim = 4010
+Trigger1 = NumTarget(StateNO)
+Trigger1 = Var(26) :=  Ceil((Target(StateNO),Pos X - Pos X)  * Facing)
+Trigger1 = Var(27) :=  Ceil(Const(Size.Mid.Pos.Y) / 2)
+Trigger2 = !NumTarget(StateNO)
+Trigger2 = Var(26) :=  Ceil((EnemyNear,Pos X - Pos X)  * Facing)
+Trigger2 = Var(27) :=  Ceil(Const(Size.Mid.Pos.Y) / 2)
+IgnoreHitPause = 1
+
+[State 4010, ChangeState]
+Type = ChangeState
+Trigger1 = !AnimTime
+Value = 50
+Ctrl = 1
+
+;-------------------------------------------------------------------------------
+[Statedef 83294]
+type    = A
+movetype= I
+physics = N
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 83294
+sprpriority = -1
+
+[State 1050,Afterimage]
+type = AfterImage
+trigger1 = time = 1
+time = 15
+trans = add
+length = 10
+timegap = 1
+framegap = 1
+palbright = 10 , 10 , 10
+palcontrast = 100, 100, 100
+paladd = 0,0,0
+palmul = .90, .90, .90
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 2
+value = S40,2
+volume = 50
+[State 0, Pause]
+type = Pause
+trigger1 = time = 0
+time = 1
+[State 0, Explod]
+type = Explod
+trigger1 = time = 2
+anim = 580
+ID = 580
+pos = 3, -24
+postype = p1
+bindtime = -1
+scale = .5, .3
+sprpriority = -1
+ontop = 0
+ownpal = 1
+removeongethit = 1
+ignorehitpause = 1
+[State 0, Explod]
+type = Explod
+trigger1 = time = 2
+anim = 590
+ID = 590
+pos = 3, -24
+postype = p1
+bindtime = -1
+scale = .5, .3
+sprpriority = -1
+ontop = 0
+ownpal = 1
+removeongethit = 1
+ignorehitpause = 1
+
+[State 0]
+Type=NotHitBy
+Trigger1=1
+Value=SCA,NA,SA,HA,NP,SP,HP
+Time=2
+IgnoreHitPause=1
+
+[State 0]
+type=PlayerPush
+trigger1=Time=[0,15]
+value=0
+
+[State 0]
+Type=Turn
+TriggerAll=!Time
+Trigger1=Command="holdback"
+
+[State 0]
+type=VelSet
+trigger1=Time=4
+x=10
+
+[State 200, End]
+type = ChangeState
+trigger1 = ifelse(pos y < 0,time = 12,animtime = 0)
+value = ifelse(pos y < 0,50,0)
+ctrl = 1
