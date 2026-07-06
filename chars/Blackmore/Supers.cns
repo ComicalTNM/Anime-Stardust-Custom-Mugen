@@ -1,0 +1,1005 @@
+;-------------------------------------------------------------------------------
+;
+[Statedef 1600]
+type    = S
+movetype= I
+physics = S
+juggle  = 0
+ctrl = 0
+poweradd = -1500
+anim = 1600
+sprpriority = 2
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 3
+value = S1601,0
+volumescale = 255
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 5
+value = S1601,1
+volumescale = 255
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 7
+value = S5,3
+volumescale = 100
+
+[State 0, Helper]
+type = helper
+trigger1 =time=0;&&numhelper(9915)=0
+helpertype = Normal ;Player
+name = "1"
+ID = 99351
+stateno = 99351
+pos = 0,0
+postype = P1 ;P2, Front, Back, Left, Right
+facing = 1
+supermovetime= 99999
+pausemovetime = 999999
+
+[State 0]
+type = palfx
+trigger1 = animelem = 7 && numhelper(900) = 0
+time = 10
+add = 80, 80, 80
+mul = 256, 256, 256
+sinadd = 0, 0, 0, 1
+invertall = 0
+color = 256
+[State 0]
+type = helper
+trigger1 = animelem = 7 && numhelper(900) = 0
+name = "Aura Fx"
+ID = 900
+stateno = 902
+pos = 0,0
+postype = P1
+facing = 1
+ownpal = 1
+supermovetime = 30
+pausemovetime = 99999
+
+[State 0, Timer]
+type = Helper
+triggerall = Numhelper(1620) = 0
+trigger1 = animelem = 8
+helpertype = normal
+name = "Timer"
+ID = 1620
+stateno = 1620
+pos = 0,0
+postype = p1
+facing = 1
+ownpal = 1
+size.xscale = 1
+size.yscale = 1
+ignorehitpause = 1
+pausemovetime = 0
+supermovetime = 0
+
+[State 0, Release Special Effects]
+type = Helper
+trigger1 = time = 0 
+helpertype = normal
+name = "Release Special Effects"
+ID = 950
+stateno = 950
+pos = 0,-30
+postype = p1
+facing = 1
+ownpal = 1
+size.xscale = .15
+size.yscale = .15
+ignorehitpause = 1
+pausemovetime = 999999
+supermovetime = 999999
+
+[State 0, SuperPause]
+type = SuperPause
+trigger1 = 1
+time = 2
+movetime = 2
+anim = -1
+sound = -1
+pos = 0,0
+darken = 0
+p2defmul = 1
+unhittable = 1
+
+[State 0, VarSet]
+type = Varset
+trigger1 = time = 0
+v = 12
+value = -100
+
+[State 0, VarSet]
+type = Varset
+trigger1 = time = 139
+v = 12
+value = 0
+
+[State 0, VarAdd]
+type = VarAdd
+trigger1 = time >= 129 && Var(12) < 0
+v = 12
+value = 6
+
+[State 0, BGColorFX]
+type = BGPalFX
+trigger1 = time > 0
+time = 1
+add = Var(12),Var(12),Var(12)
+
+[State 0, End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = cond(pos y < 0 &&numhelper(65) =0,50,0)
+ctrl = 1
+;-------------------------------------------------------------------------------
+;
+[Statedef 1620]
+type    = A
+movetype= I
+physics = N
+anim = 9999
+sprpriority = 1
+
+[State 0, Timer]
+type = Helper
+triggerall = Numhelper(1622) = 0
+trigger1 = !time
+helpertype = normal
+name = "Timer"
+ID = 1622
+stateno = 1622
+pos = 0,0
+postype = p1
+facing = 1
+ownpal = 1
+size.xscale = 1
+size.yscale = 1
+ignorehitpause = 1
+pausemovetime = 0
+supermovetime = 0
+
+[State 0, RemoveExplod]
+type = RemoveExplod
+trigger1 = !time
+id = 7211
+ignorehitpause = 1
+
+[State 0, BindToParent]
+type = BindToParent
+trigger1 = 1
+pos = 0,0
+
+[state 0]
+type = explod
+trigger1 = timemod = 1,0 && time < 10
+anim = 7210
+id = 7210
+pos = 0,10
+postype = p1
+bindtime = -1
+facing = 1
+vfacing = 1
+removetime = 1
+sprpriority = 9
+scale = .2,.2
+angle = 0
+ownpal = 1
+remappal = 100, Cond(helper(1622),var(30) < 100,999,2)
+removeongethit = 1
+ignorehitpause = 1
+trans = addalpha
+alpha = 0+25*(time%20),256
+supermovetime = 0
+pausemovetime = 0
+
+[state 0]
+type = explod
+trigger1 = timemod = 1,0 && time >= 10
+anim = 7210
+id = 7210
+pos = 0,10
+postype = p1
+bindtime = -1
+facing = 1
+vfacing = 1
+removetime = 1
+sprpriority = 9
+scale = .2,.2
+angle = 0
+ownpal = 1
+remappal = 7500,1
+removeongethit = 1
+ignorehitpause = 1
+supermovetime = 0
+pausemovetime = 0
+
+[State 0, "Zenkai OFF" Icon]
+type = Explod
+triggerall = helper(1622),var(30) != 0 && time >= 10
+trigger1 = timemod = 1,0
+anim = 7205
+ID = 7205
+pos = 0,10
+postype = p1
+facing = 1
+vfacing = 1
+bindtime = -1
+removetime = 1
+scale = .2*helper(1622),var(30)/100,.2
+remappal = 7500,1
+sprpriority = 10
+ontop = 0
+ownpal = 1
+ignorehitpause = 1
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = helper(1622),var(30) = 0 && Time >= 10
+trigger2 = root,roundstate != 2
+value = 1621
+ignorehitpause = 1
+;-------------------------------------------------------------------------------
+;
+[Statedef 1621]
+type    = A
+movetype= I
+physics = N
+anim = 9999
+sprpriority = 1
+
+[State 0, BindToParent]
+type = BindToParent
+trigger1 = 1
+pos = 0,0
+
+[state 0]
+type = explod
+trigger1 = timemod = 1,0
+anim = 7210
+id = 7211
+pos = 0,10
+postype = p1
+bindtime = -1
+facing = 1
+vfacing = 1
+removetime = 1
+sprpriority = 9
+scale = .2,.2
+angle = 0
+ownpal = 1
+remappal = 7500,1
+removeongethit = 1
+ignorehitpause = 1
+supermovetime = 0
+trans = addalpha
+alpha = 256+-35*(time%20),256
+pausemovetime = 0
+
+[State 0, "Zenkai OFF" Icon]
+type = Explod
+trigger1 = timemod = 1,0
+anim = 7205
+ID = 7211
+pos = 0,10
+postype = p1
+facing = 1
+vfacing = 1
+bindtime = -1
+removetime = 1
+scale = .2*helper(1622),var(30)/100,.2
+remappal = 100,1
+sprpriority = 10
+ontop = 0
+trans = addalpha
+alpha = 256+-35*(time%20),256
+ownpal = 1
+ignorehitpause = 1
+
+[State 0, destroyself]
+type = destroyself
+trigger1 = Time >= 10
+ignorehitpause = 1
+;-------------------------------------------------------------------------------
+;
+[Statedef 1622]
+type    = A
+movetype= I
+physics = N
+anim = 9999
+sprpriority = 1
+
+[State 0, VarAdd]
+type = VarAdd
+trigger1 = root,stateno = 800 && root,time = 1
+v = 31
+value = 1
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = !time
+v = 30
+value = 100
+
+[State 0, VarAdd]
+type = VarAdd
+triggerall = var(30) > 0 && time%9 = 0
+trigger1 = 1
+v = 30
+value = -1
+
+[State 0, BindToParent]
+type = BindToParent
+trigger1 = 1
+pos = 0,0
+
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = var(30) = 0
+trigger2 = root,roundstate != 2 && numhelper(1620) = 0
+;-------------------------------------------------------------------------------
+;
+[Statedef 1700]
+type    = S
+movetype= I
+physics = S
+juggle  = 0
+ctrl = 0
+poweradd = -1500
+anim = 1700
+sprpriority = 2
+
+[State 0, Helper]
+type = helper
+trigger1 =time=0;&&numhelper(9915)=0
+helpertype = Normal ;Player
+name = "1"
+ID = 99352
+stateno = 99352
+pos = 0,0
+postype = P1 ;P2, Front, Back, Left, Right
+facing = 1
+supermovetime= 99999
+pausemovetime = 999999
+
+[State 0, LifeAdd]
+type = LifeAdd
+trigger1 = time = [62,72]
+value = 25
+absolute = 0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 3
+value = S1601,0
+volumescale = 55
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 7
+value = S1701,0
+volumescale = 255
+
+[State 0, Explod]
+type = Explod
+trigger1 = animelem = 5
+anim = 1710
+ID = 1710
+pos = 4,-63
+postype = P1  ;P2, Front, Back, Left, Right
+facing = -1
+vfacing = 1
+bindtime = 9999
+vel = 0,0
+accel = 0,0
+random = 0,0
+removetime = -2
+supermovetime = 0
+pausemovetime = 0
+scale = .25,.25
+sprpriority = -3
+angle = 180
+trans = sub
+ownpal = 1
+removeongethit = 1
+ignorehitpause=1
+[State 0, Explod]
+type = Explod
+trigger1 = animelem = 5
+anim = 1710
+ID = 1710
+pos = 4,-63
+postype = P1  ;P2, Front, Back, Left, Right
+facing = -1
+vfacing = 1
+bindtime = 9999
+vel = 0,0
+accel = 0,0
+random = 0,0
+removetime = -2
+supermovetime = 0
+pausemovetime = 0
+scale = .25,.25
+sprpriority = 3
+angle = 180
+remappal = 7500,10
+trans = add
+ownpal = 1
+removeongethit = 1
+ignorehitpause=1
+
+[State 0, Explod]
+type = Explod
+trigger1 = animelem = 7
+anim = 1711
+ID = 1711
+pos = 4,-33
+postype = P1  ;P2, Front, Back, Left, Right
+facing = -1
+vfacing = 1
+bindtime = 9999
+vel = 0,0
+accel = 0,0
+random = 0,0
+removetime = -2
+supermovetime = 0
+pausemovetime = 0
+scale = .225,.225
+sprpriority = -3
+angle = 180
+trans = sub
+ownpal = 1
+removeongethit = 1
+ignorehitpause=1
+[State 0, Explod]
+type = Explod
+trigger1 = animelem = 7
+anim = 1711
+ID = 1711
+pos = 4,-33
+postype = P1  ;P2, Front, Back, Left, Right
+facing = -1
+vfacing = 1
+bindtime = 9999
+vel = 0,0
+accel = 0,0
+random = 0,0
+removetime = -2
+supermovetime = 0
+pausemovetime = 0
+scale = .225,.225
+sprpriority = 3
+angle = 180
+remappal = 7500,10
+trans = add
+ownpal = 1
+removeongethit = 1
+ignorehitpause=1
+
+[State 0]
+type = palfx
+trigger1 = animelem = 3 && numhelper(900) = 0
+time = 10
+add = 80, 80, 80
+mul = 256, 256, 256
+sinadd = 0, 0, 0, 1
+invertall = 0
+color = 256
+[State 0]
+type = helper
+trigger1 = animelem = 3 && numhelper(900) = 0
+name = "Aura Fx"
+ID = 900
+stateno = 902
+pos = 0,0
+postype = P1
+facing = 1
+ownpal = 1
+supermovetime = 88
+pausemovetime = 99999
+
+[State 0, Release Special Effects]
+type = Helper
+trigger1 = time = 0 
+helpertype = normal
+name = "Release Special Effects"
+ID = 950
+stateno = 950
+pos = 0,-30
+postype = p1
+facing = 1
+ownpal = 1
+size.xscale = .15
+size.yscale = .15
+ignorehitpause = 1
+pausemovetime = 999999
+supermovetime = 999999
+
+[State 0, SuperPause]
+type = SuperPause
+trigger1 = !time
+time = 30
+movetime = 30
+anim = -1
+sound = -1
+pos = 0,0
+darken = 0
+p2defmul = 1
+unhittable = 1
+
+[State 0, VarSet]
+type = Varset
+trigger1 = time = 0
+v = 12
+value = -100
+
+[State 0, VarSet]
+type = Varset
+trigger1 = time = 40
+v = 12
+value = 0
+
+[State 0, VarAdd]
+type = VarAdd
+trigger1 = time >= 54 && Var(12) < 0
+v = 12
+value = 6
+
+[State 0, BGColorFX]
+type = BGPalFX
+trigger1 = time > 0
+time = 1
+add = Var(12),Var(12),Var(12)
+
+[State 0, End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = cond(pos y < 0 &&numhelper(65) =0,50,0)
+ctrl = 1
+;-------------------------------------------------------------------------------
+;
+[Statedef 2000]
+type    = S
+movetype= I
+physics = S
+juggle  = 0
+ctrl = 0
+poweradd = 3000
+anim = 2000
+sprpriority = 2
+
+[State 0, NotHitBy]
+type = NotHitBy
+trigger1 = 1
+value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+time = 2
+
+[State 0, PlayerPush]
+type = PlayerPush
+trigger1 = 1
+value = 1
+ignorehitpause = 1
+
+[State 0, Zoom]
+type = Zoom
+triggerall = pos y = 0
+trigger1 = time = [0,35]
+scale = 1.5
+pos = pos x ,pos y
+lag = .8
+
+[State 0]
+Type = Zoom
+Trigger1 = time > 35
+lag = .55
+Scale = 1
+pos = pos x ,pos y
+IgnoreHitPause = 1
+
+[State 0, Helper]
+type = helper
+trigger1 =time=0;&&numhelper(9915)=0
+helpertype = Normal ;Player
+name = "1"
+ID = 99354
+stateno = 99354
+pos = 0,0
+postype = P1 ;P2, Front, Back, Left, Right
+facing = 1
+supermovetime= 99999
+pausemovetime = 999999
+
+[State 0, LifeSet]
+type = LifeSet
+trigger1 = !time
+value = 1
+ignorehitpause = 1
+
+[State 0, Explod]
+type = Explod
+trigger1 = time = 5
+anim = 3062
+ID = 3062
+pos = 0,0
+sprpriority = 20
+postype = P1  ;P2, Front, Back, Left, Right
+facing = 1
+vfacing = 1
+bindtime = 0
+vel = 0,0
+accel = 0,0
+random = 0,0
+removetime = -2
+scale = 99,99
+supermovetime = 999
+pausemovetime = 0
+ownpal = 1
+removeongethit = 1
+
+[State 0, Timer]
+type = Helper
+triggerall = Numhelper(2010) = 0
+trigger1 = time = 30
+helpertype = normal
+name = "Timer"
+ID = 2010
+stateno = 2010
+pos = 0,0
+postype = p1
+facing = 1
+ownpal = 1
+size.xscale = 1
+size.yscale = 1
+ignorehitpause = 1
+pausemovetime = 0
+supermovetime = 0
+
+[State 0, Release Special Effects]
+type = Helper
+trigger1 = time = 0 
+helpertype = normal
+name = "Release Special Effects"
+ID = 950
+stateno = 950
+pos = 0,-30
+postype = p1
+facing = 1
+ownpal = 1
+size.xscale = .15
+size.yscale = .15
+ignorehitpause = 1
+pausemovetime = 999999
+supermovetime = 999999
+
+[State 0, SuperPause]
+type = SuperPause
+trigger1 = !time
+time = 30
+movetime = 30
+anim = -1
+sound = -1
+pos = 0,0
+darken = 0
+p2defmul = 1
+unhittable = 1
+
+[State 0, VarSet]
+type = Varset
+trigger1 = time = 0
+v = 12
+value = -100
+
+[State 0, VarSet]
+type = Varset
+trigger1 = time = 30
+v = 12
+value = 0
+
+[State 0, VarAdd]
+type = VarAdd
+trigger1 = time >= 40 && Var(12) < 0
+v = 12
+value = 6
+
+[State 0, BGColorFX]
+type = BGPalFX
+trigger1 = time > 0
+time = 1
+add = Var(12),Var(12),Var(12)
+
+[State 0, End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+;-------------------------------------------------------------------------------
+;
+[Statedef 2010]
+type    = A
+movetype= I
+physics = N
+anim = 9999
+sprpriority = 1
+
+[State 0, Explod]
+type = Explod
+trigger1 = time = 30
+anim = 3062
+ID = 3062
+pos = 0,0
+sprpriority = 20
+postype = P1  ;P2, Front, Back, Left, Right
+facing = 1
+vfacing = 1
+bindtime = 0
+vel = 0,0
+accel = 0,0
+random = 0,0
+removetime = -2
+scale = 99,99
+supermovetime = 999
+pausemovetime = 0
+ownpal = 1
+removeongethit = 1
+
+[State 0, Timer]
+type = Helper
+triggerall = Numhelper(2020) = 0
+trigger1 = !time
+helpertype = normal
+name = "Timer"
+ID = 2020
+stateno = 2020
+pos = 0,0
+postype = p1
+facing = 1
+ownpal = 1
+size.xscale = 1
+size.yscale = 1
+ignorehitpause = 1
+pausemovetime = 0
+supermovetime = 0
+
+[State 0, RemoveExplod]
+type = RemoveExplod
+trigger1 = !time
+id = 7211
+ignorehitpause = 1
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = 1
+x = 0
+y = 0
+
+[state 0]
+type = explod
+trigger1 = timemod = 1,0 && time < 10
+anim = 7210
+id = 7210
+pos = 5,90
+postype = back
+bindtime = -1
+facing = 1
+vfacing = 1
+removetime = 1
+sprpriority = 9
+scale = .4,.35
+angle = 90
+ownpal = 1
+remappal = 100, Cond(helper(2020),var(30) < 100,999,2)
+removeongethit = 1
+ignorehitpause = 1
+trans = addalpha
+alpha = 0+25*(time%20),256
+supermovetime = 0
+pausemovetime = 0
+
+[state 0]
+type = explod
+trigger1 = timemod = 1,0 && time >= 10
+anim = 7210
+id = 7210
+pos = 5,90
+postype = back
+bindtime = -1
+facing = 1
+vfacing = 1
+removetime = 1
+sprpriority = 9
+scale = .4,.35
+angle = 90
+ownpal = 1
+remappal = 7500,1
+removeongethit = 1
+ignorehitpause = 1
+supermovetime = 0
+pausemovetime = 0
+
+[State 0, "Zenkai OFF" Icon]
+type = Explod
+triggerall = helper(2020),var(30) != 0 && time >= 10
+trigger1 = timemod = 1,0
+anim = 7205
+ID = 7205
+pos = 5,90;+helper(2020),var(31)/3.1235
+postype = back
+facing = 1
+vfacing = 1
+bindtime = -1
+removetime = 1
+scale = .4*helper(2020),var(30)/100,.35
+remappal = 7500,1
+sprpriority = 10
+angle = 90
+ontop = 0
+trans = addalpha
+alpha = 256+cond(helper(2020),var(30)<60,-15*(time%20),0),256
+ownpal = 1
+ignorehitpause = 1
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = helper(2020),var(30) = 0 && Time >= 10
+trigger2 = root,roundstate != 2
+value = 2011
+ignorehitpause = 1
+;-------------------------------------------------------------------------------
+;
+[Statedef 2011]
+type    = A
+movetype= I
+physics = N
+anim = 9999
+sprpriority = 1
+
+[State 0, BindToParent]
+type = BindToParent
+trigger1 = 1
+pos = 0,0
+
+[state 0]
+type = explod
+trigger1 = timemod = 1,0
+anim = 7210
+id = 7211
+pos = 5,90
+postype = back
+bindtime = -1
+facing = 1
+vfacing = 1
+removetime = 1
+sprpriority = 9
+scale = .4,.35
+angle = 90
+ownpal = 1
+remappal = 7500,1
+removeongethit = 1
+ignorehitpause = 1
+supermovetime = 0
+trans = addalpha
+alpha = 256+-25*(time%20),256
+pausemovetime = 0
+
+[State 0, "Zenkai OFF" Icon]
+type = Explod
+trigger1 = timemod = 1,0
+anim = 7205
+ID = 7211
+pos = 5,90;+helper(2020),var(31)/3.1235
+postype = back
+facing = 1
+vfacing = 1
+bindtime = -1
+removetime = 1
+scale = .4*helper(2020),var(30)/100,.35
+remappal = 100,1
+sprpriority = 10
+ontop = 0
+angle = 90
+trans = addalpha
+alpha = 256+-25*(time%20),256
+ownpal = 1
+ignorehitpause = 1
+
+[State 0, destroyself]
+type = destroyself
+trigger1 = Time >= 15
+ignorehitpause = 1
+;-------------------------------------------------------------------------------
+;
+[Statedef 2020]
+type    = A
+movetype= I
+physics = N
+anim = 9999
+sprpriority = 1
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = !time
+trigger2 = var(30) > 100
+v = 30
+value = 100
+
+[State 0, VarAdd]
+type = VarAdd
+trigger1 = var(30) < 100
+v = 30
+value = root,var(38)
+
+[State 0, VarAdd]
+type = VarAdd
+triggerall = var(30) > 0 && time%9 = 0
+trigger1 = 1
+v = 30
+value = -1
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = !time
+v = 31
+value = 0
+
+[State 0, VarAdd]
+type = VarAdd
+triggerall = time%9 = 0
+trigger1 = 1
+v = 31
+value = 1
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = var(30) = 0
+v = 32
+value = 1
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = enemynear,life <= 0
+v = 33
+value = 1
+
+[State 0, BindToParent]
+type = BindToParent
+trigger1 = 1
+pos = 0,0
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = var(30) = 0 && root,roundstate = 2
+value = 2021
+ctrl = 0
+;-------------------------------------------------------------------------------
+;
+[Statedef 2021]
+type    = A
+movetype= I
+physics = N
+anim = 9999
+sprpriority = 1
+
+[State 0, BindToParent]
+type = BindToParent
+trigger1 = 1
+pos = 0,0
+;-------------------------------------------------------------------------------
+;
+[Statedef 2030]
+type    = A
+movetype= I
+physics = N
+anim = 9999
+
+[State 200, End]
+type = Destroyself
+trigger1 = time = 1
+
+
