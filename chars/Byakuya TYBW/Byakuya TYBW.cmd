@@ -535,10 +535,10 @@ trigger1 = ctrl
 [State -1, Awakening]
 type = ChangeState
 triggerall = numhelper(705) = 0
-Triggerall = power >= 3000
+Triggerall = power >= 1000
 value = 700
 triggerall = command = "holddown"
-triggerall = command = "s"
+triggerall = command = "a"
 trigger1 = statetype != A
 trigger1 = ctrl
 ;--------------------------------------------------------------------------
@@ -643,3 +643,4 @@ triggerall = power >= 200
 triggerall = command = "c"
 Triggerall = statetype = A
 trigger1 = ctrl
+
