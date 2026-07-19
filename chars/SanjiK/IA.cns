@@ -1,0 +1,991 @@
+[Statedef -2]
+
+[State 0, Be Able To Fight Women] ; Kinda self explanatory, Make The Value 0 If You Don't want sanji to fight women (He'll simply do a lovestruck attack)
+Type = VarSet
+Trigger1 = 1
+V = 33
+Value = 1 ; Make This Value 0 If You Don't Want Him to be able to fight women
+
+[State 0, AI Palettes] ; Random AI Palettes [Set Value To Random%9 For Random Palettes]
+Type = VarSet
+Trigger1 = AILevel
+V = 55
+Value = 1
+
+[State 0, ChangeState]
+Type = ChangeState
+Triggerall = ctrl
+Triggerall = StateType = S
+Trigger1 = random >500
+Trigger1 = ailevel
+Triggerall = roundstate = 2
+Triggerall = P2BodyDist X >= 150
+Value = Cond(Pos y >= 0,60,100)
+
+[State 0, ChangeState]
+Type = ChangeState
+Triggerall = StateType = A && (enemy,numproj = 0) && (Stateno != 60) && (Stateno != 65) && (Stateno != 70) && (AILevel > 0) && (roundState = 2) && (ctrl) && (P2BodyDist x > 100)
+Trigger1 = Random < (AILevel * 100)/2
+Value = Cond(Pos y >= 0,60,100)
+
+[State 0, Run Atras]
+Type = ChangeState
+Triggerall = (Stateno != 60) && (Stateno != 65) && (Stateno != 70) && (AILevel > 0) && (roundState = 2) && (ctrl) && (P2BodyDist x < 100) && (backedgebodydist > 50) && (P2MoveType = A)
+Trigger1 = Random < (AILevel * 100)/4
+Value = Cond(Pos Y >= 0,105,115)
+
+[State 0, Guard]
+Type = ChangeState
+Triggerall = Enemy,HitDefAttr != SCA,NT,ST,HT
+Triggerall = Enemy,MoveType = A
+Triggerall = Enemy,StateType != L
+Triggerall = (Enemy,Stateno != 5100 && Enemy,Stateno != 5101 && Enemy,Stateno != 5110)
+Triggerall = (ailevel > 0) && (roundstate = 2) && (Cond(Stateno = 500 || Stateno = 501 || Stateno = 60 || Stateno = 61 || Stateno = 65 || Stateno = 66 || Stateno = 70 || Stateno = 80 || Stateno = 450 || Stateno = 650,!Ctrl,Ctrl))
+Triggerall = (p2moveType = A) || (enemy,numproj > 0)
+Trigger1 = (P2BodyDist x < 60) && (P2MoveType = A)
+Trigger2 = ((P2BodyDist x < 60) && (P2Stateno = [200,260])) || ((P2BodyDist x < 60) && (P2Stateno = [300,360])) ||  ((P2BodyDist x > 20 && P2BodyDist x < 60) && (P2Stateno = [400,450])) || ((P2BodyDist x < 60) && (P2Stateno = [600,650]))
+Trigger3 = (P2BodyDist x >= 0 && Enemy,NumProj > 0)
+Trigger4 = (P2BodyDist x <= 100 && Enemy,Stateno = [1000,3000])
+Value = Cond(stateType = A,132,130)
+
+;========================================================
+; Basics And Shit
+;========================================================
+[State 0, A]
+Type = ChangeState
+Triggerall = Enemy,stateType != L
+Triggerall = Enemy,Stateno != 5100 && Enemy,Stateno != 5101 && Enemy,Stateno != 5110
+Triggerall = StateType != A
+Triggerall = AILevel > 0 && RoundState = 2
+Triggerall = Ctrl
+Triggerall = P2BodyDist y = [-25,25]
+Triggerall = P2BodyDist x = [-30,30]
+Trigger1 = Random < (AILevel * 100)/2
+Value = 200
+
+[State 0, B]
+Type = ChangeState
+Triggerall = Enemy,StateType != L
+Triggerall = Enemy,Stateno != 5100 && Enemy,Stateno != 5101 && Enemy,Stateno != 5110
+Triggerall = StateType != A
+Triggerall = AILevel > 0 && RoundState = 2
+Triggerall = Ctrl
+Triggerall = P2BodyDist y = [-25,25]
+Triggerall = P2BodyDist x = [-35,35]
+Trigger1 = Random < (AILevel * 100)/3
+Value = 300
+
+[State 0, C]
+Type = ChangeState
+Triggerall = Enemy,StateType != L
+Triggerall = Enemy,Stateno != 5100 && Enemy,Stateno != 5101 && Enemy,Stateno != 5110
+Triggerall = StateType != A
+Triggerall = AILevel > 0 && RoundState = 2
+Triggerall = Ctrl
+Triggerall = P2BodyDist y = [-30,30]
+Triggerall = P2BodyDist x = [-35,35]
+Trigger1 = Random < (AILevel * 100)/3
+Value = 350
+
+[State 0, Down B/C]
+Type = changestate
+Triggerall = StateType != A
+Triggerall = (Ctrl || Stateno = 30 || Stateno = 52 || Stateno = 101 || Stateno = 501) && RoundState = 2 && Alive
+Triggerall = ailevel>0
+Trigger1 = Random < Cond(!Enemy,AILevel && Var(7) < 7,50,500)
+Trigger1 = (P2BodyDist x = [-35,35]) && (P2BodyDist y = [-60,-25])
+Value = Cond(Random >= 500,325,220)
+
+[State 0, Power Charge]
+Type = ChangeState
+Triggerall = Power < PowerMax
+Triggerall = AILevel > 0
+Triggerall = Ctrl
+Triggerall = Pos y >= 0
+Triggerall = EnemyNear,life > 0
+Triggerall = P2BodyDist x > 100
+Triggerall = StateType != A
+Trigger1 = Random < (AILevel*100)/3
+Trigger1 = Enemy,Stateno != 5120 
+Value = 500
+
+[State 0, Power Charge End]
+Type = ChangeState
+Triggerall = Time >= 12
+Triggerall = Stateno = 500
+Triggerall = AILevel > 0
+Trigger1 = ((P2BodyDist x < 100) && Enemy,StateType != L) || (Enemy,NumProj > 0)
+Trigger2 = Power >= PowerMax
+Trigger3 = Enemy,PrevStateno = 500
+Trigger4 = Enemy,MoveType = A 
+Trigger5 = Enemy,Life = 0
+Trigger6 = Enemy,Stateno = 5120 && P2BodyDist x < 100
+Value = 501
+
+[State 0, A Air]
+Type = ChangeState
+Triggerall = Enemy,StateType != L
+Triggerall = Enemy,Stateno != 5100 && Enemy,Stateno != 5101 && Enemy,Stateno != 5110
+Triggerall = StateType = A
+Triggerall = AILevel > 0 && RoundState = 2
+Triggerall = Ctrl
+Triggerall = P2BodyDist x = [-25,25]
+Triggerall = P2BodyDist y = [-35,35]
+Trigger2 = NumTarget > 0
+Trigger1 = Random < (AILevel * 100)
+Value = 225
+
+[State 0, B Air]
+Type = ChangeState
+Triggerall = Enemy,StateType != L
+Triggerall = Enemy,Stateno != 5100 && Enemy,Stateno != 5101 && Enemy,Stateno != 5110
+Triggerall = StateType = A
+Triggerall = AILevel > 0 && RoundState = 2
+Triggerall = Ctrl
+Triggerall = P2BodyDist x = [-33,33]
+Triggerall = P2BodyDist y = [-25,25]
+Triggerall = Enemy,StateType = S
+Trigger2 = NumTarget > 0
+Trigger1 = Random < (AILevel * 100)/3
+Value = 405
+
+[State 0, C Air]
+Type = ChangeState
+Triggerall = StateType = A
+Triggerall = AILevel > 0 && RoundState = 2
+Triggerall = Ctrl
+Triggerall = P2BodyDist x = [-28,28]
+Triggerall = P2BodyDist y = [-21,21]
+Triggerall = Enemy,StateType != A
+Triggerall = Enemy,MoveType != H
+Trigger1 = Random < (AILevel * 100)/4
+Value = 335
+
+[State 0, Ground Grab]
+Type = ChangeState
+Triggerall = Enemy,StateType != L
+Triggerall = Enemy,Stateno != 5100 && Enemy,Stateno != 5101 && Enemy,Stateno != 5110
+Triggerall = StateType != A
+Triggerall = AILevel > 0 && RoundState = 2
+Triggerall = Ctrl
+Triggerall = P2BodyDist x = [-28,28]
+Triggerall = P2BodyDist y = [-25,25]
+Triggerall = Enemy,StateType = S
+Triggerall = Enemy,Stateno = [120,155]
+Trigger2 = NumTarget > 0
+Trigger1 = Random < (AILevel * 100)/6
+Value = 800
+
+[State 0, Air Grab]
+Type = ChangeState
+Triggerall = Enemy,StateType != L
+Triggerall = Enemy,Stateno != 5100 && Enemy,Stateno != 5101 && Enemy,Stateno != 5110
+Triggerall = StateType = A
+Triggerall = AILevel > 0 && RoundState = 2
+Triggerall = Ctrl
+Triggerall = P2BodyDist x = [-28,28]
+Triggerall = P2BodyDist y = [-25,25]
+Triggerall = Enemy,StateType = A
+Triggerall = Enemy,Stateno = [120,155]
+Trigger2 = NumTarget > 0
+Trigger1 = Random < (AILevel * 100)/6
+Value = 830
+
+[state changestate]
+type = changestate
+triggerall = (ctrl=1||stateno=30||stateno=52||stateno=101||stateno=501)&&roundstate=2&&alive=1
+triggerall = power >= 1000
+triggerall = statetype=s
+triggerall = pos y = 0
+triggerall = ailevel>0
+trigger1 = random < Cond(!Enemy,AILevel,50,500)
+trigger1 = ((p2bodydist x = [-60,60]) && (p2bodydist x != [-20,20])) && (p2bodydist y = [-75,-30])
+trigger1 = p2statetype != L
+value = 1400
+
+[state changestate]
+type=changestate
+triggerall = (ctrl=1||stateno=30||stateno=52||stateno=101||stateno=501)&&roundstate=2&&alive=1
+triggerall = power >= 1500
+triggerall = statetype = s
+triggerall = pos y = 0
+triggerall = ailevel
+trigger1 = random<ifelse(enemy,ailevel=0,50,500)
+trigger1 = (p2bodydist x = [-60,60])&&(p2bodydist y=[-25,25])
+trigger1 = p2statetype!=l
+value = 1500
+
+[state changestate]
+type=changestate
+triggerall=(ctrl=1||stateno=30||stateno=52||stateno=101||stateno=501)&&roundstate=2&&alive=1
+triggerall=statetype!=a
+triggerall=pos y = 0
+triggerall=power >= 3000
+triggerall=teammode!=simul
+triggerall=ailevel>0
+trigger1=(p2bodydist x=[-170,170])&&(p2bodydist y=[-20,0])
+trigger1=random<ifelse(enemy,ailevel=0,5,500)
+trigger1=p2statetype != l
+trigger1=AILevel
+value=Cond(Var(24),3500,3505)
+
+[state 0]
+Type = changestate
+Value = 5200
+Trigger1 = (ailevel>4) && (numenemy)
+Trigger1 = (roundstate = 2) && (alive)
+Trigger1 = (stateno = 5050) && gethitvar(fall.recover)
+Trigger1 = (vel y > 0) && (pos y >= -20)
+Trigger1 = (random<(100*(ailevel**2/64.0)))
+
+[state 0]
+Type = changestate
+Value = 5210
+Trigger1 = (ailevel>4) && (numenemy)
+Trigger1 = (roundstate = 2) && (alive)
+Trigger1 = (stateno = 5050) && (canrecover)
+Trigger1 = (vel y > 0) && (pos y<-20)
+Trigger1 = (random<(25*(ailevel**2/64.0)))
+
+
+;[Core]
+[state 0]
+type = angledraw
+triggerall = (alive)
+trigger1 = 1
+value = cond(vel x != 0, - (atan(vel y / vel x) * (const(size.air.back)) / pi), 0)
+scale = 1, 1 + (sin((time / 50.0) * (pi / 2)) * 0.0135)
+ignorehitpause = 1
+
+[State Credits: InSeph]
+Type = AngleDraw
+Trigger1 = Vel X != 0
+Trigger1 = StateNo != 307
+Trigger1 = StateNo != 1001
+Trigger1 = StateNo != 1101
+Trigger1 = StateNo != 1300
+Value = -(Atan(Vel Y / Vel X) * (Const(Size.Air.Back)) / PI)
+;[State Credits: Riv]
+;Type = PowerAdd
+;Triggerall = RoundState = 2 && Alive
+;Triggerall = (StateNo != [170,199]) && (StateNo != [200,500]) && (StateNo != [1000,1600]) && (StateNo != 600)
+;Trigger1 = 1
+;Value = IFELSE(TeamMode = Simul,(COND((AiLevel > 0),COND((MoveType = H),4,3),2) / 2),COND((AILevel>0),COND((MoveType = H),4,3),2))
+;IgnoreHitPause	= 1
+[STATE -2]
+Type = PlayerPush
+Trigger1 = RoundState != 2
+Value = 0
+[STATE -2]
+Type = ScreenBound
+Trigger1 = !Alive
+Value = 0
+[STATE -2]
+Type = ChangeAnim
+Triggerall = Var(9)
+Trigger1 = Anim = 5 
+Value = 100005
+
+[STATE -2]
+Type = RemoveExplod
+Trigger1 = Anim != 400
+ID = 410
+[STATE 1401]
+Type = RemoveExplod
+Trigger1 = StateNo != 1400
+Trigger1 = StateNo != 1500
+ID = 1410
+IgnoreHitPause = 1
+[STATE -2]
+Type = RemoveExplod
+Trigger1 = StateNo != 1501
+ID = 1510
+[STATE -2]
+Type = RemoveExplod
+Trigger1 = StateNo != [190,193]
+ID = 7026
+[STATE -2]
+Type = AfterImageTime
+Trigger1 = StateNo != 80
+Trigger1 = StateNo != 100
+Trigger1 = StateNo != 105
+Trigger1 = PrevStateNo != 105
+Trigger1 = StateNo != 1001
+Time = 1
+IgnoreHitPause = 1
+[STATE -2]
+Type = Helper
+Triggerall = NumHelper(9100) = 0
+Trigger1 = StateNo = 1000 ||StateNo = 1001
+Trigger2 = StateNo = 1100 ||StateNo = 1101
+Trigger3 = StateNo = 1200 ||StateNo = 1201
+Trigger4 = StateNo = 1300 ||StateNo = 1301
+Trigger5 = StateNo = 1500 ||StateNo = 1501
+ID		= 9100
+StateNo		= 9100
+Name		= "9100"
+Pos		= 0,0
+PosType = P1
+IgnoreHitPause = 1
+PauseMoveTime = 999
+SuperMoveTime = 999
+[STATE -2]
+Type = Helper
+Triggerall = NumTarget
+Triggerall = NumHelper(6010) = 0
+Trigger1 = P2StateNo = 6001
+ID = 6010
+StateNo = 6010
+Name = "6010"
+Pos = 0,-30
+PosType = P2
+IgnoreHitPause = 1
+SuperMoveTime = 999
+PauseMoveTime = 999
+[STATE -2]
+Type = Helper
+Triggerall = NumTarget
+Triggerall = NumHelper(6015) = 0
+Trigger1 = Target,StateNo = 6003
+ID = 6015
+StateNo = 6015
+Name = "6015"
+Pos = 0,-30
+PosType = P2
+Facing = 1
+OwnPal = 1
+[STATE -2]
+Type = Helper
+Triggerall = NumTarget
+Triggerall = NumHelper(6020) = 0
+Trigger1 = Target,StateNo = 6004
+ID = 6020
+StateNo = 6020
+Name = "6020"
+Pos = 0,-30
+PosType = P2
+Facing = 1
+OwnPal = 1
+[STATE -2]
+Type = Helper
+Triggerall = NumTarget
+Triggerall = NumHelper(6025) = 0
+Trigger1 = Target,StateNo = 6000
+ID = 6025
+StateNo = 6025
+Name = "6025"
+Pos = 0,-30
+PosType = P2
+Facing = 1
+OwnPal = 1
+SuperMoveTime = 999
+PauseMoveTime = 999
+[STATE -2]
+Type = NotHitBy
+Trigger1 = NumHelper(9100) = 1
+Value = ,NA,NP,NT
+Time		= 1
+IgnoreHitPause = 0
+
+[StateDef -3]
+
+[State 0]
+Type = StopSnd
+Trigger1 = Stateno != [500,501]
+Channel = 5
+
+[State 0, VarSet] ; Grab Untechable Reset
+Type = VarSet
+Triggerall = Var(15)
+Trigger1 = Stateno != [800,851]
+V = 15
+Value = 0
+
+[State 0, Helper de Conexiones]
+type = Helper
+Triggerall = numhelper(700) = 0
+trigger1 = (stateno = [200,890])
+trigger2 = Stateno = [2200,2750]
+triggerall = movecontact
+helpertype = normal 
+name = "Helper de Conexiones"
+ID = 700
+stateno = 700
+pos = 999999,999999
+postype = p1
+ignorehitpause = 1
+[State 0, Run]
+type = PlaySnd
+triggerall = stateno = 60
+trigger1 = time = 1
+value = S40,2
+[State 0]
+Type = RemoveExplod
+Triggerall = NumExplod(215)
+Trigger1 = Stateno = [300,320]
+Trigger2 = Stateno = 220 || (Stateno = [325,330])
+Trigger3 = Stateno = 400
+ID = 215
+
+[State 0, AfterImage]
+type = Helper
+Triggerall = !NumHelper(40000)
+trigger1 = Var(24)
+helpertype = normal
+stateno = 40000
+ID = 40000
+pos = 0,0
+postype = p1
+facing = 1
+ownpal = 1
+Name = "Diable Jambe Glow"
+size.xscale = 1
+size.yscale = 1
+ignorehitpause = 1
+supermovetime = 99999999
+pausemovetime = 99999999
+
+[State 0]
+Type = VarSet
+Trigger1 = !Var(29) && Var(24) != 4
+V = 29
+Value = 2000
+
+[State 0]
+Type = VarSet
+Trigger1 = Var(29) && (Var(24) >= 4 || MoveType = H || !Var(24))
+V = 29
+Value = 0
+
+[State 0]
+Type = VarSet
+Triggerall = Var(24)
+Trigger1 = MoveType = H || Var(24) >= 4  || Stateno = 805 || Stateno = 851 || (Stateno = [170,199])
+V = 24
+Value = 0
+
+[State 0]
+Type = VarSet
+Trigger1 = Var(12) && Stateno = 0
+V = 12
+Value = 0
+
+[State 0]
+Type = VarSet
+Trigger1 = Var(13) && Stateno = 0
+V = 13
+Value = 0
+
+[State 0]
+Type = VarSet
+Trigger1 = Var(14) && Enemy,MoveType != H
+V = 14
+Value = 0
+
+[State 0]
+Type = VarSet
+Trigger1 = Var(18) && Enemy,MoveType != H
+V = 18
+Value = 0
+
+[State 0]
+Type = VarSet
+Trigger1 = Var(19) && Enemy,MoveType != H
+V = 19
+Value = 0
+
+[State 0]
+Type = VarSet
+Trigger1 = Var(25) && Enemy,MoveType != H
+V = 25
+Value = 0
+
+[State 0]
+Type = VarSet
+Trigger1 = Var(26) && (Enemy,MoveType != H || (Enemy,Stateno = [5110,5150]) || NumTarget(336))
+V = 26
+Value = 0
+
+[State 0]
+Type = VarSet
+Trigger1 = Var(28) && (Enemy,MoveType != H || (Enemy,Stateno = [5110,5150]))
+V = 28
+Value = 0
+
+[State 0]
+Type = VarSet
+Trigger1 = Var(14) && !Fvar(24)
+Fv = 24
+Value = 1
+
+[State 0]
+Type = VarSet
+Trigger1 = Var(25) && Fvar(22) < 2
+Fv = 22
+Value = 2
+
+[State 0]
+Type = VarSet
+Trigger1 = Var(23) && Fvar(23) < 2
+Fv = 23
+Value = 1
+
+[State 0]
+Type = VarSet
+Trigger1 = !NumTarget(320) && (Enemy,MoveType != H || (Enemy,Stateno = [5110,5150]))
+V = 23
+Value = 0
+
+[State 0]
+Type = VarSet
+Trigger1 = Var(9) && !Var(16)
+V = 16
+Value = 100000
+
+[State 0]
+Type = VarSet
+Triggerall = Var(33)
+Trigger1 = Var(9) && Var(16) && Var(29) || (P2dist x = [-120,120]) && Var(9) && Var(16)
+V = 16
+Value = 0
+
+[State 0]
+Type = VarSet
+Trigger1 = Var(16) && Var(9) && !Var(10)
+V = 10
+Value = 1
+
+[State 0]
+Type = VarAdd
+Trigger1 = Var(30)
+V = 30
+Value = 1
+
+[State 0]
+Type = VarSet
+Trigger1 = Var(30) >= 600 || NumTarget(1501)
+V = 30
+Value = 0
+
+[State 0, DisplayToClipboard]
+Type = DisplayToClipboard
+Trigger1 = 1
+Text = "%d, %d, %d"
+Params = P2BodyDist x, P2bodydist y, Var(33)
+IgnoreHitPause = 1
+
+[State 0]
+Type = VarSet
+Trigger1 = Enemy,Name = "Nami" || Enemy,Name = "Robin" || Enemy,Name = "Nico Robin" || Enemy,Name = "Vivi" || Enemy,Name = "Nerfertari Vivi" || Enemy,Name = "Eleven" || Enemy,Name = "Roxy" || Enemy,Name = "Roxy Migurdia" || Enemy,Name = "Sakuya" || Enemy,Name = "Nezuko" || Enemy,Name = "Nezuko [Kuro]" || Enemy,Name = "Yi" || Enemy,Name = "Aria" || Enemy,Name = "Aria [Kuro]" || Enemy,Name = "Neferpitou" || Enemy,Name = "Yoruichi" || Enemy,Name = "Kuroko" || Enemy,Name = "Kuroko [Kuro]" || Enemy,Name = "Aigis" || Enemy,Name = "Yang Xiao Long" || Enemy,Name = "Kos-Mos" || Enemy,Name = "KOS-MOS" || Enemy,Name = "KOS-MOS [Kuro]" || Enemy,Name = "Fana"
+Trigger2 = Enemy,Name = "Android 18" || Enemy,Name = "18" || Enemy,Name = "Android 21" || Enemy,Name = "Caulifla" || Enemy,Name = "Kale" || Enemy,Name = "Kefla" || Enemy,Name = "Rias" || Enemy,Name = "Riasu [Kuro/Jt]" || Enemy,Name = "Kuro [Kuro]" || Enemy,Name = "Maki Zenin" || Enemy,Name = "Rider" || Enemy,Name = "Rider [Jt]" || Enemy,Name = "Annie" || Enemy,Name = "Annie [Iso]" || Enemy,Name = "Power [Kuro]" || Enemy,Name = "Mt Lady" || Enemy,Name = "Mt lady" || Enemy,Name = "Hatsune Miku" || Enemy,Name = "Miku" || Enemy,Name = "Rwby" || Enemy,Name = "Ruby" || Enemy,Name = "Ruby Rose" || Enemy,Name = "Miya" || Enemy,Name = "Akiha" || Enemy,Name = "Dorothy"
+Trigger3 = Enemy,Name = "Sakura" || Enemy,Name = "Hinata" || Enemy,Name = "Sarada" || Enemy,Name = "Ino" || Enemy,Name = "Tsunade" || Enemy,Name = "Konan" || Enemy,Name = "Ino" || Enemy,Name = "Kaguya" || Enemy,Name = "Mordred" || Enemy,Name = "Mordred [Jt/Kuro]" || Enemy,Name = "Mordred [Jt]" || Enemy,Name = "Tsunade" || Enemy,Name = "Legendary Tsunade OP" || Enemy,Name = "Legendary Tsunade" || Enemy,Name = "Mitsuri" || Enemy,Name = "Mitsuri [Jt]" || Enemy,Name = "Mitsuri [Kuro]" || Enemy,Name = "Makima" || Enemy,Name = "Makima [Kuro]" || Enemy,Name = "Makima [Jt]" || Enemy,Name = "Amy" || Enemy,Name = "Amy Rose" || Enemy,Name = "Chichi"
+Trigger4 = Enemy,Name = "Rukia" || Enemy,Name = "Yoruichi"  || Enemy,Name = "Matsumoto Rangiku" || Enemy,Name = "Rangiku" || Enemy,Name = "Lenalee" || Enemy,Name = "Lenalee [Kuro]" || Enemy,Name = "Maka" || Enemy,Name = "Maka [Kuro]" || Enemy,Name = "Akame" || Enemy,Name = "Akame [Kuro]" || Enemy,Name = "Akame [Kuro/Raz]" || Enemy,Name = "Akame [Raz/Kuro]" || Enemy,Name = "Rukia" || Enemy,Name = "Rukia [Jt]" || Enemy,Name = "Rukia [Jt V1.5]" || Enemy,Name = "Chica Mosquito" || Enemy,Name = "Chica" || Enemy,Name = "Morrigan" || Enemy,Name = "Ryougi" || Enemy,Name = "Ryougi Shiki" || Enemy,Name = "2B" || Enemy,Name = "Nadya" || Enemy,Name = "Medusa Rider"
+Trigger5 = Enemy,Name = "Kagura" || Enemy,Name = "Mai Shiranui" || Enemy,Name = "Mai" || Enemy,Name = "Kula" || Enemy,Name = "Kula Diamond" || Enemy,Name = "Megumin" || Enemy,Name = "Medaka" || Enemy,Name = "Medaka [Kuro]" || Enemy,Name = "Tohka" || Enemy,Name = "Tohka [Kuro]" || Enemy,Name = "Tohka [Kuro/Jt]" || Enemy,Name = "Tohka [Jt/Kuro]" || Enemy,Name = "Hange" || Enemy,Name = "Hange [Jt]" || Enemy,Name = "Halibel" || Enemy,Name = "Halibel V2 OP" || Enemy,Name = "Mereoleona" || Enemy,Name = "Mereleona" || Enemy,Name = "Mereoleona [Iso]" || Enemy,Name = "Female Sukuna" || Enemy,Name = "Female Gojo" || Enemy,Name = "Nelliel" || Enemy,Name = "Medusa"
+Trigger6 = Enemy,Name = "Karen" || Enemy,Name = "Astolfo"  || Enemy,Name = "Kurumi" || Enemy,Name = "Pitou" || Enemy,Name = "Reve" || Enemy,Name = "WonderWoman" || Enemy,Name = "Wonder Woman" || Enemy,Name = "Woman" || Enemy,Name = "Reve [Kuro]" || Enemy,Name = "Saber" || Enemy,Name = "Saber [Kuro]" || Enemy,Name = "Artoria Pendragon" || Enemy,Name = "Artoria Pendragon [Kuro]" || Enemy,Name = "Saber [Iso/Kuro]" || Enemy,Name = "Artoria Pendragon [Iso/Kuro]"  || Enemy,Name = "Otsutsuki Kaguya" || Enemy,Name = "Arcueid" || Enemy,Name = "Arcueid Brunestud" || Enemy,Name = "Arcueid Brunestud [JXM]" || Enemy,Name = "Orihime TYBW" || Enemy,Name = "Zetta Ashikaga"
+Trigger7 = Enemy,Name = "(ICARUS) Karen Heidden" || Enemy,Name = "Asuka" || Enemy,Name = "Chun Li" || Enemy,Name = "Chun-Li" || Enemy,Name = "Chun-Li [Kuro]" || Enemy,Name = "Mikasa" || Enemy,Name = "Misaka" || Enemy,Name = "Misaka [Kuro]" || Enemy,Name = "Noelle" || Enemy,Name = "Noelle [Jt]" || Enemy,Name = "Noelle [Jt/Iso]" || Enemy,Name = "Maki" || Enemy,Name = "Mai" || Enemy,Name = "Merlin" || Enemy,Name = "Power" || Enemy,Name = "Tatsumaki" || Enemy,Name = "Tatsumaki [Kuro]" || Enemy,Name = "Castrophe Queen Tatsumaki" || Enemy,Name = "Catastrophe Queen Tatsumaki [Kuro]" || Enemy,Name = "Mizukage" || Enemy,Name = "Toru Hagakune" || Enemy,Name = "Black Rock"
+Trigger8 = Enemy,Name = "PinkiePie" || Enemy,Name = "Pinkie Pie" || Enemy,Name = "Pinkie Pie [Kuro]" || Enemy,Name = "PinkiePie [Kuro]" || Enemy,Name = "Barbie" || Enemy,Name = "Barbie [Kuro]" || Enemy,Name = "Ivy" || Enemy,Name = "Ivy Valentine" || Enemy,Name = "Soma Cruz" || Enemy,Name = "Soma" || Enemy,Name = "Draco" || Enemy,Name = "Draco EX" || Enemy,Name = "Reisen Inaba" || Enemy,Name = "Reisen" || Enemy,Name = "Felicia" || Enemy,Name = "Raven" || Enemy,Name = "Raven [Kuro]" || Enemy,Name = "Nero Saber" || Enemy,Name = "Reimu" || Enemy,Name = "Reimu Hakarei" || Enemy,Name = "Toriel" || Enemy,Name = "Orihime" || Enemy,Name = "Kirio Hikifune"
+Trigger9 = Enemy,Name = "Fairy Leviathan" || Enemy,Name = "Noel" || Enemy,Name = "Noel Vermillion" || Enemy,Name = "Orie" || Enemy,Name = "Orie Ballardiae" || Enemy,Name = "Mitsuru Kirijo" || Enemy,Name = "Mitsuru" || Enemy,Name = "Labrys" || Enemy,Name = "Misaka Mikoto" || Enemy,Name = "Berserker Winter" || Enemy,Name = "BerserkerWinter" || Enemy,Name = "Blossom" || Enemy,Name = "Bubbles" || Enemy,Name = "Buttercup" || Enemy,Name = "Aubrey" || Enemy,Name = "Iris" || Enemy,Name = "Bloom" || Enemy,Name = "Blaze" || Enemy,Name = "Lara Croft" || Enemy,Name = "Lara" || Enemy,Name = "BB" || Enemy,Name = "Mash Kyrielight" || Enemy,Name = "Kirio" || Enemy,Name = "Zetta"
+Trigger10 = Enemy,Name = "Ladybug" || Enemy,Name = "Peach" || Enemy,Name = "Princess" || Enemy,Name = "Princess Peach" || Enemy,Name = "Poniko" || Enemy,Name = "Mysterious Heroine X" || Enemy,Name = "Rouge" || Enemy,Name = "Yuri" || Enemy,Name = "Yuri Sakazaki" || Enemy,Name = "Yukki" || Enemy,Name = "Yukki Konno" || Enemy,Name = "Asuna" || Enemy,Name = "Presea" || Enemy,Name = "Mirko" || Enemy,Name = "Shinobu" || Enemy,Name = "Shinobu Kocho" || Enemy,Name = "Frieren" || Enemy,Name = "Fubuki" || Enemy,Name = "KoyunTheMad" || Enemy,Name = "Koyun" || Enemy,Name = "Nero Claudius" || Enemy,Name = "Mash" || Enemy,Name = "Chloe Von Einzbern" || Enemy,Name = "Juri-Han"
+Trigger11 = Enemy,Name = "Nobara" || Enemy,Name = "Nobara Modulo" || Enemy,Name = "Purple Heart" || Enemy,Name = "Eto" || Enemy,Name = "Yoshimura Eto" || Enemy,Name = "Eto Yoshimura" || Enemy,Name = "Kanao" || Enemy,Name = "Makomo" || Enemy,Name = "Rin Tohsaka" || Enemy,Name = "Tohsaka" || Enemy,Name = "Tohsaka Rin" || Enemy,Name = "Videl" || Enemy,Name = "Temari" || Enemy,Name = "Neco Arc" || Enemy,Name = "Neko" || Enemy,Name = "Ciel" || Enemy,Name = "Red Arcueid" || Enemy,Name = "Kohaku" || Enemy,Name = "Aoko" || Enemy,Name = "Hisui" || Enemy,Name = "Dead Apostle Noel" || Enemy,Name = "Miyako" || Enemy,Name = "Candice" || Enemy,Name = "Juri"
+Trigger12 = Enemy,Name = "Ushiwakamaru" || Enemy,Name = "Ushiwakamaru [Kuro]" || Enemy,Name = "Ushiwakamaru [Jt/Kuro]" || Enemy,Name = "Neco-Arc" || Enemy,Name = "Fully-Powered Ciel" || Enemy,Name = "Milim" || Enemy,Name = "Milim Nava" || Enemy,Name = "Giselle" || Enemy,Name = "Homura" || Enemy,Name = "Homura [Kuro]" || Enemy,Name = "Monet" || Enemy,Name = "Tiamat" || Enemy,Name = "Shizu" || Enemy,Name = "Valkyrie" || Enemy,Name = "Yuki" || Enemy,Name = "Yuki Tsukumo" || Enemy,Name = "Monika" || Enemy,Name = "Dark Monika" || Enemy,Name = "Tharja" || Enemy,Name = "Lenneth" || Enemy,Name = "Lenneth Valkyrie" || Enemy,Name = "Candice Catnipp"
+Trigger13 = Enemy,Name = "Pieck" || Enemy,Name = "Delta" || Enemy,Name = "Delta [Kuro]" || Enemy,Name = "Melascula" || Enemy,Name = "Beta" || Enemy,Name = "Beta [Kuro]" || Enemy,Name = "Alpha" || Enemy,Name = "Alpha [Kuro]" || Enemy,Name = "Takako" || Enemy,Name = "Takako Uro" || Enemy,Name = "Jolyne" || Enemy,Name = "Albedo" || Enemy,Name = "Altair" || Enemy,Name = "Tanya" || Enemy,Name = "Beatrice" || Enemy,Name = "Ram" || Enemy,Name = "Rem" || Enemy,Name = "Emilia" || Enemy,Name = "Leafa" || Enemy,Name = "Konno Yukki" || Enemy,Name = "Emi Yusa" || Enemy,Name = "Emi Yusa Final Form" || Enemy,Name = "Alice" || Enemy,Name = "Alice Zubero"
+Trigger14 = Enemy,Name = "Eris Boreas Greyrat" || Enemy,Name = "Eris" || Enemy,Name = "Eris Boreas" || Enemy,Name = "Roxy Migurdia" || Enemy,Name = "Sylphiette" || Enemy,Name = "Raphtalia" || Enemy,Name = "Fitoria" || Enemy,Name = "Nobara Shinjuku" || Enemy,Name = "Yachiro" || Enemy,Name = "Yachiro Unohana" || Enemy,Name = "Unohana" || Enemy,Name = "21" || Enemy,Name = "Android 21" || Enemy,Name = "A21 Labcoat" || Enemy,Name = "Android 21 Labcoat" || Enemy,Name = "Rukia Kuchiki" || Enemy,Name = "Yumi" || Enemy,Name = "Jewelry Bonney V2" || Enemy,Name = "Bonney" || Enemy,Name = "Neptune" || Enemy,Name = "Sailor Moon" || Enemy,Name = "Kyuubei"
+Trigger15 = Enemy,Name = "Momo" || Enemy,Name = "Momo Nishimiya" || Enemy,Name = "Gojo Girl Waifu" || Enemy,Name = "Miwa" || Enemy,Name = "Touka" || Enemy,Name = "Touka Rabbit" || Enemy,Name = "Mai Zenin" || Enemy,Name = "Abigail" || Enemy,Name = "Yamato" || Enemy,Name = "Tohru Alter" || Enemy,Name = "Tohru" || Enemy,Name = "Yuuki" || Enemy,Name = "Sukuna Girl" || Enemy,Name = "Shoko" || Enemy,Name = "Shana" || Enemy,Name = "Erza" || Enemy,Name = "Erza [Kuro]" || Enemy,Name = "Shiba Miyuki" || Enemy,Name = "Bomb Devil" || Enemy,Name = "Susamaru" || Enemy,Name = "Susamaru [Kuro]" || Enemy,Name = "Nakime" || Enemy,Name = "Morgiana"
+Trigger16 = Enemy,Name = "Irene Belersion" || Enemy,Name = "Bulma" || Enemy,Name = "Athena" || Enemy,Name = "Mei-Fang" || Enemy,Name = "Tohka Yatogami" || Enemy,Name = "Tanya von Degurechaff" || Enemy,Name = "Ryuko Matoi" || Enemy,Name = "Ryuko" || Enemy,Name = "Perona" || Enemy,Name = "Tashigi" || Enemy,Name = "Miss Doublefinger" || Enemy,Name = "Kalifa"
+V = 9
+Value = 1
+
+[State 0]
+Type = RemoveExplod
+Trigger1 = Stateno != 335 && NumExplod(335)
+ID = 335
+[State 0]
+Type = RemoveExplod
+Trigger1 = Pos Y >= 0 && NumExplod(225)
+ID = 225
+[State 0]
+Type = RemoveExplod
+Trigger1 = Pos Y >= 0 && NumExplod(405)
+ID = 405
+
+[State 0, VarRangeSet]
+type = VarRangeSet
+Triggerall = !Var(19)
+triggerall = !Var(24)
+Triggerall = Stateno != [100,101]
+trigger1 = stateno = 0
+trigger2 = stateno != [200,699] 
+Fvalue = 0
+first = 20
+last = 35
+
+[State 0]
+Type = VarSet
+Trigger1 = Enemy,NumTarget(800) && Fvar(23) != 1
+Fv = 23
+Value = 1
+
+[State 240]
+type = ChangeState
+triggerall = Fvar(30) = 0
+Triggerall = Cond(!Var(33) && Var(9),0,1)
+triggerall = !Var(24)
+triggerall = power >= 250
+triggerall = ailevel = 0 && command = "a" && command = "b"
+triggerall = movecontact
+triggerall = statetype != A
+trigger1 = (stateno=[200,250]) && Stateno != 215 || Stateno = 215 && AnimElemTime(6) >= 1 
+trigger2 = (stateno=[300,350]) && Stateno != 320 && Stateno != 330
+trigger3 = (stateno=[400,410]) || (stateno=[420,430]) && animelemtime(6) >= 0 || (stateno=[440,460]) 
+value = 400
+
+[State 350]
+type = ChangeState
+triggerall = Fvar(31) = 0
+triggerall = power >= 250
+triggerall = ailevel = 0 && command = "b" && command = "c"
+triggerall = !Var(24)
+triggerall = movecontact
+triggerall = statetype != A
+Triggerall = Cond(!Var(33) && Var(9),0,1)
+trigger1 = (stateno=[200,250]) && Stateno != 215 || Stateno = 215 && AnimElemTime(6) >= 1 
+trigger2 = (stateno=[300,350]) && Stateno != 330 && Stateno != 320 || Stateno = 320 && AnimElemTime(14) >= 0
+trigger3 = (stateno=[400,410]) || (stateno=[420,430]) && animelemtime(6) >= 0 || (stateno=[440,460]) 
+value = 450
+ignorehitpause = 1
+
+[State 620]
+type = ChangeState
+triggerall = Fvar(33) = 0
+triggerall = !Var(24)
+triggerall = ailevel = 0 && command = "holddown" && command = "b" 
+triggerall = statetype = A
+Triggerall = Cond(!Var(33) && Var(9),0,1)
+triggerall = movecontact
+trigger1 = (stateno=[225,235]) || Stateno = 405 || Stateno = 335
+value = 230
+
+[State 240]
+type = ChangeState
+triggerall = Fvar(23) < 2
+triggerall = ailevel = 0 && command = "holddown" && command = "a" 
+triggerall = statetype != A
+triggerall = movecontact && Stateno != 320
+trigger1 = (stateno=[200,250]) && Stateno != 215 && Stateno != 210 || Stateno = 215 && AnimElemTime(6) >= 1 || Stateno = 210 && AnimElemTime(3) >= 2
+trigger2 = (stateno=[300,370]) && Stateno != 330
+Triggerall = Cond(!Var(33) && Var(9),0,1)
+triggerall = !Var(24)
+trigger3 = (stateno=[400,410])
+value = Cond(Fvar(23),215,210)
+
+[State 340]
+type = ChangeState
+triggerall = !Fvar(24)
+triggerall = ailevel = 0 && command = "holddown" && command = "b" 
+triggerall = statetype != A
+Triggerall = Cond(!Var(33) && Var(9),0,1)
+triggerall = !Var(24)
+triggerall = movecontact && Stateno != 320
+trigger1 = (stateno=[200,250]) 
+trigger2 = (stateno=[300,370]) && Stateno != 330
+trigger3 = (stateno=[400,410])
+value = 220
+
+[State 440]
+type = ChangeState
+triggerall = Fvar(25) < 2
+triggerall = ailevel = 0 && command = "holddown" && command = "c" 
+triggerall = !Var(24)
+triggerall = statetype != A
+triggerall = movecontact
+trigger1 = (stateno=[200,250])
+Triggerall = Cond(!Var(33) && Var(9),0,1)
+trigger2 = (stateno=[300,370]) && Stateno != 320 && Stateno != 330
+trigger3 = (stateno=[400,410]) || (stateno=[420,430]) && animelemtime(7) >= 0 || (stateno=[440,460]) 
+value = cond(Fvar(25) < 1,325,cond(Fvar(25)<2,330,320))
+
+[State 200]
+type = ChangeState
+triggerall = Fvar(20) < 3
+triggerall = ailevel = 0 && command = "a"
+triggerall = !Var(24)
+triggerall = statetype != A
+triggerall = movecontact
+trigger1 = (stateno=[200,250]) && Stateno != 215 && Stateno != 210 || Stateno = 215 && AnimElemTime(6) >= 1 || Stateno = 210 && AnimElemTime(3) >= 2 
+Triggerall = Cond(!Var(33) && Var(9),0,1)
+trigger2 = (stateno=[300,370]) && Stateno != 320 && Stateno != 330
+trigger3 = (stateno=[400,410]) 
+value = cond(Fvar(20) < 1,200,cond(Fvar(20)<2,315,cond(Fvar(20)<3,205,200)))
+
+[State 300]
+type = ChangeState
+triggerall = Fvar(21) < 4
+triggerall = ailevel = 0 && command = "b"
+triggerall = !Var(24)
+triggerall = statetype != A
+triggerall = movecontact
+trigger1 = (stateno=[200,250])
+Triggerall = Cond(!Var(33) && Var(9),0,1)
+trigger2 = (stateno=[300,370]) && Stateno != 320 && Stateno != 330
+trigger3 = (stateno=[400,410])
+value = cond(Fvar(21) < 1,300,cond(Fvar(21)<2,305,cond(Fvar(21)<3,310,cond(Fvar(21)<4,320,300))))
+
+[State 400]
+type = ChangeState
+triggerall = Fvar(22) < 3
+triggerall = ailevel = 0 && command = "c"
+triggerall = !Var(24)
+triggerall = statetype != A
+triggerall = movecontact
+trigger1 = (stateno=[200,250]) && Stateno != 215 || Stateno = 215 && AnimElemTime(6) >= 1 
+Triggerall = Cond(!Var(33) && Var(9),0,1)
+trigger2 = (stateno=[300,370]) && Stateno != 320 && Stateno != 330
+trigger3 = (stateno=[400,410]) || (stateno=[420,430]) && animelemtime(6) >= 0 || (stateno=[440,460]) 
+value = cond(Fvar(22) < 1,350,cond(Fvar(22)<2,360,cond(Fvar(22)<3,370,350)))
+
+[State 400]
+type = ChangeState
+triggerall = !Fvar(34)
+triggerall = ailevel = 0 && command = "y"
+triggerall = movecontact
+Triggerall = Cond(!Var(33) && Var(9),0,1)
+trigger1 = (stateno=[200,250]) && Stateno != 215 || Stateno = 215 && AnimElemTime(6) >= 1 
+trigger2 = (stateno=[300,370]) && Stateno != 320 && Stateno != 330
+trigger3 = (stateno=[400,410]) || (stateno=[420,430]) && animelemtime(6) >= 0 || (stateno=[440,460]) 
+trigger4 = (stateno=[225,235]) || Stateno = 405 || Stateno = 335
+value = Cond(Pos Y < 0,830,801)
+
+[State 600]
+type = ChangeState
+triggerall = Fvar(26) < 2
+Triggerall = Cond(!Var(33) && Var(9),0,1)
+triggerall = !Var(24)
+triggerall = ailevel = 0 && command = "a" 
+triggerall = statetype = A
+triggerall = movecontact
+trigger1 = (stateno=[225,235]) || Stateno = 405 || Stateno = 335
+value = cond(Fvar(26) < 1,225,cond(Fvar(26)<2,235,225))
+
+[State 610]
+type = ChangeState
+Triggerall = Cond(!Var(33) && Var(9),0,1)
+triggerall = !Fvar(27)
+triggerall = !Var(24)
+triggerall = ailevel = 0 && command = "b" 
+triggerall = statetype = A 
+triggerall = movecontact
+trigger1 = (stateno=[225,235]) || Stateno = 405 || Stateno = 335
+value = 405
+
+[State 630]
+type = ChangeState
+Triggerall = Cond(!Var(33) && Var(9),0,1)
+triggerall = !Fvar(28)
+triggerall = !Var(24)
+triggerall = ailevel = 0 && command = "c" 
+triggerall = statetype = A 
+triggerall = movehit
+trigger1 = (stateno=[225,235]) || Stateno = 405 || Stateno = 335
+value = 335
+
+[STATE -3]
+Type = RemapPal
+Trigger1 = 1
+Source = 1,1
+Dest = 1,Var(55)
+
+[State -3]
+Type = VarSet
+Trigger1 = 1
+V = 20
+Value = ((Life - LifeMax) + (Enemy,LifeMax))
+[STATE -3]
+Type = VarSet
+Trigger1 = Var(55) = [0,5]
+Value = 4
+V = 64
+[STATE -3]
+Type = VarSet
+Trigger1 = Var(55) = 6
+Value = 5
+V = 64
+[STATE -3]
+Type = VarSet
+Trigger1 = Var(55) = 7
+Value = 6
+V = 64
+[STATE -3]
+Type = VarSet
+Trigger1 = Var(55) = [0,5]
+Value = 5
+V = 65
+[STATE -3]
+Type = VarSet
+Trigger1 = Var(55) = 6
+Value = 4
+V = 65
+[STATE -3]
+Type = VarSet
+Trigger1 = Var(55) = 7
+Value = 7
+V = 65
+[STATE -3]
+Type = VarSet
+Trigger1 = Ctrl
+V = 21
+Value = 0
+[STATE -3]
+Type = StopSnd
+Trigger1 = StateNo != [190,193]
+Channel = 1
+IgnoreHitPause	= 1
+[STATE -3]
+Type = StopSnd
+Trigger1 = StateNo != [190,193]
+Channel = 2
+IgnoreHitPause	= 1
+[STATE -3]
+Type = StopSnd
+Trigger1 = Anim != 405
+Channel = 3
+IgnoreHitPause	= 1
+[STATE -3]
+Type = StopSnd
+Trigger1 = Anim != 405
+Channel = 4
+IgnoreHitPause	= 1
+[STATE -3]
+Type = StopSnd
+Trigger1 = StateNo != 1400
+Trigger1 = StateNo != 1500
+Channel = 5
+IgnoreHitPause	= 1
+[STATE 0]
+Type = StopSnd
+Trigger1 = Anim = 1501
+Channel = 6
+IgnoreHitPause	= 1
+[STATE 0]
+Type = StopSnd
+Trigger1 = Anim = 1501
+Channel = 7
+IgnoreHitPause	= 1
+[STATE -3]
+Type = PlaySnd
+Trigger1 = MoveType = H && (StateNo != [0,155]) && !Time && HitOver = 0 && (Random % 5) = 0
+Value = 5000,0 + (Random % 4)
+VolumeScale	= 100
+[State 0]
+Type = RemoveExplod
+Triggerall = NumExplod(200)
+Trigger1 = Stateno = [1000,3999]
+ID = 200
+IgnoreHitPause = 1
+[State 0]
+Type = RemoveExplod
+Triggerall = NumExplod(215)
+Trigger1 = Stateno = [1000,3999]
+ID = 215
+IgnoreHitPause = 1
+[State 0]
+Type = RemoveExplod
+Triggerall = NumExplod(205)
+Trigger1 = Stateno = [1000,3999]
+ID = 205
+IgnoreHitPause = 1
+[State 0]
+Type = RemoveExplod
+Triggerall = NumExplod(300)
+Trigger1 = Stateno = [1000,3999]
+ID = 300
+IgnoreHitPause = 1
+[State 0]
+Type = RemoveExplod
+Triggerall = NumExplod(305)
+Trigger1 = Stateno = [1000,3999]
+ID = 305
+IgnoreHitPause = 1
+[State 0]
+Type = RemoveExplod
+Triggerall = NumExplod(310)
+Trigger1 = Stateno = [1000,3999]
+ID = 310
+IgnoreHitPause = 1
+[State 0]
+Type = RemoveExplod
+Triggerall = NumExplod(320)
+Trigger1 = Stateno = [1000,3999]
+ID = 320
+IgnoreHitPause = 1
+[State 0]
+Type = RemoveExplod
+Triggerall = NumExplod(220)
+Trigger1 = Stateno = [1000,3999]
+ID = 220
+IgnoreHitPause = 1
+[State 0]
+Type = RemoveExplod
+Triggerall = NumExplod(315)
+Trigger1 = Stateno = [1000,3999]
+ID = 315
+IgnoreHitPause = 1
+[State 0]
+Type = RemoveExplod
+Triggerall = NumExplod(325)
+Trigger1 = Stateno = [1000,3999]
+ID = 325
+IgnoreHitPause = 1
+[State 0]
+Type = RemoveExplod
+Triggerall = NumExplod(330)
+Trigger1 = Stateno = [1000,3999]
+ID = 330
+IgnoreHitPause = 1
+[State 0]
+Type = RemoveExplod
+Triggerall = NumExplod(350)
+Trigger1 = Stateno = [1000,3999]
+ID = 350
+IgnoreHitPause = 1
+[State 0]
+Type = RemoveExplod
+Triggerall = NumExplod(360)
+Trigger1 = Stateno = [1000,3999]
+ID = 360
+IgnoreHitPause = 1
+[State 0]
+Type = RemoveExplod
+Triggerall = NumExplod(370)
+Trigger1 = Stateno = [1000,3999]
+ID = 370
+IgnoreHitPause = 1
+[State 0]
+Type = RemoveExplod
+Triggerall = NumExplod(225)
+Trigger1 = Stateno = [1000,3999]
+ID = 225
+IgnoreHitPause = 1
+[State 0]
+Type = RemoveExplod
+Triggerall = NumExplod(235)
+Trigger1 = Stateno = [1000,3999]
+ID = 235
+IgnoreHitPause = 1
+[State 0]
+Type = RemoveExplod
+Triggerall = NumExplod(405)
+Trigger1 = Stateno = [1000,3999]
+ID = 405
+IgnoreHitPause = 1
+[State 0]
+Type = RemoveExplod
+Triggerall = NumExplod(335)
+Trigger1 = Stateno = [1000,3999]
+ID = 335
+IgnoreHitPause = 1
+[State 0]
+Type = RemoveExplod
+Triggerall = NumExplod(230)
+Trigger1 = Stateno = [1000,3999]
+ID = 230
+IgnoreHitPause = 1
