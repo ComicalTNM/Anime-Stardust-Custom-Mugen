@@ -8,6 +8,18 @@ type = S
 physics = S
 sprpriority = 0
 
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = PREVSTATENO = 4014
+flag = NoBarDisplay
+flag2 = NoBG
+flag3 = NoFG
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = PREVSTATENO = 4014
+flag = GlobalNoShadow
+flag2 = NoMusic
+
 [State 0, PalFX]
 type = PalFX
 trigger1 = 1
@@ -17,10 +29,9 @@ color = 256
 
 [State 0, 1]
 type = ChangeAnim
-trigger1 = Anim != 0 &&Anim != 1 && Anim != 5 && anim != 2||((Var(56)=10 && anim!=1)||(Var(56)=9 && anim!=2))
+trigger1 = Anim != 0 && Anim != 5&& Anim != 4010
 trigger2 = Anim = 5 && AnimTime = 0 ;Turn anim over
-value = Cond(Var(56)=10,1,Cond(Var(56)=9,2,0))
-
+value = 0
 [State 0, 2]
 type = VelSet
 trigger1 = Time = 0
@@ -35,13 +46,6 @@ type = VelSet
 trigger1 = abs(vel x) < Const(movement.stand.friction.threshold)
 trigger2 = Time = 4
 x = 0
-
-[State 0, A]
-type = ChangeState
-triggerall = numhelper(6500)
-triggerall = ailevel > 0 && roundstate = 2
-trigger1 = ((helper(6500),movehit)||(helper(6500),numexplod(10)))&&(prevstateno = 1205||prevstateno = 1105)
-value = Cond(Var(15)=0,1500,40)
 
 [State 0, 4] ;Are you dead?
 type = ChangeState
@@ -105,9 +109,23 @@ type    = S
 physics = S
 sprpriority = 0
 
+[State 0, PlaySnd]
+type = PlaySnd
+triggerall = anim = 20
+trigger1 = animelem = 2 || animelem = 6
+value = S52,1
+volumescale = 40
+[State 0, PlaySnd]
+type = PlaySnd
+triggerall = anim = 21
+trigger1 = animelem = 5 || animelem = 7
+value = S52,1
+volumescale = 40
+
 [State 20, 1]
 type = VelSet
 trigger1 = command = "holdfwd"
+trigger2 = ailevel 
 x = const(velocity.walk.fwd.x)
 
 [State 20, 2]
@@ -121,12 +139,7 @@ triggerall = vel x > 0
 trigger1 = Anim != 20 && Anim != 5
 trigger2 = Anim = 5 && AnimTime = 0
 value = 20
-[State 0, A]
-type = ChangeState
-triggerall = numhelper(6500)
-triggerall = ailevel > 0 && roundstate = 2
-trigger1 = (helper(6500),movehit)||(helper(6500),numexplod(10))
-value = Cond(Var(15)=0,1500,40)
+
 [State 20, 4]
 type = ChangeAnim
 triggerall = vel x < 0
@@ -154,13 +167,20 @@ id = 005
 
 [State 40, 2]
 type = VarSet
+triggerall = numtarget 
+trigger1 = (target,stateno = [5000,5300])&&ailevel
+sysvar(1) = 1
+
+[State 40, 2]
+type = VarSet
 trigger1 = command = "holdfwd"
-trigger2 = ailevel > 0
+trigger2 = ailevel > 0 && enemynear,movetype != A&& numtarget = 0 && p2bodydist x > 60
 sysvar(1) = 1
 
 [State 40, 3]
 type = VarSet
-trigger1 = command = "holdback" && ailevel = 0
+trigger1 = command = "holdback"&& ailevel = 0
+trigger2 = ailevel && enemynear,movetype = A 
 sysvar(1) = -1
 
 [State 0, Speed FX]
@@ -188,14 +208,11 @@ trigger1 = prevstateno = 60
 trigger1 = sysvar(1) = 1
 x = const(velocity.runjump.fwd.x)
 
-
 [State 0, SelfState]
 type = SelfState
-triggerall = enemy,statetype != A||enemy,pos y = 0
-trigger1 = ailevel > 0
-value = 0 
-ctrl = 1
-
+trigger1 = ailevel > 6 && enemy,pos y >= -10&&prevstateno != 300
+value =0 
+ctrl =1
 [State 40, 6]
 type = ChangeState
 trigger1 = AnimTime = 0
@@ -231,18 +248,18 @@ sysvar(1) = 1
 
 [State 45, 5]
 type = VarSet
-trigger1 = command = "holdback"&&ailevel = 0
+trigger1 = command = "holdback"
 sysvar(1) = -1
 
 [State 45, 6]
 type = VelSet
 trigger1 = Time = 2
 x = cond(sysvar(1)=0, const(velocity.airjump.neu.x), cond(sysvar(1)=1,const(velocity.airjump.fwd.x), const(velocity.airjump.back.x)))
-y =const(velocity.airjump.y)
+y =Cond(prevstateno = 610,-6,const(velocity.airjump.y))
 [State 0, Speed FX]
 type = Explod
 trigger1 = time = 1
-anim = 49
+anim = 51
 ID = 42
 postype = p1
 facing = 1
@@ -281,7 +298,7 @@ physics = A
 type = VarSet
 trigger1 = Time = 0
 sysvar(1) = 0
-value = 1701
+
 [State 50, 2]
 type = ChangeAnim
 trigger1 = Time = 0
@@ -307,7 +324,7 @@ trigger1 = 1
 type    = S
 physics = S
 ctrl = 0
-anim = Cond(prevstateno = 1500||prevstateno = 1501,48,Cond(numexplod(620),48,47))
+anim = 47
 
 [State 0, RemoveExplod]
 type = RemoveExplod
@@ -329,7 +346,7 @@ y = 0
 
 [State 0, AssertSpecial]
 type = AssertSpecial
-trigger1 = (prevstateno != [5200,5210])&& time < 4
+trigger1 = (prevstateno != [5200,5210])&& time < 2
 flag = nostandguard
 flag2 = nocrouchguard
 flag3 = noairguard
@@ -337,7 +354,7 @@ flag3 = noairguard
 
 [State 0, CtrlSet]
 type = CtrlSet
-trigger1 =  time = 4
+trigger1 =  time = 2
 value = 1
 
 [State 52, 2]
@@ -354,7 +371,7 @@ ctrl = 1
 ; Run:
 ;-------------------------------------------------------------------------------
 [Statedef 60]
-type    = A
+type    = S
 movetype= I
 physics = N
 juggle  = 1
@@ -418,7 +435,7 @@ Angle = 90
 
 [State 0, Explod]
 type = Explod
-trigger1 = !time
+trigger1 = time=6
 anim = 7022
 ID = 1051
 pos = 0,0
@@ -436,7 +453,7 @@ pausemovetime = 999
 
 [State 0, Explod]
 type = Explod
-trigger1 = timemod = 4,0 && time > 5 && pos y = 0
+trigger1 = timemod = 4,0 && time > 8 && pos y = 0
 anim = 7022
 ID = 1051
 pos = 0,0
@@ -454,92 +471,98 @@ pausemovetime = 999
 
 [State 0, VelSet]
 type = VelSet
-trigger1 = time > 2
+trigger1 = time > 6
 x = 12
 
 [State 0, VelSet]
 type = PosSet
-trigger1 = time > 2
+trigger1 = time > 6
 trigger1 = pos y >= 0
 y = 0
 
 [State 200, JUMP]
 type = ChangeState
 triggerall = pos y >= 0
-triggerall = time > 2
-trigger1 = command = "up"||command = "holdup"
-trigger2 = enemy, pos y < -30&&ailevel
+triggerall = time >6
+trigger1 = command = "up"
 value = 40
 
 [State 200, LAND]
 type = ChangeState
 triggerall = time > 2
-trigger1 = pos y > 0
+trigger1 = pos y > 6
 value = 12
 [State 200, End]
 type = ChangeState
-triggerall = time > 2
+triggerall = time > 6
 triggerall = ailevel = 0 
-trigger1 = ailevel = 0 && command = "a" && command = "holddown"
+trigger1 = ailevel = 0 && command = "a" && command = "holddownfwd"
 value = 230
 ; A
 [State -1, A]
 type = ChangeState
 value = 200
 triggerall = ailevel = 0
-triggerall = time > 2
+triggerall = time > 6
 triggerall = ailevel = 0
 trigger1 = command = "a"
+
 [State 200, End]
 type = ChangeState
-triggerall = time > 2
-triggerall = ailevel = 0 
-trigger1 = ailevel = 0 && command = "b" && command = "holddown"
-value = 310
-[State 200, End]
-type = ChangeState
-triggerall = time > 2
+triggerall = time > 6
 triggerall = ailevel = 0 
 trigger1 = ailevel = 0 && command = "b" && command = "holddownfwd"
-value = 311
+value = 310
 ; B
 [State -1, B]
 type = ChangeState
 value = 300
-triggerall = time > 2
+triggerall = time > 6
 triggerall = ailevel = 0
 trigger1 = command = "b"
-
-; B
-[State -1, B]
-type = ChangeState
-value = 360
-triggerall = time > 2
-triggerall = ailevel = 0
-trigger1 = command = "c"
 
 
 ; C
 [State -1, C]
 type = ChangeState
-value = 400
-triggerall = time > 2
+value = 350
+triggerall = time > 6
 triggerall = ailevel = 0
-triggerall = power >= 200
+trigger1 = command = "c"&&command = "holddown"
+
+[State -1, C]
+type = ChangeState
+value = 360
+triggerall = time > 6
+triggerall = ailevel = 0
+trigger1 = command = "c"
+[State -1, C]
+type = ChangeState
+value = 450
+triggerall = time > 6
+triggerall = ailevel = 0
+trigger1 = command = "x"&& command = "holddown"
+[State -1, C]
+type = ChangeState
+value = 400
+triggerall = time > 6
+triggerall = ailevel = 0
 trigger1 = command = "x"
 [State 200, End]
 type = ChangeState
 triggerall = time > 10
 trigger1 = ailevel = 0 && command != "holdfwd"
-trigger2 = ailevel > 0 && time = 100+random%200
+trigger2 = ailevel > 0 && time = 60+random%200
 trigger3 = ailevel > 0 && p2bodydist x < 50
+trigger4 = ailevel > 0 && PlayerIDExist(helper(1690),var(3))
+trigger4 = PlayerID(helper(1690),var(3)), p2bodydist x < 90
 value = cond(pos y < 0,50,12)
 ctrl = 1
 ;===============================================================================
 ; Backdash:
 ;-------------------------------------------------------------------------------
 [Statedef 70]
-type    = A
+type    = S
 movetype= I
 physics = N
 juggle  = 1
@@ -687,7 +710,7 @@ physics = A
 [State 0, ChangeState]
 type = ChangeState
 triggerall = time > 2
-trigger1 = command = "fwd"
+trigger1 = command = "fwd"&&ailevel=0
 value = 100
 ctrl = 0
 
@@ -966,7 +989,7 @@ ignorehitpause = 1
 
 [State 0, CtrlSet]
 type = CtrlSet
-trigger1 = time >= 5
+trigger1 = time >= 6
 value = 1
 
 [State 200, End]
@@ -1037,7 +1060,7 @@ ownpal = 1
 removeongethit = 1
 ignorehitpause = 1
 Trans = Sub
-Angle = 65
+Angle = 75
 [State 0, Speed FX]
 type = Explod
 trigger1 = time = 6
@@ -1056,7 +1079,7 @@ ownpal = 1
 removeongethit = 1
 ignorehitpause = 1
 Trans = add
-Angle = 70
+Angle = 80
 
 [State 0, Explod]
 type = Explod
@@ -1140,15 +1163,15 @@ physics = A
 
 [State 120, Hi to Lo]
 type = StateTypeSet
-trigger1 = statetype = S && command != "holddown"&&ailevel=0
-trigger2 =  statetype = S&&ailevel&&EnemyNear(0),statetype != A 
+trigger1 = statetype = S && command = "holddown"&&ailevel = 0
+trigger2 = Ailevel && enemy,statetype != A
 statetype = C
 physics = C
 
 [State 120, Lo to Hi]
 type = StateTypeSet
-trigger1 = statetype = C && command != "holddown"&&ailevel=0
-trigger2 =  statetype = C&&ailevel&&EnemyNear(0),statetype = A 
+trigger1 = statetype = C && command != "holddown"&&ailevel = 0
+trigger2 = Ailevel && enemy,statetype = A
 statetype = S
 physics = S
 
@@ -1176,19 +1199,12 @@ value = 130
 [State 130, Hi to Lo]
 type = ChangeState
 trigger1 = command = "holddown"&&ailevel = 0
-trigger2 =  statetype = S&&ailevel&&EnemyNear(0),statetype != A 
+trigger2 =  ailevel&&EnemyNear(0),statetype = C
 value = 131
-
-[State -1, Vanish]
-type = ChangeState
-Triggerall = power >= 1000
-value = 1780
-trigger1 = command = "holdfwd"&&command="hold_z"&& ailevel = 0
-trigger2 = ailevel && random%48=ailevel&& time = 4
 
 [State 130, Stop Guarding]
 type = ChangeState
-trigger1 = (command != "holdback"||!inguarddist)&&ailevel = 0
+trigger1 = (command != "holdback"&&ailevel = 0)||!inguarddist
 trigger2 = !inguarddist
 value = 140
 ;---------------------------------------------------------------------------
@@ -1205,9 +1221,9 @@ value = 131
 [State 131, Lo to Hi]
 type = ChangeState
 trigger1 = command != "holddown"&&ailevel = 0
-trigger2 = statetype = S &&ailevel
-trigger2 =  statetype = C&&ailevel&&EnemyNear(0),statetype = A 
+trigger2 =  ailevel&&EnemyNear(0),statetype != C
 value = 130
+
 [State 131, Stop Guarding]
 type = ChangeState
 trigger1 = (command != "holdback"||!inguarddist)&&ailevel = 0
@@ -1247,7 +1263,7 @@ y = 0
 [State 132, 6]
 type = ChangeState
 trigger1 = sysvar(0)
-trigger1 = command = "holdback"
+trigger1 = command = "holdback"&&ailevel = 0
 trigger1 = inguarddist
 value = 130
 
@@ -1290,15 +1306,13 @@ physics = A
 
 [State 140, Hi to Lo]
 type = StateTypeSet
-trigger1 = statetype = S && command != "holddown"&&ailevel=0
-trigger2 = EnemyNear(0),statetype != A && ailevel
+trigger1 = statetype = S && command = "holddown"&&ailevel = 0
 statetype = C
 physics = C
 
 [State 140, Lo to Hi]
 type = StateTypeSet
-trigger1 = statetype = C && command != "holddown"&&ailevel=0
-trigger2 = EnemyNear(0),statetype = A && ailevel
+trigger1 = statetype = C && command != "holddown"&&ailevel = 0
 statetype = S
 physics = S
 ;---------------------------------------------------------------------------
@@ -1334,20 +1348,15 @@ value = 151 + 2*(command = "holddown")
 
 [State 150, Hi to Lo]
 type = StateTypeSet
-trigger1 = statetype = S && command != "holddown"&&ailevel=0
-trigger2 = statetype = S &&ailevel
-trigger2 = EnemyNear(0),statetype = A && ailevel
+trigger1 = statetype = S && command = "holddown"&&ailevel = 0
 statetype = C
 physics = C
-ignorehitpause = 1
 
 [State 150, Lo to Hi]
 type = StateTypeSet
-trigger1 = statetype = C && command != "holddown"&&ailevel=0
-trigger2 = EnemyNear(0),statetype = A && ailevel
+trigger1 = statetype = C && command != "holddown"&&ailevel = 0
 statetype = S
 physics = S
-ignorehitpause = 1
 
 [State 150, 3]
 type = ForceFeedback
@@ -1360,8 +1369,7 @@ time = 3
 type = ChangeState
 Triggerall = power >= 1000
 value = 1780
-trigger1 = command = "holdfwd"&&command="hold_z"&& ailevel = 0
-trigger2 = ailevel && random%48=ailevel&& time = 4
+trigger1 = command = "holdfwd"&&command="hold_z"&&ailevel = 0
 ;---------------------------------------------------------------------------
 ; SGUARDHIT2 (knocked back)
 [Statedef 151]
@@ -1388,16 +1396,13 @@ value = 1
 
 [State 151, Hi to Lo]
 type = StateTypeSet
-trigger1 = statetype = S && command != "holddown"&&ailevel=0
-trigger2 = EnemyNear(0),statetype != A && ailevel
+trigger1 = statetype = S && command = "holddown"&&ailevel = 0
 statetype = C
 physics = C
-ignorehitpause = 1
 
 [State 151, Lo to Hi]
 type = StateTypeSet
-trigger1 = statetype = C && command != "holddown"&&ailevel=0
-trigger2 = EnemyNear(0),statetype = A && ailevel
+trigger1 = statetype = C && command != "holddown"&&ailevel = 0
 statetype = S
 physics = S
 
@@ -1410,8 +1415,7 @@ ctrl = 1
 type = ChangeState
 Triggerall = power >= 1000
 value = 1780
-trigger1 = command = "holdfwd"&&command="hold_z"&& ailevel = 0
-trigger2 = ailevel && random%48=ailevel&& time = 4
+trigger1 = command = "holdfwd"&&command="hold_z"&&ailevel = 0
 ;---------------------------------------------------------------------------
 ; CGUARDHIT (shaking)
 [Statedef 152]
@@ -1441,19 +1445,19 @@ value = 151
 [State 152, 3]
 type = ChangeState
 trigger1 = HitShakeOver
-value = 151 + 2*(command = "holddown")
+value = 151 + 2*(Cond(ailevel=0,command = "holddown",enemy,statetype != A))
 
 [State 152, Hi to Lo]
 type = StateTypeSet
-trigger1 = statetype = S && command != "holddown"&&ailevel=0
-trigger2 = EnemyNear(0),statetype != A && ailevel
+trigger1 = statetype = S && command = "holddown"&&ailevel = 0
+trigger2 = Ailevel && enemy,statetype != A
 statetype = C
 physics = C
 
 [State 152, Lo to Hi]
 type = StateTypeSet
-trigger1 = statetype = C && command != "holddown"&&ailevel=0
-trigger2 = EnemyNear(0),statetype = A && ailevel
+trigger1 = statetype = C && command != "holddown"&&ailevel = 0
+trigger2 = Ailevel && enemy,statetype = A
 statetype = S
 physics = S
 
@@ -1467,8 +1471,7 @@ time = 4
 type = ChangeState
 Triggerall = power >= 1000
 value = 1780
-trigger1 = command = "holdfwd"&&command="hold_z"&& ailevel = 0
-trigger2 = ailevel && random%48=ailevel&& time = 4
+trigger1 = command = "holdfwd"&&command="hold_z"&&ailevel = 0
 ;---------------------------------------------------------------------------
 ; CGUARDHIT2 (knocked back)
 [Statedef 153]
@@ -1495,15 +1498,15 @@ value = 1
 
 [State 153, Hi to Lo]
 type = StateTypeSet
-trigger1 = statetype = S && command != "holddown"&&ailevel=0
-trigger2 = EnemyNear(0),statetype != A && ailevel
+trigger1 = statetype = S && command = "holddown"&&ailevel = 0
+trigger2 = Ailevel && enemy,statetype != A
 statetype = C
 physics = C
 
 [State 153, Lo to Hi]
 type = StateTypeSet
-trigger1 = statetype = C && command != "holddown"&&ailevel=0
-trigger2 = EnemyNear(0),statetype = A && ailevel
+trigger1 = statetype = C && command != "holddown"&&ailevel = 0
+trigger2 = Ailevel && enemy,statetype = A
 statetype = S
 physics = S
 
@@ -1517,8 +1520,7 @@ ctrl = 1
 type = ChangeState
 Triggerall = power >= 1000
 value = 1780
-trigger1 = command = "holdfwd"&&command="hold_z"&& ailevel = 0
-trigger2 = ailevel && random%48=ailevel&& time = 4
+trigger1 = command = "holdfwd"&&command="hold_z"&&ailevel = 0
 ;---------------------------------------------------------------------------
 ; AGUARDHIT (shaking)
 [Statedef 154]
@@ -2566,8 +2568,18 @@ value = 0+random%2
 [State 0, PlaySnd]
 type = PlaySnd
 trigger1 = time = 0
-value = S5000+(Cond(Var(56)=9,1,Cond(Var(56)=10,2,0))),6+Fvar(13)
-volumescale = 200
+value = S5000,6+Fvar(13)
+volumescale = 100
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S5000,6+Fvar(13)
+volumescale = 100
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S5000,6+Fvar(13)
+volumescale = 100
 
 [State 5120, 2]
 type = VelSet
@@ -2625,13 +2637,8 @@ sprpriority = -3
 
 [State 0, AssertSpecial]
 type = AssertSpecial
-trigger1 = prevstateno = 3020
+trigger1 = prevstateno = 3093
 flag = Invisible
-
-[State 0, PosSet]
-type = PosSet
-trigger1 = prevstateno = 3020
-y = 0
 
 [State 5150, 1] ;Normal anim
 type = ChangeAnim
@@ -2644,7 +2651,7 @@ value = 5140
 
 [State 0,AssertSpecial]
 type=AssertSpecial
-TriggerAll=PrevStateNo=4076
+TriggerAll=PrevStateNo=4065
 Trigger1=1
 flag=invisible
 flag2=noshadow
@@ -2725,6 +2732,11 @@ movetype= H
 physics = A
 anim = 5200
 
+[State 0, CtrlSet]
+type = CtrlSet
+trigger1 = time = 15
+value = 1
+
 [State 0, VelSet]
 type = VelSet
 trigger1 = time=5&&(command ="holdfwd" ||command = "holdback")
@@ -2761,8 +2773,18 @@ value = 0+random%2
 [State 0, PlaySnd]
 type = PlaySnd
 trigger1 = time = 0
-value = S5000+(Cond(Var(56)=9,1,Cond(Var(56)=10,2,0))),4+Fvar(13)
-volumescale = 200
+value = S5000,4+Fvar(13)
+volumescale = 100
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S5000,4+Fvar(13)
+volumescale = 100
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S5000,4+Fvar(13)
+volumescale = 100
 
 [State 5201, 5] ;Blink white
 type = PalFX
@@ -2840,8 +2862,18 @@ value = 0+random%2
 [State 0, PlaySnd]
 type = PlaySnd
 trigger1 = time = 0
-value = S5000+(Cond(Var(56)=9,1,Cond(Var(56)=10,2,0))),4+Fvar(13)
-volumescale = 200
+value = S5000,4+Fvar(13)
+volumescale = 100
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S5000,4+Fvar(13)
+volumescale = 100
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S5000,4+Fvar(13)
+volumescale = 100
 
 [State 5210, 1]
 type = VelAdd
@@ -2872,12 +2904,16 @@ type = VelAdd
 trigger1 = Time = 4
 trigger1 = Command = "holdback"
 x = -1
+[State 0, CtrlSet]
+type = CtrlSet
+trigger1 = time = 15
+value = 1
 
 [State 5210, 3]
 type = NotHitBy
 trigger1 = Time = 0
 value = SCA
-time = 15
+time = 20
 
 [State 5210, 4]
 type = CtrlSet
@@ -2922,6 +2958,7 @@ type = ChangeAnim
 trigger1 = time = 0
 trigger1 = SelfAnimExist(5500)
 value = 5500
+
 ;===============================================================================
 ; Super Dash
 ;-------------------------------------------------------------------------------
@@ -2962,7 +2999,7 @@ pausemovetime = 9999
 type = PlaySnd
 triggerall = prevstateno = 1710||random%2=0
 trigger1 = time = 0
-value = S0,Cond(prevstateno = 1710,15,12)
+value = S0,21
 volumescale = 200
 
 [State 0, NotHitBy]
@@ -3116,7 +3153,6 @@ removetime = -2
 sprpriority = -5
 ontop = 0
 ownpal = 1
-remappal = 7500,8
 angle = ((atan((-1*Vel Y)/ceil(Vel X+1)))*(360/(2*pi)))+90
 removeongethit = 1
 
@@ -3134,6 +3170,7 @@ bindtime = 4
 removetime = -2
 sprpriority = 6
 ontop = 0
+remappal = 7500,0
 ownpal = 1
 trans =sub
 angle = ((atan((-1*Vel Y)/ceil(Vel X+1)))*(360/(2*pi)))+90
@@ -3151,10 +3188,9 @@ facing = 1
 vfacing = 1
 bindtime = -1
 removetime = 5
-sprpriority = -6
+sprpriority = 6
 ontop = 0
 ownpal = 1
-trans =sub
 angle = ((atan((-1*Vel Y)/ceil(Vel X+1)))*(360/(2*pi)))+90
 removeongethit = 1
 [State 0, Honda FX]
@@ -3173,7 +3209,6 @@ removetime = 5
 sprpriority = -6
 ontop = 0
 ownpal = 1
-trans =sub
 angle = ((atan((-1*Vel Y)/ceil(Vel X+1)))*(360/(2*pi)))+90
 removeongethit = 1
 [State 0, ModifyExplod]
@@ -3188,7 +3223,6 @@ removetime = -1
 pausemovetime = 999
 scale = .5,.45
 sprpriority = -6
-trans = sub
 ontop = 0
 angle = ((atan((-1*Vel Y)/ceil(Vel X+1)))*(360/(2*pi)))+90
 removeongethit = 1
@@ -3205,7 +3239,6 @@ removetime = -1
 pausemovetime = 999
 scale = .5,.45
 sprpriority = -5
-remappal = 7500,18
 ontop = 0
 angle = ((atan((-1*Vel Y)/ceil(Vel X+1)))*(360/(2*pi)))+90
 removeongethit = 1
@@ -3221,8 +3254,7 @@ bindtime = -1
 removetime = -1
 pausemovetime = 999
 scale = .25,.25
-trans = sub
-sprpriority = -6
+sprpriority = 5
 ontop = 0
 angle = ((atan((-1*Vel Y)/ceil(Vel X+1)))*(360/(2*pi)))+90
 removeongethit = 1
@@ -3492,7 +3524,7 @@ ignorehitpause = 1
 
 [State 200, End]
 type = ChangeState
-Triggerall = Time >= 4
+Triggerall = Time >= 3
 trigger1 = roundstate = 2 && ailevel > 0 
 value = 610
 
@@ -3607,13 +3639,8 @@ value = .8
 [State 0, PlaySnd]
 type = PlaySnd
 trigger1 = !time
-value = S0,17
-volumescale = 100
-[State 0, PlaySnd]
-type = PlaySnd
-trigger1 = !time
-value = S0,17
-volumescale = 100
+value = S0,21
+volumescale = 200
 
 [State 5210,1]
 type = PalFX
@@ -3630,8 +3657,8 @@ movecamera = 0,0
 [State 0, PlaySnd]
 type = PlaySnd
 trigger1 = time = 4 || time = 19
-value = S5,13
-volumescale = 100
+value = S1,17
+volumescale = 50
 
 [State 0, Speed FX]
 type = Explod
@@ -3660,7 +3687,7 @@ pos = 0,-26
 postype = p1
 facing = 1
 vfacing = 1
-bindtime = -1
+bindtime = 0
 removetime = -2
 scale = .32,.15
 sprpriority = 2
@@ -3670,6 +3697,21 @@ removeongethit = 1
 ignorehitpause = 1
 Trans = add
 
+[State 0, Ki Blast - Helper]
+type = Helper
+triggerall = numtarget
+trigger1 = movehit = 1 && numexplod(9)=0&&target,ishelper=0&&numhelper(1231)=0&&Var(54)=0
+name = "Ki Blast - Helper"
+ID = 1231
+stateno = 801
+pos = 0,0
+postype = p1
+facing = 1
+persistent = 1
+pausemovetime =999
+keyctrl = 0
+ownpal = 1
+ignorehitpause = 1
 [State 0, PosSet]
 type = Posadd
 trigger1 = time = 11
@@ -3693,8 +3735,8 @@ pausetime = 12,12
 sparkno = -1
 guard.sparkno = -1
 sparkxy = 0,-30
-hitsound = S1,14
-guardsound = S6,0
+hitsound = S1,13
+guardsound = S4,1
 ground.type = High
 air.type = High
 ground.slidetime = 20
@@ -3729,7 +3771,7 @@ anim = 8001
 ID = 9018
 postype = P1
 facing = 1
-pos = 18,-24
+pos = 29,-23
 vfacing = 1
 bindtime = 0
 removetime = -2
@@ -3749,7 +3791,7 @@ anim = 8007
 ID = 9018
 postype = P1
 facing = 1
-pos = 18,-24
+pos = 29,-23
 vfacing = 1
 bindtime = 0
 removetime = -2
@@ -3769,19 +3811,41 @@ anim = 8001
 ID = 9018
 postype = P1
 facing = 1
-pos = 18,-24
+pos = 29,-23
 vfacing = 1
 bindtime = 0
 removetime = -2
 scale = .2,.2
 angle = 0+Random%360
-sprpriority = 1
+sprpriority = 4
 persistent = 90
 remappal = 7500,10
 ownpal = 1
 pausemovetime = 3
 ignorehitpause = 1
 removeongethit = 1
+[State 0, Explod]
+type = Explod
+trigger1 = movehit = 1
+anim = 8009
+ID = 9018
+postype = P1
+facing = 1
+pos = 29,-23
+vfacing = 1
+bindtime = 0
+removetime = -2
+scale = .18,.18
+angle = 0+Random%360
+sprpriority = 1
+persistent = 90
+remappal = 7500,10
+ownpal = 1
+ignorehitpause = 1
+pausemovetime = 3
+removeongethit = 1
+
+
 
 [State 0,Explod]
 type = Explod
@@ -3802,21 +3866,7 @@ removeongethit = 1
 ignorehitpause = 1
 persistent = 60
 RemapPal = 7500,6
-[State 0, Ki Blast - Helper]
-type = Helper
-triggerall = numtarget
-trigger1 = movehit = 1 && numexplod(9)=0&&target,ishelper=0&&numhelper(1231)=0&&Var(54)=0
-name = "Ki Blast - Helper"
-ID = 1231
-stateno = 801
-pos = 0,0
-postype = p1
-facing = 1
-persistent = 1
-pausemovetime =999
-keyctrl = 0
-ownpal = 1
-ignorehitpause = 1
+
 [State 200, End]
 type = ChangeState
 trigger1 = AnimTime = 0
@@ -3829,7 +3879,7 @@ physics = N
 juggle  = 0
 velset = 0,0
 ctrl = 0
-anim = 1305
+anim = 1300
 poweradd = -1000
 sprpriority = 2
 
@@ -3845,13 +3895,8 @@ persistent = 1
 [State 0, PlaySnd]
 type = PlaySnd
 trigger1 = !time
-value = S0,17
-volumescale = 100
-[State 0, PlaySnd]
-type = PlaySnd
-trigger1 = !time
-value = S0,17
-volumescale = 100
+value = S0,21
+volumescale = 200
 
 [State 5210,1]
 type = PalFX
@@ -3868,8 +3913,8 @@ movecamera = 0,0
 [State 0, PlaySnd]
 type = PlaySnd
 trigger1 = time = 4 || time = 19
-value = S5,13
-volumescale = 100
+value = S1,17
+volumescale = 50
 
 [State 0, Speed FX]
 type = Explod
@@ -3898,7 +3943,7 @@ pos = 0,-26
 postype = p1
 facing = 1
 vfacing = 1
-bindtime = -1
+bindtime = 0
 removetime = -2
 scale = .3,.25
 sprpriority = 2
@@ -3931,8 +3976,8 @@ guard.pausetime = 0,0
 sparkno = -1
 guard.sparkno = -1
 sparkxy = 0,-30
-hitsound = S1,14
-guardsound = S6,0
+hitsound = S1,13
+guardsound = S4,0
 guard.velocity = 0
 ground.type = High
 air.type = High
@@ -4014,7 +4059,7 @@ trigger1 = MoveGuarded = 1
 anim = 7000
 ID = 7000
 pos = 10,-40
-scale = 0.15*1,0.25*1
+scale = 0.3,0.5
 facing = 1
 vfacing = 1
 postype = p2
@@ -4190,6 +4235,7 @@ time = 1
 ID = 1481
 pos = 0,-30
 postype = "Foot"
+
 [State 0,Wall Impact]
 type = Explod
 triggerall = numexplod(8260) = 0
@@ -4207,7 +4253,7 @@ scale = .4,.4
 angle = 90
 removeongethit = 1
 ontop = 0
-remappal = 7500,18
+remappal = 7500,4
 ignorehitpause = 1
 supermovetime 	= 999
 pausemovetime = 9999
@@ -4228,7 +4274,7 @@ ownpal = 1
 scale = .4,.4
 removeongethit = 1
 ontop = 0
-remappal = 7500,17
+remappal = 7500,2
 ignorehitpause = 1
 supermovetime 	= 999
 pausemovetime = 9999
@@ -4354,7 +4400,7 @@ random = 0,0
 removetime = -2
 scale = .3,.3
 sprpriority = 4
-remappal = 7500,16
+remappal = 7500,15
 ownpal = 1
 removeongethit = 1
 
@@ -4387,16 +4433,23 @@ Envshake.time = 5
 Getpower = 0,0
 ;------------------------------------------------------------
 
+[State 0, VarSet]
+type = VarSet
+trigger1 = !time
+v = 13
+value = 0+random%2
 [State 0, PlaySnd]
 type = PlaySnd
 trigger1 = time = 1
-value = S0+(Cond(Var(56)=9,2,Cond(Var(56)=10,3,0))),10
-volumescale = 200
-[State 0, VarSet]
-type = VarSet
-trigger1 = 1
-v = 25
-value = 1
+value = S0,11
+volumescale = 100
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 1
+value = S0,11
+volumescale = 100
+;====================
+
 [State 0, VarSet]
 type = VarSet
 trigger1 = 1
@@ -4544,7 +4597,7 @@ value = Root,Var(52)
 type = parentVarSet
 trigger1 = Time = 1
 v = 52    ;fv = 10
-value = 9
+value = 4
 [State 0, PlaySnd]
 type = PlaySnd
 trigger1 = time = 0
@@ -4597,7 +4650,7 @@ type = Explod
 trigger1 = time = 0&&teamside = 2
 anim = 1699
 ID = 1620
-pos = -50,screenheight/1.7
+pos = -75,screenheight/1.7
 postype = right
 facing = 1
 vfacing = 1
@@ -4614,7 +4667,7 @@ type = Explod
 trigger1 = time = 0&&teamside = 2
 anim = 1699
 ID = 1620
-pos = -50,screenheight/1.7
+pos = -75,screenheight/1.7
 postype = right
 facing = 1
 vfacing = 1
@@ -4632,6 +4685,7 @@ supermovetime = 999
 [State 0, DestroySelf]
 type = DestroySelf
 trigger1 = 0
+;==========================================================================
 [Statedef 1690]
 type = A
 movetype = I
@@ -4736,6 +4790,7 @@ time = 1
 facing = 1
 pos =0,-2
 ignorehitpause = 1 
+
 [Statedef 1700]
 type    = U
 movetype= A
@@ -4759,24 +4814,24 @@ volumescale = 100
 type = PosAdd
 triggerall = statetype = A
 triggerall = time < 30
-trigger1 = animelemtime(3)>=0
+trigger1 = animelemtime(4)>=0
 y = p2bodydist y /40
 
 [State 0, PlaySnd]
 type = PlaySnd
 trigger1 = time = 0
-value = S0,13
+value = S0,14
 volumescale = 200
 
 [State 0, VelSet]
 type = VelSet
-TriggerAll = AnimElem = 3
+TriggerAll = AnimElem = 4
 trigger1 = 1
 x = 8
 
 [State 0, VelSet]
 type = VelSet
-trigger1 = animelemtime(5) >=0
+trigger1 = animelem = 6
 x = .1
 
 [State 0, VelSet]
@@ -4870,10 +4925,15 @@ trigger1 = time = 10
 value = S40,2
 volumescale = 100
 
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S0,14
+volumescale = 200
 
 [State 0, VelSet]
 type = VelSet
-TriggerAll = AnimElem = 3
+TriggerAll = AnimElem = 4
 trigger1 = 1
 x = 10
 
@@ -4881,12 +4941,12 @@ x = 10
 type = PosAdd
 triggerall = statetype = A
 triggerall = animelemtime(5)<0
-trigger1 = animelemtime(3)>=0
+trigger1 = animelemtime(4)>=0
 y = p2bodydist y /40
 
 [State 0, VelSet]
 type = VelSet
-TriggerAll = AnimElem = 5
+TriggerAll = AnimElem = 6
 trigger1 = 1
 x = 1
 y = 0
@@ -4992,12 +5052,18 @@ pausemovetime =999
 keyctrl = 0
 ownpal = 1
 ignorehitpause = 1
+
 [State 0, ParentVarAdd]
 type = VarAdd
 trigger1 = time = 0
 fv = 26    
 value = .8
 
+[State 0, PlaySnd]
+type = PlaySnd 
+trigger1 = time = 0
+value = S0,25
+volumescale = 200
 [State 0, PlaySnd]
 type = PlaySnd
 trigger1 = time = 0
@@ -5017,6 +5083,7 @@ attr = S, ST
 animtype  = Medium
 damage    =  2
 Hitflag = MAF
+guardflag = MA
 pausetime = 1,12
 sparkno = -1
 guard.sparkno = -1
@@ -5042,8 +5109,9 @@ value = 10-random%40
 [State 0, VarSet]
 type = VarSet
 trigger1 = 1
-v = 12
+v = 14
 value = -20-random%20
+
 [State 0, Explod]
 type = Explod
 trigger1 = movehit = 1
@@ -5051,31 +5119,14 @@ anim = 8001
 ID = 9018
 postype = P2
 facing = 1
-pos = Var(13),Var(12)
+pos = Var(13),Var(14)
 vfacing = 1
 bindtime = 0
 removetime = -2
 scale = .17,.17
-sprpriority = 4
-remappal = 7500,18
-ownpal = 1
-persistent = 5
-ignorehitpause = 1
-removeongethit = 1
-[State 0, Explod]
-type = Explod
-trigger1 = movehit = 1
-anim = 8001
-ID = 9018
-postype = P2
-facing = 1
-pos = Var(13),Var(12)
-vfacing = 1
-bindtime = 0
-removetime = -2
-scale = .17,.17
+angle = 0+Random%360
 sprpriority = 5
-trans = sub
+remappal = 7500,2
 ownpal = 1
 persistent = 5
 ignorehitpause = 1
@@ -5087,14 +5138,14 @@ anim = 8007
 ID = 9018
 postype = P2
 facing = 1
-pos = Var(13),Var(12)
+pos = Var(13),Var(14)
 vfacing = 1
 bindtime = 0
 removetime = -2
 scale = .08,.08
 angle = 0+Random%360
 sprpriority = 5
-remappal = 7500,17
+remappal = 7500,10
 ownpal = 1
 persistent = 5
 ignorehitpause = 1
@@ -5104,7 +5155,7 @@ removeongethit = 1
 type = ChangeState 
 triggerall = prevstateno = 1700
 Triggerall = hitcount>=10
-trigger1 = ailevel = 0 && command != "hold_a" && command != "hold_b"
+trigger1 = ailevel = 0 && command != "hold_b" && command != "hold_c"
 trigger2 = hitcount >= 20
 value = 1710
 ctrl = 0
@@ -5113,7 +5164,7 @@ ctrl = 0
 type = ChangeState 
 triggerall = prevstateno = 1701
 Triggerall = hitcount>=10
-trigger1 = ailevel = 0 && command != "hold_a" && command != "hold_b"
+trigger1 = ailevel = 0 && command != "hold_b" && command != "hold_c"
 trigger2 = hitcount >= 20
 value = Cond(pos y = 0,1720,1715)
 ctrl = 0
@@ -5151,6 +5202,11 @@ facing = 1
 pos = 20,-41
 removetime = -1
 
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S0,19
+volumescale = 200
 [State 220, 1]
 type = HitDef
 trigger1 = !Movecontact
@@ -5200,17 +5256,12 @@ sprpriority = 2
 [State 0, PlaySnd]
 type = PlaySnd
 trigger1 = time = 0
-value = S0,16
-volumescale = 200
+value = S0,17
+volumescale = 100
 [State 0, StopSnd]
 type = StopSnd
 trigger1 = 1
 channel = 17
-
-[State 0, VelSet]
-type = VelSet
-trigger1 = !animelemtime(9)
-y = 6
 
 [State 200, 1]
 type = HitDef
@@ -5261,7 +5312,7 @@ sprpriority = 2
 [State 0, PlaySnd]
 type = PlaySnd
 trigger1 = time = 0
-value = S0,14
+value = S0,17
 volumescale = 100
 
 [State 0, StopSnd]
@@ -5281,7 +5332,7 @@ pausetime = 12,12
 sparkno = -1
 guard.sparkno = -1
 sparkxy = -8,-25
-hitsound   = S1,19
+hitsound   = S1,13
 guardsound = S4,1
 ground.type = High
 ground.slidetime = 12
@@ -5411,7 +5462,7 @@ type = HitOverride
 trigger1 = time < 22
 attr = SCA,SP,HP
 slot = 1
-stateno = 1751
+stateno = 1750
 time = 1
 
 [State 0, ReversalDef]
@@ -5432,6 +5483,8 @@ pos = 0,0
 postype = p1
 ownpal = 1
 
+
+
 [State 0, Viento]
 type = Explod
 trigger1 = !animelemtime(3)
@@ -5449,6 +5502,12 @@ ontop = 0
 ownpal = 1
 removeongethit = 1
 
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = helper(1750),var(10)=1
+triggerall = numhelper(1750)
+value = 1751
+ctrl = 1
 
 [State 0, ChangeState]
 type = ChangeState
@@ -5467,34 +5526,13 @@ sprpriority = 2
 
 [State 0, PlaySnd]
 type = PlaySnd
-trigger1 = time = 0
-value = S2,5
-volumescale = 50
-
-[State 0, PlaySnd]
-type = PlaySnd
-trigger1 = animelemtime(2) = 0&&numexplod(1620)=0
+trigger1 = time = 0&&numexplod(1620)=0
 value = S2,3
 volumescale = 200
 
-[State 0, CtrlSet]
-type = CtrlSet
-trigger1 = time>= 12
-value = 1
-
-[State 0, HitOverride]
-type = HitOverride
-trigger1 = 1
-attr = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
-slot = 1
-stateno = 1751
-time = 1
-
-
-
 [State 0, Speedline1]
 type = Explod
-trigger1 = time = 1&&facing = 1
+trigger1 = time = 0&&facing = 1
 anim = 1692
 ID = 1620
 pos = 5,screenheight/1.7
@@ -5511,7 +5549,7 @@ removeongethit = 1
 supermovetime = 999
 [State 0, Speedline1]
 type = Explod
-trigger1 = time = 1&&facing = 1
+trigger1 = time = 0&&facing = 1
 anim = 1692
 ID = 1620
 pos = 5,screenheight/1.7
@@ -5529,7 +5567,7 @@ removeongethit = 1
 supermovetime = 999
 [State 0, Speedline1]
 type = Explod
-trigger1 = time = 1&&facing = -1
+trigger1 = time = 0&&facing = -1
 anim = 1692
 ID = 1620
 pos = -50,screenheight/1.7
@@ -5546,7 +5584,7 @@ removeongethit = 1
 supermovetime = 999
 [State 0, Speedline1]
 type = Explod
-trigger1 = time = 1&&facing = -1
+trigger1 = time = 0&&facing = -1
 anim = 1692
 ID = 1620
 pos = -50,screenheight/1.7
@@ -5562,28 +5600,28 @@ ontop = 0
 ownpal = 1
 removeongethit = 1
 supermovetime = 999
-
-[State 0, RemoveExplod]
-type = RemoveExplod
-trigger1 = !TIME
-id = 1620
-
 
 [State 0, Viento]
 type = Explod
 trigger1 = !time
 anim = 1755
-ID = 1755
+ID = 1020
 postype = p1
 facing = 1
 vfacing = 1
 bindtime = -1
 removetime = -2
-sprpriority = -1
+sprpriority = 5
 remappal = 7500,11
 ontop = 0
 ownpal = 1
 removeongethit = 1
+
+[State 0, NotHitBy]
+type = NotHitBy
+trigger1 = 1
+value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+time = 1
 
 [State 0, ]
 type = Helper
@@ -5600,6 +5638,12 @@ facing = 1
 ownpal = 1
 persistent = 20
 ignorehitpause = 1
+
+[State 0, NotHitBy]
+type = NotHitBy
+trigger1 = 1
+value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+time = 1
 
 [State 0, Width]
 type = Width
@@ -5620,7 +5664,7 @@ Ctrl = 0
 VelSet = 0,0
 anim = Cond(ishelper(505),505,1753)
 SprPriority = 0
-MoveType = H
+MoveType = I
 
 [State 0, BindToRoot]
 Type = BindToRoot
@@ -5714,6 +5758,288 @@ player = 20,20
 type = DestroySelf
 trigger1 = time = 6
 
+[Statedef 1780]
+type    = A
+movetype= A
+physics = N
+juggle  = 0
+velset = 0,0
+ctrl = 0
+anim = 1780
+poweradd = -1000
+sprpriority = 2
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S2,0
+volumescale = 200
+
+
+[State 0, Speedline1]
+type = Explod
+trigger1 = time = 0&&teamside = 1
+anim = 1690
+ID = 1620
+pos = 5,screenheight/1.7
+postype = left
+facing = 1
+vfacing = 1
+bindtime = 100
+removetime = -2
+remappal = 7500,2
+sprpriority = 10
+ontop = 0
+ownpal = 1
+removeongethit = 1
+supermovetime = 999
+[State 0, Speedline1]
+type = Explod
+trigger1 = time = 0&&teamside = 1
+anim = 1690
+ID = 1620
+pos = 5,screenheight/1.7
+postype = left
+facing = 1
+vfacing = 1
+bindtime = 100
+removetime = 40
+remappal = 7500,0
+trans = sub
+sprpriority = 10
+ontop = 0
+ownpal = 1
+removeongethit = 1
+supermovetime = 999
+[State 0, Speedline1]
+type = Explod
+trigger1 = time = 0&&teamside = 2
+anim = 1690
+ID = 1620
+pos = -50,screenheight/1.7
+postype = right
+facing = 1
+vfacing = 1
+remappal = 7500,2
+bindtime = 100
+removetime = -2
+sprpriority = 10
+ontop = 0
+ownpal = 1
+removeongethit = 1
+supermovetime = 999
+[State 0, Speedline1]
+type = Explod
+trigger1 = time = 0&&teamside = 2
+anim = 1690
+ID = 1620
+pos = -50,screenheight/1.7
+postype = right
+facing = 1
+vfacing = 1
+remappal = 7500,0
+trans = sub
+bindtime = 100
+removetime = 40
+sprpriority = 10
+ontop = 0
+ownpal = 1
+removeongethit = 1
+supermovetime = 999
+
+[State 0, SuperPause]
+type = SuperPause
+trigger1 = time = 2
+time =  16
+movetime = 16
+darken = 0
+anim = -1
+persistent = 1
+
+[State 3000, VarSet]
+type = Varset
+trigger1 = time = 0
+v = 14
+value = -100
+
+[State 3000, VarAdd]
+type = VarAdd
+trigger1 = time >= 20 && var(14) < 0
+v = 14
+value = 10
+
+[State 3000, BGColorFX]
+type = BGPalFX
+trigger1 = Time > 0
+time = 1
+add = var(14),var(14),var(14)
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time=20
+value = S0,13
+volumescale = 100
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time=20
+value = S0,13
+volumescale = 100
+
+[State 5210,1]
+type = PalFX
+trigger1=!Time
+time = 5
+add = 128,128,128
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 7 || time = 13
+value = S1,17
+volumescale = 100
+
+[State 0, Speed FX]
+type = Explod
+trigger1 = time = 7||time = 13
+anim = 580
+ID = 001
+pos = -5,-20
+postype = p1
+facing = 1
+vfacing = 1
+bindtime = 0
+removetime = -2
+scale = .32,.15
+sprpriority = 2
+ontop = 1
+ownpal = 1
+removeongethit = 1
+ignorehitpause = 1
+Trans = Sub
+[State 0, Speed FX]
+type = Explod
+trigger1 = time = 7||time = 13
+anim = 580
+ID = 001
+pos = 0,-26
+postype = p1
+facing = 1
+vfacing = 1
+bindtime = -1
+removetime = -2
+scale = .32,.15
+sprpriority = 2
+ontop = 1
+ownpal = 1
+removeongethit = 1
+ignorehitpause = 1
+Trans = add
+
+[State 0, PosSet]
+type = Posadd
+trigger1 = time = 11
+x = p2bodydist x + 40
+
+[State 0, Turn]
+type = Turn
+trigger1 = time = 13
+
+[State 260, hit]
+type = HitDef
+trigger1 = !movecontact
+attr = A, SA
+hitflag = MAF
+guardflag = MA
+animtype = Hard
+priority = 4,Hit
+damage    =  ceil(fvar(28)*50),20
+pausetime = 5,5
+guard.pausetime = 12,3
+sparkno = -1
+guard.sparkno = -1
+sparkxy = 0,-30
+hitsound = S1,14
+guardsound = S6,0
+ground.type = High
+air.type = High
+ground.slidetime = 20
+guard.slidetime = 20
+ground.hittime = 20
+guard.hittime = 20
+air.hittime = 20
+guard.velocity = -1
+ground.velocity = -10,-4
+p2facing = 1
+air.velocity = -10,-4
+envshake.time = 13
+envshake.ampl = 6
+fall = 1
+P2facing = 1
+
+[State 0, Explod]
+type = Explod
+trigger1 = movehit = 1
+anim = 8001
+ID = 8001
+postype = P1
+facing = 1
+pos = 12,-23
+vfacing = 1
+bindtime = 0
+removetime = -2
+scale = .18,.18
+angle = 0+Random%360
+sprpriority = 5
+remappal = 7500,9
+ownpal = 1
+persistent = 20
+ignorehitpause = 1
+removeongethit = 1
+[State 0, Explod]
+type = Explod
+trigger1 = movehit = 1
+anim = 8007
+ID = 8003
+postype = P1
+facing = 1
+pos = 12,-23
+vfacing = 1
+bindtime = 0
+removetime = -2
+scale = .09,.09
+angle = 0+Random%360
+sprpriority = 5
+remappal = 7500,10
+ownpal = 1
+persistent = 20
+ignorehitpause = 1
+removeongethit = 1
+[State 0,Explod]
+type = Explod
+triggerall = numexplod(7000) = 0
+trigger1 = MoveGuarded = 1
+anim = 7000
+ID = 7000
+pos = 5,-32
+scale = 0.3,0.5
+facing = 1
+vfacing = 1
+postype = p2
+bindtime = 0
+removetime = -2
+sprpriority = 3
+ontop = 0
+ownpal = 1
+removeongethit = 1
+ignorehitpause = 1
+persistent = 6
+RemapPal = 7500,2
+
+
+[State 200, End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
 [Statedef 8455]
 type    = A
 movetype= H
@@ -5781,9 +6107,17 @@ type = A
 movetype = H
 physics = N
 
+[State 0, Turn]
+type = Turn
+trigger1 = prevstateno = 1881 && !time
+[State 0, HitBy]
+type = NotHitBy
+trigger1 = prevstateno = 3091
+value = SCA,AA,AP,AT
+time = 5
 [State 0, HitBy]
 type = HitBy
-trigger1 = 1
+trigger1 = prevstateno != 3091
 value = SCA,HA,HP,HT
 time = 5
 
@@ -5920,6 +6254,7 @@ pausemovetime = 99999
 [State 200, End]
 type = Destroyself
 trigger1 = enemy,stateno != 8455
+trigger2 = enemy,stateno != 8490
 [Statedef 8458]
 type    = S
 movetype= I
@@ -6042,7 +6377,7 @@ trigger1 = pos y > 0
 value = 8471
 
 ;Bounce
-[Statedef 8471]
+[Statedef 8474]
 type    = A
 movetype= H
 physics = N
@@ -6050,12 +6385,6 @@ juggle  = 1
 velset = 0,0
 ctrl = 0
 sprpriority = 1
-
-[State 0, NotHitBy]
-type = NotHitBy
-trigger1 = !time
-value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
-time = 5
 
 [State 0, VelSet]
 type = Velset
@@ -6112,7 +6441,7 @@ elem = 1
 [State 200, End]
 type = ChangeState
 trigger1 = pos y > 0
-value = 8473
+value = 8474
 
 [Statedef 8473]
 type = A
@@ -6199,7 +6528,7 @@ y = -4
 [State 0, VelAdd]
 type = VelAdd
 trigger1 = 1
-y = 0.4
+y = 0.6
 
 [State 0, ChangeAnim]
 type = ChangeAnim
@@ -6211,292 +6540,173 @@ elem = 1
 type = ChangeState
 trigger1 = pos y > 0&&time >= 5
 value = 8480
-[Statedef 1780]
+
+[Statedef 8490]
 type    = A
-movetype= A
+movetype= H
 physics = N
-juggle  = 0
-velset = 0,0
+juggle  = 1
 ctrl = 0
-anim = 1780
-poweradd = -1000
-sprpriority = 2
+sprpriority = 1
+Facep2 = 1
 
-[State 0, PlaySnd]
-type = PlaySnd
+[State 0, PlayerPush]
+type = PlayerPush
+trigger1 = 1
+value = 1
+ignorehitpause = 1
+
+[State 0, ScreenBound]
+type = ScreenBound
+trigger1 = 1
+value = 1
+movecamera = 1,1
+
+[State 0, VelSet]
+type = VelSet
 trigger1 = time = 0
-value = S2,0
-volumescale = 200
+x = -4
+y = 9
 
-
-[State 0, Speedline1]
-type = Explod
-trigger1 = time = 0&&teamside = 1
-anim = 1690
-ID = 1620
-pos = 5,screenheight/1.7
-postype = left
-facing = 1
-vfacing = 1
-bindtime = 100
-removetime = -2
-remappal = 7500,2
-sprpriority = 10
-ontop = 0
-ownpal = 1
-removeongethit = 1
-supermovetime = 999
-[State 0, Speedline1]
-type = Explod
-trigger1 = time = 0&&teamside = 1
-anim = 1690
-ID = 1620
-pos = 5,screenheight/1.7
-postype = left
-facing = 1
-vfacing = 1
-bindtime = 100
-removetime = 40
-remappal = 7500,0
-trans = sub
-sprpriority = 10
-ontop = 0
-ownpal = 1
-removeongethit = 1
-supermovetime = 999
-[State 0, Speedline1]
-type = Explod
-trigger1 = time = 0&&teamside = 2
-anim = 1690
-ID = 1620
-pos = -50,screenheight/1.7
-postype = right
-facing = 1
-vfacing = 1
-remappal = 7500,2
-bindtime = 100
-removetime = -2
-sprpriority = 10
-ontop = 0
-ownpal = 1
-removeongethit = 1
-supermovetime = 999
-[State 0, Speedline1]
-type = Explod
-trigger1 = time = 0&&teamside = 2
-anim = 1690
-ID = 1620
-pos = -50,screenheight/1.7
-postype = right
-facing = 1
-vfacing = 1
-remappal = 7500,0
-trans = sub
-bindtime = 100
-removetime = 40
-sprpriority = 10
-ontop = 0
-ownpal = 1
-removeongethit = 1
-supermovetime = 999
-
-[State 0, SuperPause]
-type = SuperPause
-trigger1 = time = 2
-time =  16
-movetime = 16
-darken = 0
-anim = -1
-persistent = 1
-
-[State 3000, VarSet]
-type = Varset
-trigger1 = time = 0
-v = 14
-value = -100
-
-[State 3000, VarAdd]
-type = VarAdd
-trigger1 = time >= 20 && var(14) < 0
-v = 14
-value = 10
-
-[State 3000, BGColorFX]
-type = BGPalFX
-trigger1 = Time > 0
-time = 1
-add = var(14),var(14),var(14)
-
-[State 0, PlaySnd]
-type = PlaySnd
-trigger1 = !time
-value = S0,22
-volumescale = 100
-[State 0, PlaySnd]
-type = PlaySnd
-trigger1 = !time
-value = S0,22
-volumescale = 100
-
-[State 5210,1]
-type = PalFX
-trigger1=!Time
-time = 5
-add = 128,128,128
-
-[State 0, PlaySnd]
-type = PlaySnd
-trigger1 = time = 7 || time = 13
-value = S5,13
-volumescale = 100
-
-[State 0, Speed FX]
-type = Explod
-trigger1 = time = 7||time = 13
-anim = 580
-ID = 001
-pos = -5,-20
-postype = p1
-facing = 1
-vfacing = 1
-bindtime = 0
-removetime = -2
-scale = .32,.15
-sprpriority = 2
-ontop = 1
-ownpal = 1
-removeongethit = 1
-ignorehitpause = 1
-Trans = Sub
-[State 0, Speed FX]
-type = Explod
-trigger1 = time = 7||time = 13
-anim = 580
-ID = 001
-pos = 0,-26
-postype = p1
-facing = 1
-vfacing = 1
-bindtime = -1
-removetime = -2
-scale = .32,.15
-sprpriority = 2
-ontop = 1
-ownpal = 1
-removeongethit = 1
-ignorehitpause = 1
-Trans = add
-
-[State 0, PosSet]
-type = Posadd
-trigger1 = time = 11
-x = p2bodydist x + 40
-
-[State 0, Turn]
-type = Turn
-trigger1 = time = 13
-
-[State 260, hit]
-type = HitDef
-trigger1 = !movecontact
-attr = A, SA
-hitflag = MAF
-guardflag = MA
-animtype = Hard
-priority = 4,Hit
-damage    =  ceil(fvar(28)*50),20
-pausetime = 5,5
-guard.pausetime = 12,3
-sparkno = -1
-guard.sparkno = -1
-sparkxy = 0,-30
-hitsound = S1,14
-guardsound = S6,0
-ground.type = High
-air.type = High
-ground.slidetime = 20
-guard.slidetime = 20
-ground.hittime = 20
-guard.hittime = 20
-air.hittime = 20
-guard.velocity = -1
-ground.velocity = -10,-4
-p2facing = 1
-air.velocity = -10,-4
-envshake.time = 13
-envshake.ampl = 6
-kill = 0
-fall = 1
-P2facing = 1
-
-[State 0, Explod]
-type = Explod
-trigger1 = movehit = 1
-anim = 8001
-ID = 8001
-postype = P1
-facing = 1
-pos = 12,-23
-vfacing = 1
-bindtime = 0
-removetime = -2
-scale = .18,.18
-angle = 0+Random%360
-sprpriority = 5
-remappal = 7500,9
-ownpal = 1
-persistent = 20
-ignorehitpause = 1
-removeongethit = 1
-[State 0, Explod]
-type = Explod
-trigger1 = movehit = 1
-anim = 8007
-ID = 8003
-postype = P1
-facing = 1
-pos = 12,-23
-vfacing = 1
-bindtime = 0
-removetime = -2
-scale = .09,.09
-angle = 0+Random%360
-sprpriority = 5
-remappal = 7500,10
-ownpal = 1
-persistent = 20
-ignorehitpause = 1
-removeongethit = 1
-[State 0,Explod]
-type = Explod
-triggerall = numexplod(7000) = 0
-trigger1 = MoveGuarded = 1
-anim = 7000
-ID = 7000
-pos = 5,-32
-scale = 0.3,0.5
-facing = 1
-vfacing = 1
-postype = p2
-bindtime = 0
-removetime = -2
-sprpriority = 3
-ontop = 0
-ownpal = 1
-removeongethit = 1
-ignorehitpause = 1
-persistent = 6
-RemapPal = 7500,6
-
+[State 0, ChangeAnim]
+type = ChangeAnim
+trigger1 = 1
+value = 5100+Cond(authorname = "Mikel8888"||authorname = "Rivelio"||authorname = "Knightmare"||authorname = "InSeph",var(10),0)
+elem = 1
 
 [State 200, End]
 type = ChangeState
-trigger1 = AnimTime = 0
-value = 0
-ctrl = 1
+trigger1 = pos y > 0
+value = 8491
 
-[Statedef -3]
-[State -3, PowerAdd]
-type = PowerAdd
+[Statedef 8491]
+type = A
+movetype = H
+physics = N
+velset = 0,0
+
+
+[State 0, HitBy]
+type = HitBy
 trigger1 = 1
-value = 3
+value = SCA,HA,HP,HT
+time = 5
+
+[State 0, ScreenBound]
+type = ScreenBound
+trigger1 = 1 
+value = 1
+movecamera = 1,1
+
+
+[State 0,ChangeAnim]
+type = ChangeAnim
+trigger1 = Time>= 0
+value = 5110+Cond(authorname = "Mikel8888"||authorname = "Rivelio"||authorname = "Knightmare"||authorname = "Teixeira's Mugen",var(10),0)
+
+[State 0,PosSet]
+type = PosSet
+trigger1 = !time
+y = 0
+
+[State 0,PlayerPush]
+type=PlayerPush
+trigger1=1
+value=1
+ignorehitpause=1
+
+[State 200,End]
+type = SelfState
+trigger1 = Time = 999
+value = 5110
+
+[Statedef 8492]
+type    = S
+movetype= I
+physics = N
+ctrl = 0
+anim = 9999
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = !time
+value = S1,11
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = !time
+value = S1,11
+
+[State 2001, PosAdd]
+type = PosAdd
+trigger1 = 1
+x = p2dist x
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = 1
+y = 0
+
+[State 0,Floor Dust]
+type = Explod
+trigger1 = time= 0
+anim = 8235
+ID = 8235
+pos = 0,0
+postype = p1
+facing = 1
+scale = 1.3,1.3
+vfacing = 1
+bindtime = 1
+removetime = -2
+sprpriority = 4
+remappal = 7500,7
+ontop = 0
+ownpal = 1
+removeongethit = 0
+ignorehitpause = 0
+
+[State 0,Floor Dust]
+type = Explod
+trigger1 = time= 0
+anim = 8230
+ID = 8235
+pos = 0,0
+postype = p1
+facing = 1
+scale = 1.3,1.3
+vfacing = 1
+bindtime = 1
+removetime = -2
+sprpriority = 4
+ontop = 0
+ownpal = 1
+removeongethit = 0
+ignorehitpause = 0
+
+[State 0,Floor Dust]
+type = Explod
+trigger1 = time= 0
+anim = 8240
+ID = 8235
+pos = 0,0
+postype = p1
+facing = 1
+scale = 1.3,1.3
+vfacing = 1
+bindtime = 1
+removetime = -2
+sprpriority = -4
+ontop = 0
+ownpal = 1
+removeongethit = 0
+ignorehitpause = 0
+
+[State 0, ScreenBound]
+type = ScreenBound
+trigger1 = 1
+value = 1
+movecamera = 1,1
+
+[State 200, End]
+type = Destroyself
+trigger1 = time = 3
