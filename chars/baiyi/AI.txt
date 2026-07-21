@@ -1,0 +1,2054 @@
+[Statedef -2]
+
+[State 0, 真实伤害开关]
+type = VarSet
+trigger1 = !ishelper
+v = 5
+value = 2     ; 0-2     0为关闭 1为1级真实伤害 2为2级真实伤害
+ignorehitpause = 1
+
+[State -2, 0] 
+type = poweradd 
+trigger1 = var(9)
+trigger1 = 1 
+value = 3
+[State -1, Change to State 2100 on Hit with 2000 Power]
+type = null
+triggerall = !ishelper          
+triggerall = alive             
+triggerall = movetype = H      
+trigger1   = var(9)
+trigger1 = Power >= 1000       
+value = 1000                   
+ctrl = 0                       
+ignorehitpause = 1              
+persistent = 0
+
+[State 0]
+type = changestate
+Triggerall = power >= 4000
+triggerall = RoundState = 2 && ailevel > 0
+triggerall = StateType != A
+triggerall = P2BodyDist X = [0,150]
+triggerall = var(9)
+trigger1 = Ctrl
+trigger1 = enemynear,statetype != L
+value = 4000
+
+
+[State 0, NotHitBy]
+type = NotHitBy
+trigger1 = Movetype = A
+trigger1 = var(9)
+value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+time = 1
+ignorehitpause = 1
+
+
+
+
+
+[State 0, HitOverride]
+type = selfstate
+triggerall  = var(9) = 0
+triggerall = life <= lifemax/2
+triggerall = alive && roundstate = 2
+trigger1 = ctrl || movetype = H
+value = 3600
+
+
+[State 0, HitOverride]
+type = selfstate
+trigger1 = movetype = H
+triggerall = pos y >= 0
+triggerall = alive && var(59)
+triggerall = (enemynear,pos x - pos x)*facing < 100
+triggerall = gametime % 60 = 0
+trigger1 = random%100 = [0,20]
+value = cond(var(9)=0&&life<lifemax/3,3600,1000)
+
+[State 0, PowerAdd]
+type = PowerAdd
+triggerall = time = 1
+triggerall = stateno < 3000
+trigger1 = movetype = A
+value = 80
+ignorehitpause = 1
+
+[State 0, 蓝色眼睛]
+type = RemapPal
+trigger1 = var(9) != 0
+source = 0,398
+dest = 0,397
+ignorehitpause = 1
+
+[State 0, 黑色眼睛]
+type = RemapPal
+trigger1 = var(9) = 0
+source = 0,397
+dest = 0,398
+ignorehitpause = 1
+
+;persistent =
+; All of the player sprites that use
+; the source palette will be drawn
+; using the dest palette instead.
+; The source and dest palettes must
+; exist within the player's sprites,
+; and both must be of the same color
+; depth. Note that the dest palette
+; number refers to an unmapped palette
+; e.g. if you map (1,1) -> (1,6), and
+; then you map (2,2) -> (1,1), the result
+; is that (2,2) will be mapped to palette
+; (1,1) from the original sprite file,
+; not (1,6).
+
+
+
+;-[分隔线]--------------------------------------------------------------------
+[State -2,Dusk 召唤攻击记录helper]
+type = helper
+trigger1 = numhelper(2335) = 0
+trigger1 = !ishelper
+trigger1 = roundstate <= 2 && alive
+helpertype = normal
+name = "JILU"
+stateno = 2335
+id = 2335
+pos = 0,0
+postype = P1
+supermovetime = 99999999999
+pausemovetime = 99999999999
+persistent = 0
+
+[State -2,Dusk 检测地图前版边helper]
+type = Helper
+trigger1 = numhelper(2336) = 0
+trigger1 = !ishelper
+trigger1 = roundstate <= 2 && alive
+helpertype = normal
+name = "QIAN"
+stateNo = 2336
+id = 2336
+pos = 0,0
+postype = P1
+supermovetime = 99999999999
+pausemovetime = 99999999999
+persistent = 0
+
+[State -2,Dusk 检测地图后版边helper]
+type = Helper
+trigger1 = numhelper(2337) = 0
+trigger1 = !ishelper
+trigger1 = roundstate <= 2 && alive
+helpertype = normal
+name = "HOU"
+stateNo = 2337
+id = 2337
+pos = 0,0
+postype = P1
+supermovetime = 99999999999
+pausemovetime = 99999999999
+persistent = 0
+;-[分隔线]--------------------------------------------------------------------
+[State -2,Dusk 敌方浮空时间归零]
+Type = VarSet
+trigger1 = 1
+var(41) = 0
+IgnoreHitPause = 1
+[State -2,Dusk 敌方浮空时间计算]
+Type = VarSet
+trigger1 = enemynear(var(50)),statetype = A && fvar(20) != 0
+trigger1 = ((floor(enemynear(var(50)),vel y))**2-2*(fvar(20))*(floor(enemynear(var(50)),Pos Y))) >= 0
+var(41) = floor(((-fvar(22))+(((floor(enemynear(var(50)),vel Y))**2-2*(fvar(20))*(floor(enemynear(var(50)),pos y)))**0.5))/(fvar(20)))+1
+IgnoreHitPause = 1
+;-[分隔线]--------------------------------------------------------------------
+[State -2,Dusk 检测到地图前方版边真实距离]
+type = varset
+triggerall =!IsHelper
+trigger1 =(NumHelper(2336) && NumHelper(2337))
+trigger1 = TeamSide = 1
+var(42) = floor(Abs(ifelse(1 = 1,Helper(2336),RootDist X,Helper(2337),RootDist X)))
+ignorehitpause = 1
+[State -2,Dusk 检测到地图前方版边真实距离]
+type = varset
+triggerall =!IsHelper
+trigger1 =(NumHelper(2336) && NumHelper(2337))
+trigger1 = TeamSide = 2
+var(42) = floor(Abs(ifelse(1 = 1,Helper(2337),RootDist X,Helper(2336),RootDist X)))
+ignorehitpause = 1
+;-[分隔线]--------------------------------------------------------------------
+[State -2,Dusk 检测到地图后方版边真实距离]
+type = varset
+triggerall =!IsHelper
+trigger1 =(NumHelper(2336) && NumHelper(2337))
+trigger1 = TeamSide = 1
+var(43) = floor(Abs(ifelse(1 = 1,Helper(2337),RootDist X,Helper(2336),RootDist X)))
+ignorehitpause = 1
+[State -2,Dusk 检测到地图后方版边真实距离]
+type = varset
+triggerall =!IsHelper
+trigger1 =(NumHelper(2336) && NumHelper(2337))
+trigger1 = TeamSide = 2
+var(43) = floor(Abs(ifelse(1 = 1,Helper(2336),RootDist X,Helper(2337),RootDist X)))
+ignorehitpause = 1
+;-[分隔线]--------------------------------------------------------------------
+[State -2,Dusk 重力加速度计算]
+type = VarSet
+value = Helper(2335),fvar(0);对方下落加速度
+triggerall = NumHelper(2335);存在2335号helper
+triggerall = enemynear(var(50)),vel Y != 0;对方y轴速度不为0
+triggerall = enemynear(var(50)),Pos Y < (((enemynear(var(50)),anim != [5051,5059]) && (enemynear(var(50)),anim != [5061,5069])) && (enemynear(var(50)),stateno = 15050))*25;参考系
+triggerall = fvar(20) != Helper(2335),fvar(0);变量20不等于2335号helper的变量0
+Trigger1 = enemynear(var(50)),stateno != [116000,116210];不在受击状态号
+Trigger2 = enemynear(var(50)),movetype != H;对方不在受击状态
+fv = 20
+IgnoreHitPause = 1
+[State -2,Dusk 重力加速度计算]
+type = VarSet
+value = enemynear(var(50)),GetHitVar(yaccel);被打击的加速度
+triggerall = enemynear(var(50)),vel Y != 0;对方y轴速度不为0
+triggerall = enemynear(var(50)),movetype = H;对方在受击状态
+triggerall = enemynear(var(50)),Pos Y < (((enemynear(var(50)),anim != [5051,5059]) && (enemynear(var(50)),anim != [5061,5069])) && (enemynear(var(50)),stateno = 15050))*25;参考系
+triggerall = fvar(20) != enemynear(var(50)),GetHitVar(yaccel);变量20不等于打击附加的加速度
+trigger1 = enemynear(var(50)),stateno = [116000,116210];对方在受击状态号
+fv = 20
+IgnoreHitPause = 1
+[State -2,Dusk 重力加速度计算]
+type = VarSet
+value = 0
+trigger1 = fvar(20) != 0 && enemynear(var(50)),vel Y = 0
+fv = 20
+IgnoreHitPause = 1
+;-[分隔线]--------------------------------------------------------------------
+[state -2,Dusk X轴速度计算]
+type = varset
+value = enemynear(var(50)),vel X
+Triggerall = enemynear(var(50)),movetype != H; || enemynear(var(50)),stateno != [5000,5210];对方不在受击状态
+trigger1 = fvar(21) != enemynear(var(50)),vel X;变量不等于对方x轴速度
+fv = 21
+ignorehitpause = 1
+[state -2,Dusk X轴速度计算]
+type = varset
+value = enemynear(var(50)),vel X
+Triggerall = enemynear(var(50)),movetype = H; || enemynear(var(50)),stateno = [5000,5210];对方在受击状态
+Triggerall = enemynear(var(50)),GetHitVar(HitShakeTime) = 0;对方受击震动时间为0
+trigger1 = fvar(21) != enemynear(var(50)),vel X;变量不等于对方x轴速度
+fv = 21
+ignorehitpause = 1
+[state -2,Dusk X轴速度计算]
+type = varset
+value = enemynear(var(50)),GetHitVar(xvel)
+Triggerall = enemynear(var(50)),movetype = H; || enemynear(var(50)),stateno = [5000,5210];对方在受击状态
+Triggerall = enemynear(var(50)),GetHitVar(HitShakeTime) != 0;对方受击震动时间不为0
+trigger1 = fvar(21) != enemynear(var(50)),GetHitVar(xvel);变量不等于x轴打击速度
+fv = 21
+ignorehitpause = 1
+;-[分隔线]--------------------------------------------------------------------
+[state -2,Dusk Y轴速度计算]
+type = varset
+value = enemynear(var(50)),vel Y
+Triggerall = enemynear(var(50)),movetype != H; || enemynear(var(50)),stateno != [5000,5210];对方不在受击状态
+trigger1 = fvar(22) != enemynear(var(50)),vel Y;变量不等于对方y轴速度
+fv = 22
+ignorehitpause = 1
+[state -2,Dusk Y轴速度计算]
+type = varset
+value = enemynear(var(50)),vel Y
+Triggerall = enemynear(var(50)),movetype = H; || enemynear(var(50)),stateno = [5000,5210];对方在受击状态
+Triggerall = enemynear(var(50)),GetHitVar(HitShakeTime) = 0;对方受击震动时间为0
+trigger1 = fvar(22) != enemynear(var(50)),vel Y;变量不等于对方y轴速度
+fv = 22
+ignorehitpause = 1
+[state -2,Dusk Y轴速度计算]
+type = varset
+value = enemynear(var(50)),GetHitVar(yvel)
+Triggerall = enemynear(var(50)),movetype = H; || enemynear(var(50)),stateno = [5000,5210];对方在受击状态
+Triggerall = enemynear(var(50)),GetHitVar(HitShakeTime) != 0;对方受击震动时间不为0
+trigger1 = fvar(22) != enemynear(var(50)),GetHitVar(yvel);变量不等于y轴打击速度
+fv = 22
+ignorehitpause = 1
+;-[分隔线]--------------------------------------------------------------------
+[state -2,Dusk 与对方的X轴距离计算]
+type = varset
+value = abs(enemynear(var(50)),pos x-pos x)-enemynear(var(50)),const(size.ground.front);x轴绝对值距离减去宽度条
+trigger1 = 1;任何时候
+fv = 23
+;-[分隔线]--------------------------------------------------------------------
+[state -2,Dusk 与对方的Y轴距离计算]
+type = varset
+value = enemynear(var(50)),pos y-pos y;y轴绝对值距离
+trigger1 = 1;任何时候
+fv = 24
+;-[分隔线]--------------------------------------------------------------------
+[state -2,Dusk 攻击被当身记录1]
+type = varset
+triggerall = !ishelper;这不是helper
+triggerall = var(59) >= 1;在ai启动中
+triggerall = roundstate = 2;在对局中
+triggerall = movereversed;发生了当身
+triggerall = alive != 0;自己活着
+triggerall = var(46) = 0;变量46为0
+trigger1 = (movetype = h) || (sysvar(4) != ((12*(gametime*10+11153)*gametime)+((7*gametime-14450)+gametime)*gametime-805414)-(gametime*3)*gametime);自己在受击状态或p2带入状态
+var(46) = enemynear(var(50)),stateno;记录对方状态号
+ignorehitpause = 1
+;-[分隔线]--------------------------------------------------------------------
+[state -2,Dusk 攻击被当身记录2]
+type = varset
+triggerall = !ishelper;这不是helper
+triggerall = var(59) >= 1;在ai启动中
+triggerall = roundstate = 2;在对局中
+triggerall = movereversed;发生了当身
+triggerall = alive != 0;自己活着
+triggerall = var(47) = 0;变量47为0
+trigger1 = (movetype = h) || (sysvar(4) != ((12*(gametime*10+11153)*gametime)+((7*gametime-14450)+gametime)*gametime-805414)-(gametime*3)*gametime);自己在受击状态或p2带入状态
+trigger1 = var(46) != enemynear(var(50)),prevstateno;不是变量46记录的状态号
+var(47) = enemynear(var(50)),stateno;记录对方状态号
+ignorehitpause = 1
+;-[分隔线]--------------------------------------------------------------------
+[state -2,Dusk 攻击被当身记录3]
+type = varset
+triggerall = !ishelper;这不是helper
+triggerall = var(59) >= 1;在ai启动中
+triggerall = roundstate = 2;在对局中
+triggerall = movereversed;发生了当身
+triggerall = alive != 0;自己活着
+triggerall = var(48) = 0;变量48为0
+trigger1 = (movetype = h) || (sysvar(4) != ((12*(gametime*10+11153)*gametime)+((7*gametime-14450)+gametime)*gametime-805414)-(gametime*3)*gametime);自己在受击状态或p2带入状态
+trigger1 = var(46) != enemynear(var(50)),prevstateno;不是变量46记录的状态号
+trigger1 = var(47) != enemynear(var(50)),prevstateno;不是变量47记录的状态号
+var(48) = enemynear(var(50)),stateno;记录对方状态号
+ignorehitpause = 1
+;-[分隔线]--------------------------------------------------------------------
+[state -2,Dusk 攻击被当身记录4]
+type = varset
+triggerall = !ishelper;这不是helper
+triggerall = var(59) >= 1;在ai启动中
+triggerall = roundstate = 2;在对局中
+triggerall = movereversed;发生了当身
+triggerall = alive != 0;自己活着
+triggerall = var(36) = 0;变量46为0
+trigger1 = (movetype = h) || (sysvar(4) != ((12*(gametime*10+11153)*gametime)+((7*gametime-14450)+gametime)*gametime-805414)-(gametime*3)*gametime);自己在受击状态或p2带入状态
+var(36) = enemynear(var(50)),prevstateno;记录对方状态号
+ignorehitpause = 1
+;-[分隔线]--------------------------------------------------------------------
+[state -2,Dusk 攻击被当身记录5]
+type = varset
+triggerall = !ishelper;这不是helper
+triggerall = var(59) >= 1;在ai启动中
+triggerall = roundstate = 2;在对局中
+triggerall = movereversed;发生了当身
+triggerall = alive != 0;自己活着
+triggerall = var(37) = 0;变量47为0
+trigger1 = (movetype = h) || (sysvar(4) != ((12*(gametime*10+11153)*gametime)+((7*gametime-14450)+gametime)*gametime-805414)-(gametime*3)*gametime);自己在受击状态或p2带入状态
+var(37) = enemynear(var(50)),prevstateno;记录对方状态号
+ignorehitpause = 1
+;-[分隔线]--------------------------------------------------------------------
+[state -2,Dusk 攻击被当身记录6]
+type = varset
+triggerall = !ishelper;这不是helper
+triggerall = var(59) >= 1;在ai启动中
+triggerall = roundstate = 2;在对局中
+triggerall = movereversed;发生了当身
+triggerall = alive != 0;自己活着
+triggerall = var(38) = 0;变量48为0
+trigger1 = (movetype = h) || (sysvar(4) != ((12*(gametime*10+11153)*gametime)+((7*gametime-14450)+gametime)*gametime-805414)-(gametime*3)*gametime);自己在受击状态或p2带入状态
+var(38) = enemynear(var(50)),prevstateno;记录对方状态号
+ignorehitpause = 1
+;-[分隔线]--------------------------------------------------------------------
+[state -2,Dusk 站立被破防记录1]
+type = varset
+triggerall = !ishelper;这不是helper
+triggerall = var(59) >= 1;在ai启动中
+triggerall = roundstate = 2;在对局中
+triggerall = alive != 0;自己活着
+triggerall = (anim = 120) || (anim = 130) || (anim = 150);自己在防御状态中
+triggerall = var(56) = 0;变量56为0
+trigger1 = stateno = [5000,5150];自己在受击状态中
+trigger2 = sysvar(4) != ((12*(gametime*10+11153)*gametime)+((7*gametime-14450)+gametime)*gametime-805414)-(gametime*3)*gametime;自己在p2状态中
+var(56) = enemynear(var(50)),stateno;记录对方状态号
+ignorehitpause = 1
+;-[分隔线]--------------------------------------------------------------------
+[state -2,Dusk 站立被破防记录2]
+type = varset
+triggerall = !ishelper;这不是helper
+triggerall = var(59) >= 1;在ai启动中
+triggerall = roundstate = 2;在对局中
+triggerall = alive != 0;自己活着
+triggerall = (anim = 120) || (anim = 130) || (anim = 150);自己在防御状态中
+triggerall = var(56) != 0;变量56不为0
+triggerall = var(57) = 0;变量57为0
+trigger1 = stateno = [5000,5150];自己在受击状态中
+trigger2 = sysvar(4) != ((12*(gametime*10+11153)*gametime)+((7*gametime-14450)+gametime)*gametime-805414)-(gametime*3)*gametime;自己在p2状态中
+var(57) = enemynear(var(50)),stateno;记录对方状态号
+ignorehitpause = 1
+;-[分隔线]--------------------------------------------------------------------
+[state -2,Dusk 站立被破防记录3]
+type = varset
+triggerall = !ishelper;这不是helper
+triggerall = var(59) >= 1;在ai启动中
+triggerall = roundstate = 2;在对局中
+triggerall = alive != 0;自己活着
+triggerall = (anim = 120) || (anim = 130) || (anim = 150);自己在防御状态中
+triggerall = var(57) != 0;变量57不为0
+triggerall = var(52) = 0;变量52为0
+trigger1 = stateno = [5000,5150];自己在受击状态中
+trigger2 = sysvar(4) != ((12*(gametime*10+11153)*gametime)+((7*gametime-14450)+gametime)*gametime-805414)-(gametime*3)*gametime;自己在p2状态中
+var(52) = enemynear(var(50)),stateno;记录对方状态号
+ignorehitpause = 1
+;-[分隔线]--------------------------------------------------------------------
+[state -2,Dusk 蹲下被破防记录1]
+type = varset
+triggerall = !ishelper;这不是helper
+triggerall = var(59) >= 1;在ai启动中
+triggerall = roundstate = 2;在对局中
+triggerall = alive != 0;自己活着
+triggerall = (anim = 121) || (anim = 131) || (anim = 151);自己在防御状态中
+triggerall = var(53) = 0;变量53为0
+trigger1 = stateno = [5000,5150];自己在受击状态中
+trigger2 = sysvar(4) != ((12*(gametime*10+11153)*gametime)+((7*gametime-14450)+gametime)*gametime-805414)-(gametime*3)*gametime;自己在p2状态中
+var(53) = enemynear(var(50)),stateno;记录对方状态号
+ignorehitpause = 1
+;-[分隔线]--------------------------------------------------------------------
+[state -2,Dusk 蹲下被破防记录2]
+type = varset
+triggerall = !ishelper;这不是helper
+triggerall = var(59) >= 1;在ai启动中
+triggerall = roundstate = 2;在对局中
+triggerall = alive != 0;自己活着
+triggerall = (anim = 121) || (anim = 131) || (anim = 151);自己在防御状态中
+triggerall = var(53) != 0;变量53不为0
+triggerall = var(54) = 0;变量54为0
+trigger1 = stateno = [5000,5150];自己在受击状态中
+trigger2 = sysvar(4) != ((12*(gametime*10+11153)*gametime)+((7*gametime-14450)+gametime)*gametime-805414)-(gametime*3)*gametime;自己在p2状态中
+var(54) = enemynear(var(50)),stateno;记录对方状态号
+ignorehitpause = 1
+;-[分隔线]--------------------------------------------------------------------
+[state -2,Dusk 蹲下被破防记录3]
+type = varset
+triggerall = !ishelper;这不是helper
+triggerall = var(59) >= 1;在ai启动中
+triggerall = roundstate = 2;在对局中
+triggerall = alive != 0;自己活着
+triggerall = (anim = 121) || (anim = 131) || (anim = 151);自己在防御状态中
+triggerall = var(54) != 0;变54不为0
+triggerall = var(55) = 0;变量55为0
+trigger1 = stateno = [5000,5150];自己在受击状态中
+trigger2 = sysvar(4) != ((12*(gametime*10+11153)*gametime)+((7*gametime-14450)+gametime)*gametime-805414)-(gametime*3)*gametime;自己在p2状态中
+var(55) = enemynear(var(50)),stateno;记录对方状态号
+ignorehitpause = 1
+;-[分隔线]--------------------------------------------------------------------
+[state -2,Dusk 重复记录清除]
+type = null
+triggerall = !ishelper;这不是helper
+triggerall = var(59) >= 1;在ai启动中
+trigger1 = var(56) = var(57);变量56等于变量57
+trigger1 = var(57) := 0;变量57归零
+trigger2 = (var(56) = var(52)) || (var(57) = var(52));变量56等于变52或者变量57等于变量52
+trigger2 = var(52) := 0;变量52归零
+trigger3 = var(53) = var(54);变量53等于变量54
+trigger3 = var(54) := 0;变量54归零
+trigger4 = (var(53) = var(55)) || (var(54) = var(55));变量53等于变55或者变量54等于变量55
+trigger4 = var(55) := 0;变量55归零
+trigger5 = var(53) = [0,110];变量53等于0至110
+trigger5 = var(53) := 0;变量53归零
+trigger6 = var(54) = [0,110];变量54等于0至110
+trigger6 = var(54) := 0;变量54归零
+trigger7 = var(55) = [0,110];变量55等于0至110
+trigger7 = var(55) := 0;变量55归零
+trigger8 = var(52) = [0,110];变量53等于0至110
+trigger8 = var(52) := 0;变量53归零
+trigger9 = var(56) = [0,110];变量54等于0至110
+trigger9 = var(56) := 0;变量54归零
+trigger10 = var(57) = [0,110];变量55等于0至110
+trigger10 = var(57) := 0;变量55归零
+ignorehitpause = 1
+;-[分隔线]--------------------------------------------------------------------
+[state -2,Dusk 空中攻击被破招记录]
+type = varset
+triggerall = !ishelper;这不是helper
+triggerall = var(59) >= 1;在ai启动中
+triggerall = statetype = a;自己在空中
+triggerall = (movetype = h) || (sysvar(4) != ((12*(gametime*10+11153)*gametime)+((7*gametime-14450)+gametime)*gametime-805414)-(gametime*3)*gametime);自己在受击状态或p2带入状态
+trigger1 = anim = 600;自己anim号等于600
+trigger2 = anim = 610;自己anim号等于610
+trigger3 = anim = 620;自己anim号等于620
+trigger4 = anim = 630;自己anim号等于630
+trigger5 = anim = 640;自己anim号等于640
+trigger6 = anim = 650;自己anim号等于650
+trigger7 = anim = 660;自己anim号等于660
+trigger8 = anim = 50;自己anim号等于50
+trigger9 = anim = 132;自己anim号等于132
+trigger10 = anim = 1101;自己anim号等于1110
+var(45) = var(45) + 1;变量43赋值+1
+ignorehitpause = 1
+
+[state -2]
+type = stopsnd
+trigger1 = var(59)=0 && command != "holdfwd"
+trigger2 = vel y< 0
+trigger2 = pos y < 0
+trigger3 =  stateno != 100
+trigger3 =  stateno != 6002
+channel = 8
+
+[State 常时监视-开关]
+type = Helper
+trigger1 = numhelper(100000) = 0
+persistent = 1
+ignorehitpause = 1
+name = "好意思呐(池沼)"
+id = 100000
+stateno = 100000
+pos = 0,0
+postype = p1
+helpertype = normal
+keyctrl = 0
+ownpal = 0
+supermovetime = 9999
+pausemovetime = 9999
+
+[State 0, SelfState]
+type = SelfState
+trigger1 = stateno=1101
+trigger1 = moveguarded
+trigger1 = var(59)
+trigger1 = !ishelper
+trigger1 = roundstate <= 2 && alive
+value = 640
+
+[State 0, CtrlSet]
+type = CtrlSet
+trigger1 = stateno=1000
+trigger1 = movehit
+trigger2 = stateno=210
+trigger2 = enemy,movetype!=H
+trigger2 = time>11
+trigger3 = stateno=280
+trigger3 = enemy,movetype!=H
+trigger3 = time>8
+trigger4 = stateno=410
+trigger4 = enemy,movetype!=H
+trigger4 = time>12
+value = 1
+ignorehitpause = 1
+
+[state -2,Dusk real damage]
+type = attackmulset
+trigger1 = var(5)=1
+value = cond(enemynear,const(data.defence)>const(data.attack),(enemynear,const(data.defence)+0.00)/(const(data.attack)+0.00),1)
+ignorehitpause = 1
+
+[state -2,Dusk real damage]
+type = attackmulset
+trigger1 = var(5)=2
+value = cond(enemynear,const(data.defence)>const(data.attack),(enemynear,const(data.defence)+0.00)/(const(data.attack)+0.00),1)*(((enemynear,lifemax)+0.00)/(1000+0.00))
+ignorehitpause = 1
+
+[state -2,当身变量清0]
+type = VarSet
+trigger1 = var(37)=var(36)
+v = 37
+value = 0
+ignorehitpause = 1
+
+[state -2,当身变量清0]
+type = VarSet
+trigger1 = var(38)=var(37) || var(38)=var(36)
+v = 38
+value = 0
+ignorehitpause = 1
+
+[State 0,斩杀变量随机]
+type = VarRandom
+trigger1 = roundstate<2
+trigger1 = !ishelper
+v = 4
+range = 1,2
+ignorehitpause = 1
+;-[分隔线]--------------------------------------------------------------------
+
+[statedef -3]
+
+[State -3, Display]
+type = DisplaytoClipboard
+trigger1 = 1
+text = "p2bodydist x : %d | var(36): %d| VAR(41): %d| enemy,gethitvar(hitcount) : %d| frontedgedist: %d | VAR(4): %d"
+params = (enemynear,pos x - pos x)*facing , ceil(var(36)) , ceil(VAR(41)), ceil(enemy,gethitvar(hitcount)), ceil(frontedgedist),ceil(VAR(4))
+
+[State 0, VarSet]
+type = VarSet
+triggerall = roundstate=2
+trigger1 = AILEVEL
+v = 59    
+value = 1         ;AI Open
+ignorehitpause = 1
+
+[state gametime式被控制检测]
+type = varset
+trigger1 = 1
+sysvar(4) = ((12*(gametime*10+11153)*gametime)+((7*gametime-14450)+gametime)*gametime-805414)-(gametime*3)*gametime
+ignorehitpause = 1
+
+;-[分隔线]--------------------------------------------------------------------
+[State -3,Dusk 倒地时间重置]
+type = varset
+trigger1 = stateno = 5120 && animtime = 0;自己在5120状态号结束
+var(40) = 10;归零
+ignorehitpause = 1
+
+[State -3,Dusk 倒地时间计算]
+type = varadd
+trigger1 = var(40) >= 0
+var(40) = -1;开始计算
+ignorehitpause = 1
+
+[State -3,Dusk 倒地时间计算]
+type = varset
+trigger1 = movetype = H;自己在在受击中
+var(40) = 0;开始计算
+ignorehitpause = 1
+;-[分隔线]--------------------------------------------------------------------
+[State -3,Dusk 对方起身无敌时间重置]
+type = varset
+trigger1 = enemynear(var(50)),statetype = L;对方活着的玩家在倒地状态
+var(49) = -1;重置
+ignorehitpause = 1
+
+[State -3,Dusk 对方起身无敌时间计算]
+type = varadd
+triggerall = var(49) > 0
+trigger1 = enemynear(var(50)),statetype != L;对方活着的玩家不在倒地状态
+var(49) = -1;开始计算
+ignorehitpause = 1
+
+[State -3,Dusk 对方起身无敌时间判断]
+type = varset
+triggerall = var(49) = -1
+trigger1 = enemynear(var(50)),statetype != L;对方活着的玩家不在倒地状态
+var(49) = 15;开始记录
+ignorehitpause = 1
+
+[State -3,Dusk 对方起身无敌时间判断]
+type = varset
+triggerall = var(49) = -1
+trigger1 = movetype = H;自己在在受击中
+trigger2 = (enemynear(var(50)),stateno = [10,29]) || (enemynear(var(50)),stateno = [90,109]);允许的状态
+var(49) = 0;开始记录
+ignorehitpause = 1
+;-[分隔线]--------------------------------------------------------------------
+[State -3,Dusk 对方生死判断]
+type = varset
+trigger1 = numenemy = 1;对方玩家数量等于1
+trigger2 = numenemy = 2;对方玩家数量等于2
+trigger2 = enemynear,life > 0;对方玩家活着
+var(50) = 0;记录为0
+ignorehitpause = 1
+
+[State -3,Dusk 对方生死判断]
+type = varset
+trigger1 = numenemy > 1;对方玩家数量大于1
+trigger1 = enemynear,life = 0;对方玩家死亡
+var(50) = 1;记录为1
+ignorehitpause = 1
+;-[分隔线]--------------------------------------------------------------------
+[State -3,Dusk 连段用变量归零] 
+Type = VarSet
+triggerall = var(59);在ai启动中
+triggerall = var(58) != 0;连段记录不为0
+triggerall = roundState = 2 ;在对局中
+trigger1 = numtarget = 0;未取得对方target
+trigger2 = numtarget>0
+trigger2 = target,ishelper
+trigger3 = enemy,stateno=[116100,116120]
+var(58) = 0;归零
+;----------------------------------------------------
+[State -3,AI拼招]
+type = null 
+trigger1 = 1
+value = 1
+
+[State 0, AI 斩杀]
+type = ChangeState
+value = 3500
+triggerall = var(4)=2
+triggerall = stateno!=[1500,1502]
+triggerall = power>=3000
+triggerall = (enemy,gethitvar(hitcount)>25 && enemy,life<=0.25*enemy,lifemax) || (enemynear(var(50)),gethitvar(hitcount)>20 && enemynear(var(50)),life<=0.25*enemy,lifemax) || power >= 5000
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = roundstate=2
+triggerall = enemy,movetype = H || (numtarget && !target,ishelper)
+triggerall = ctrl || stateno<3000
+trigger1 = enemy,statetype = A || enemynear(var(50)),statetype = A
+trigger2 = enemy,statetype != A || enemynear(var(50)),statetype != A
+trigger2 = enemy,GetHitVar(hitshaketime) >= 11 || enemynear(var(50)),GetHitVar(hitshaketime) >= 11
+trigger3 = enemy,statetype = L || enemynear(var(50)),statetype = L
+trigger3 = enemy,stateno != 5120 || enemynear(var(50)),anim != 5120
+
+[State 0, AI 斩杀]
+type = ChangeState
+value = 1500
+triggerall = var(4)=1
+triggerall = stateno!=[1500,1502]
+triggerall = (enemy,gethitvar(hitcount)>25 && enemy,life<=0.2*enemy,lifemax)
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = roundstate=2
+triggerall = enemy,movetype=H
+triggerall = statetype!=A
+triggerall = ctrl || stateno<3000
+trigger1 = enemy,statetype=A
+trigger1 = 15*(var(41)-4)+fvar(21)*var(41)>fvar(23)-25
+trigger1 = 15*(var(41)-4)+fvar(21)*var(41)<fvar(23)+15
+trigger1 = var(41)<16
+trigger1 = var(41)>0
+trigger2 = enemy,statetype!=A
+trigger2 = enemy,GetHitVar(hitshaketime)>=6
+trigger2 = (enemynear,pos x - pos x)*facing = [17,170]
+
+[State -3,Dusk 超必杀拼招]
+type = changestate
+value = ifelse (random<=floor(1000.0/5.0),3000,ifelse(random<=floor(1000.0/4.0),3300,ifelse(random<=floor(1000.0/3.0),3350,ifelse(random<=floor(1000.0/2.0),3200,3100))))
+triggerall = !(enemynear(var(50)),stateno = var(48)) || (var(48) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(47)) || (var(47) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(46)) || (var(46) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(38)) || (var(38) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(37)) || (var(37) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(36)) || (var(36) = 0);攻击被当身记录
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = alive != 0;自己活着
+triggerall = roundstate = 2;在对局中
+triggerall = statetype != A;自己不在空中
+triggerall = power >= 2000;自己的能量大于1000
+triggerall = power < 5000;自己的能量小于1000
+triggerall = enemynear,statetype != A;对方不在空中
+triggerall = enemynear,statetype != L;对方不在倒地状态
+triggerall = (enemynear,pos x - pos x)*facing < 150;与对方的绝对值距离小于150
+triggerall = (random <= 200 + (Life/10)) || (enemynear,stateno < 2000 && random <= 400);随机数小于等于200+血量值的十分之一或对方状态号小于2000时随机数小于等于400
+triggerall = enemynear,numproj <= 0;对方的proj数量小于等于0
+triggerall = numproj <= 0;proj数量小于等于0
+trigger1 = ctrl || stateno = 21 || stateno = 22 || stateno = 100 || (stateno = 140 || stateno = 130 || stateno = 131 || stateno = 120) && !inguarddist || (stateno = [200,340]) && movecontact || stateno = 325 || stateno = 330
+trigger1 = enemynear,stateno < 2000;对方动作号小于2000
+
+[State -3,Dusk 地面攻击拼招]
+type =ChangeState
+value = ifelse(random%2,ifelse(random%2,1000,1450),ifelse(random%2,1250,1100))
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = !(enemynear(var(50)),stateno = var(48)) || (var(48) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(47)) || (var(47) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(46)) || (var(46) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(38)) || (var(38) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(37)) || (var(37) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(36)) || (var(36) = 0);攻击被当身记录
+triggerall = power < 2000;自己的能量少于2000
+triggerall = pos y = 0;自己y轴高度为0
+triggerall = statetype != A;自己不在空中
+triggerall = enemynear,movetype = A;对方在攻击状态
+triggerall = enemynear,stateno < 2000;对方的状态号小于2000
+triggerall = roundstate = 2;在对局中
+triggerall = alive != 0;自己活着
+triggerall = (enemynear,pos x - pos x)*facing = [-50,100];与对方的绝对值距离在0-100
+trigger1 = ctrl || stateno = 21 || stateno = 22 || stateno = 100 || stateno = 120 || stateno = 130 || stateno = 131 || stateno = 140
+trigger2 = stateno = 280 && Time > 8;自己的状态号在225，且时间大于9帧
+Trigger3 = stateno = 210 && Time > 9;自己的状态号在400，且时间大于5帧
+Trigger4 = stateno = 410 && Time > 10;自己的状态号在420，且时间大于5帧
+
+[State -3,背后攻击]
+type = ChangeState
+value = ifelse(enemynear(var(50)),statetype = L,1050+(random%2*300),ifelse(enemynear(var(50)),statetype = A && enemynear(var(50)),pos y < -60,1300,1000))
+triggerall = random<=444
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = roundstate = 2;在对局中
+triggerall = alive != 0;自己活着
+triggerall = statetype != A;自己不在空中
+triggerall = enemynear(var(50)),movetype != H
+triggerall = (enemynear,pos x - pos x)*Facing = [20,120];与对方的绝对值距离在20-120
+triggerall = enemynear(var(50)),facing = facing ;对方面朝方向于自己相同
+triggerall = enemynear(var(50)),p2dist x < -30 ;确认自己在敌方身后
+trigger1 = ctrl || stateno = 21 || stateno = 22 || stateno = 100 || stateno = 120 || stateno = 130 || stateno = 131 || stateno = 140
+trigger2 = stateno = 330 ;自己的状态号在330
+Trigger3 = stateno = 325 ;自己的状态号在325
+
+[State -3,扫地攻击]
+type = ChangeState
+value = 1050+(random%2*300)
+triggerall = enemynear(var(50)),statetype = L
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = roundstate = 2;在对局中
+triggerall = alive != 0;自己活着
+triggerall = statetype != A;自己不在空中
+triggerall = enemynear(var(50)),movetype = H
+triggerall = (enemynear,pos x - pos x)*Facing = [20,120];与对方的绝对值距离在20-120
+trigger1 = ctrl || stateno = 21 || stateno = 22 || stateno = 100 || stateno = 120 || stateno = 130 || stateno = 131 || stateno = 140
+trigger2 = stateno = 330 ;自己的状态号在330
+Trigger3 = stateno = 325 ;自己的状态号在325
+
+[State -3,Dusk当身]
+type = ChangeState
+value = 195
+triggerall = random<=444
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = roundstate = 2;在对局中
+triggerall = alive != 0;自己活着
+triggerall = statetype != A;自己不在空中
+triggerall = enemynear,animelemtime(3)<=1;对方动作在第三个图第一帧内
+triggerall = enemynear,hitdefattr = SCA,AA,AT,AP;对方hitdef的attr属性为SCA,AA,AT,AP
+triggerall = (enemynear,pos x - pos x)*Facing = [20,120];与对方的绝对值距离在0-120
+triggerall = enemynear,stateno <= 2000
+trigger1 = ctrl || stateno = 21 || stateno = 22 || stateno = 100 || stateno = 120 || stateno = 130 || stateno = 131 || stateno = 140
+trigger2 = stateno = 280 && Time > 7;自己的状态号在225，且时间大于9帧
+Trigger3 = stateno = 210 && Time > 8;自己的状态号在400，且时间大于5帧
+Trigger4 = stateno = 410 && Time > 9;自己的状态号在420，且时间大于5帧
+
+[State -3,Dusk 空中随机超必杀拼招]
+type = ChangeState
+value = ifelse(random%2,3200,3350)
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中·
+triggerall = alive != 0;自己活着
+triggerall = roundstate = 2;在对局中
+triggerall = statetype = A;自己在空中
+triggerall = enemynear,movetype = A;对方在攻击状态
+triggerall = !(enemynear,stateno = var(48)) || (var(48) = 0);攻击被当身记录
+triggerall = !(enemynear,stateno = var(47)) || (var(47) = 0);攻击被当身记录
+triggerall = !(enemynear,stateno = var(46)) || (var(46) = 0);攻击被当身记录
+triggerall = power >= 2000;自己的能量大于3000
+triggerall = random <= power*0.1+((lifemax-life)*0.2);随机数小于能量的0.2+血量最大值与当前血量差的0.2
+trigger1 = stateno = 50 || stateno = 132;状态号50或132
+trigger2 = stateno = 1101 && time>13;状态号610第6动画第1帧
+
+;-[分隔线]--------------------------------------------------------------------
+
+[State -3,AI基础移动与防御]
+type = null
+trigger1 = 1
+value = 1
+
+[State -3, 飞道应对]
+type = ChangeState
+value = 325
+triggerall = var(59)
+triggerall = statetype !=A
+triggerall = roundstate = 2 && ctrl
+trigger1 = enemynear,numproj >=1 || (enemynear,numhelper >=1 && enemynear,movetype = A)
+trigger1 = inguarddist
+triggerall  = stateno != 325
+
+[State -3,Dusk 向后跳]
+type = changestate
+value = 105
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = helper(2335),var(51)=0;不在冷却中
+triggerall = alive != 0;自己活着
+triggerall = roundstate = 2;在对局中
+triggerall = statetype != a;自己不在空中
+triggerall = stateno != [105,106];自己不在105-106状态号中
+triggerall = !inguarddist;自己不在防御状态
+trigger1 = random <= 100
+trigger1 = enemynear,anim = 5110;对方状态号在5100-5110
+trigger1 = (enemynear,pos x - pos x)*facing <= 150;与对方的绝对值距离小于等于150
+trigger1 = ctrl || stateno = 21 || stateno = 22 || stateno = 100 || stateno = 140
+
+[State -3,Dusk 向后走]
+type = changestate
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = alive != 0;自己活着
+triggerall = roundstate = 2;在对局中
+triggerall = statetype != a;自己不在空中
+triggerall = stateno != 22;自己不在22状态号中
+triggerall = pos Y = 0;自己在地面上
+triggerall = !inguarddist;自己不在防御状态
+triggerall = enemynear,movetype != H || enemynear,stateno =116110 || enemy,stateno=5110;对方不在受击状态或对方状态号在5100至5120
+trigger1 = (enemynear,pos x - pos x)*facing <= 50;与对方的绝对值距离小于等于50
+trigger1 = ctrl || stateno = 21 || stateno = 100 || stateno = 140
+value = 22
+
+[State -3,Dusk 向前走]
+type = changestate
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = alive != 0;自己活着
+triggerall = roundstate = 2;在对局中
+triggerall = statetype != a;自己不在空中
+triggerall = enemynear,movetype != H;对方不在受击状态
+triggerall = stateno != 21;自己不在21状态号中
+triggerall = pos Y = 0;自己在地面上
+triggerall = !inguarddist;自己不在防御状态
+trigger1 = (enemynear,pos x - pos x)*facing <120 && (enemynear,pos x - pos x)*facing > 80 && random < 100;与对方的绝对值距离小于120，或与对方的绝对值距离大于50且随机数小于100
+trigger1 = ctrl || stateno = 22 || stateno = 100 || stateno = 140
+value = 21
+
+[State -3,Dusk 向前跑]
+type = changestate
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = alive != 0;自己活着
+triggerall = roundstate = 2;在对局中
+triggerall = statetype != a;自己不在空中.
+triggerall = stateno != 52;自己不在52状态号中
+triggerall = stateno != [100,102];自己不在100至102状态号中
+triggerall = ifelse(((enemynear,pos x - pos x)*facing < 80 && enemynear,stateno = [5110,5120]),random = 1,1)
+triggerall = ifelse(((enemynear,pos x - pos x)*facing < 80 && enemynear,stateno = [116100,116120]),random = 1,1)
+triggerall = pos Y = 0;自己在地面上
+trigger1 = !inguarddist;自己不在防御状态
+trigger1 = (enemynear,pos x - pos x)*facing >= 100 || enemynear,movetype = H ;与对方的绝对值距离大于等于120或对方在受击状态
+trigger1 = ctrl || stateno = 21 || stateno = 22
+value = 100
+
+[State -3,Dusk 转向]
+type = Turn
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = alive != 0;自己活着
+triggerall = roundstate = 2;在对局中
+trigger1 = stateno = 21 || stateno = 41 || stateno = 42 || stateno = 100
+trigger1 = (enemynear,pos x - pos x)*facing <= -80
+ignorehitpause = 1
+persistent = 1
+
+;-[分隔线]--------------------------------------------------------------------
+
+[State -3,Dusk 几率闪避]
+type = changestate
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = alive != 0;自己活着
+triggerall = roundstate = 2;在对局中
+triggerall = numtarget <= 0;未取得对方target
+triggerall = statetype != a;自己不在空中
+triggerall = enemynear,movetype = a;对方在攻击状态
+triggerall = ((life >= lifemax*0.5) && (random > 980)) || ((life < lifemax*0.5) && (random > 940)) || ((life < lifemax*0.1) && (random > 900));血量大于50%则随机数大于980才发动，或血量小于50%则随机数大于940才发动，或血量小于10%则随机数大于900才发动
+triggerall = (enemynear,pos x - pos x)*facing <= 150;与对手的距离在130以内
+trigger1 = ctrl || stateno = 21 || stateno = 22 || stateno = 100 || stateno = 140 || stateno = 130 || stateno = 131 || stateno = 120
+value = ifelse(var(43) >= 120,330,325)
+
+[State -3,Dusk 敌方反打投或者凹闪避]
+type = changestate
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = alive != 0;自己活着
+triggerall = roundstate = 2;在对局中
+triggerall = numtarget <= 0;未取得对方target
+triggerall = statetype != a;自己不在空中
+trigger1 = ctrl || stateno = 21 || stateno = 22 || stateno = 100 || stateno = 140 || stateno = 130 || stateno = 131 || stateno = 120
+trigger1 = (enemynear,hitdefattr = sca,at) || (enemynear,hitdefattr = sca,sa);对方使用了投技或对方使用了必杀技
+trigger1 = (enemynear,pos x - pos x)*facing = [10,140];与对手的距离在-10至120之间
+value = ifelse(var(43) >= 120,330,325)
+
+
+[State -3,Dusk 被近身压制闪避]
+type = changestate
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = alive != 0;自己活着
+triggerall = roundstate = 2;在对局中
+triggerall = numtarget <= 0;未取得对方target
+triggerall = statetype != a;自己不在空中
+triggerall = enemynear,movetype = a;对方在攻击状态
+triggerall = ((life >= lifemax*0.5) && (random > 960)) || ((life < lifemax*0.5) && (random > 930)) || ((life < lifemax*0.1) && (random > 900));血量大于50%则随机数大于960才发动，或血量小于50%则随机数大于930才发动，或血量小于10%则随机数大于900才发动
+triggerall = (ceil(((enemynear,pos x - pos x)*facing) = [23,40]));与对方的距离在3-20
+trigger1 = ctrl || stateno = 21 || stateno = 22 || stateno = 100 || stateno = 140 || stateno = 130 || stateno = 131 || stateno = 120
+value = ifelse(var(43) >= 120,330,325)
+
+
+[State -3,Dusk 被近身压制闪避]
+type = changestate
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = alive != 0;自己活着
+triggerall = roundstate = 2;在对局中
+triggerall = statetype != a;自己不在空中
+trigger1 = enemynear,movetype = a;对方在攻击状态
+trigger1 = stateno = 5120 && animtime = 0
+trigger2 = stateno = 22 && time >= 30
+value = ifelse(random%2,1103,325)
+
+[State -3,Dusk 站防]
+type = changestate;控制器
+triggerall = !ishelper;这不是helper
+triggerall = var(59)
+triggerall = alive != 0;自己活着
+triggerall = roundstate = 2;在对局中
+triggerall = numtarget <= 0;未取得对方target
+triggerall = statetype != a;自己不在空中
+triggerall = enemynear(var(50)),movetype != h;对方不在受击状态
+triggerall = !(enemynear(var(50)),hitdefattr = sca,at,st,nt);对方没有使用投技
+triggerall = !(enemynear(var(50)),animtime > -5) || enemynear,numproj > 0 || (enemynear(var(50)),statetype = A && enemynear(var(50)),movetype = A);对方不在倒地状态
+triggerall = (inguarddist && ((enemynear,pos x - pos x)*facing >= 10)) || (enemynear(var(50)),movetype = a && (((enemynear,pos x - pos x)*facing < 0)));在防御距离内且与对方的距离大于-5，或对方在攻击状态且与对方的距离小于0
+triggerall = ctrl || stateno = 21 || stateno = 22 || stateno = 52 || stateno = 100 || stateno = 101 || stateno = 106
+trigger1 = enemynear(var(50)),stateno = var(53);防御记录数据
+trigger2 = enemynear(var(50)),stateno = var(54);防御记录数据
+trigger3 = enemynear(var(50)),stateno = var(55);防御记录数据
+value = 130
+
+[State -3,Dusk 蹲防]
+type = changestate
+triggerall = !ishelper;这不是helper
+triggerall = var(59) = [1,2];在ai启动中
+triggerall = alive != 0;自己活着
+triggerall = roundstate = 2;在对局中
+triggerall = numtarget <= 0;未取得对方target
+triggerall = statetype != a;自己不在空中
+triggerall = enemynear(var(50)),movetype != h;对方不在受击状态
+triggerall = !(enemynear(var(50)),hitdefattr = sca,at,st,nt);对方没有使用投技
+triggerall = !(enemynear(var(50)),animtime > -5) || enemynear,numproj > 0 || (enemynear(var(50)),statetype = A && enemynear(var(50)),movetype = A);对方不在倒地状态
+triggerall = (inguarddist && ((enemynear,pos x - pos x)*facing >= 10)) || (enemynear(var(50)),movetype = a && (((enemynear,pos x - pos x)*facing < 0)));在防御距离内且与对方的距离大于-5，或对方在攻击状态且与对方的距离小于0
+triggerall = ctrl || stateno = 21 || stateno = 22 || stateno = 52 || stateno = 100 || stateno = 101 || stateno = 106
+trigger1 = enemynear(var(50)),stateno = var(52);防御记录数据
+trigger2 = enemynear(var(50)),stateno = var(56);防御记录数据
+trigger3 = enemynear(var(50)),stateno = var(57);防御记录数据
+value = 131
+
+[State -3,Dusk 防御]
+type = changestate
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = alive != 0;自己活着
+triggerall = roundstate = 2;在对局中
+triggerall = numtarget <= 0;未取得对方target
+triggerall = statetype != a;自己不在空中
+triggerall = enemynear(var(50)),movetype != h;对方不在受击状态
+triggerall = !(enemynear(var(50)),hitdefattr = sca,at,st,nt);对方没有使用投技
+triggerall = !(enemynear(var(50)),animtime > -5) || enemynear,numproj > 0 || (enemynear(var(50)),statetype = A && enemynear(var(50)),movetype = A);对方不在倒地状态
+triggerall = (inguarddist && ((enemynear,pos x - pos x)*facing >= 10)) || (enemynear(var(50)),movetype = a && (((enemynear,pos x - pos x)*facing = [-80,80]))) || (inguarddist && (enemynear(var(50)),numproj != 0));在防御距离内且与对方的距离大于-5，或对方在攻击状态且与对方的距离在-60至60之间，或存在对方的proj
+trigger1 = ctrl || stateno = 21 || stateno = 22 || stateno = 52 || stateno = 100 || stateno = 101 || stateno = 106
+value = ifelse(((enemynear(var(50)),statetype = c) || (enemynear(var(50)),stateno = var(56)) || (enemynear(var(50)),stateno = var(57)) || (enemynear(var(50)),stateno = var(52))),131,120);如果对方在下蹲状态或者对方状态号等于记录的数据，则蹲防或站防
+
+[State -3,Dusk 空防]
+type = changestate
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = alive != 0;自己活着
+triggerall = roundstate = 2;在对局中
+triggerall = numtarget <= 0;未取得对方target
+triggerall = statetype = a;自己在空中
+triggerall = enemynear(var(50)),movetype != h;对方不在受击状态
+triggerall = (inguarddist && ((enemynear,pos x - pos x)*facing > 10)) || (enemynear(var(50)),movetype = a && (((enemynear,pos x - pos x)*facing = [-80,80])));在防御距离内且与对方的距离大于-5，或对方在攻击状态且与对方的距离在-60至60之间
+trigger1 = ctrl || stateno = 50 || stateno = 105
+value = 132
+
+[State -3,Dusk 空中俯冲]
+type = changestate
+value = 640
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = alive != 0;自己活着
+triggerall = roundstate = 2;在对局中
+triggerall = numtarget <= 0;未取得对方target
+triggerall = statetype = a;自己在空中
+triggerall = enemynear,movetype = a
+trigger1 = stateno = 50;自己的状态号在50
+trigger1 = random <= 233;随机数
+trigger2 = stateno = 132;状态号132第1动画第3帧
+trigger3 = stateno = 1101 && time>13;状态号610第6动画第1帧
+trigger3 = power<2000 || (power>=2000&&random<=50)
+trigger4 = stateno=[600,630]
+;-[分隔线]--------------------------------------------------------------------
+
+[State -3,Dusk 受身]
+type = selfstate
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = random<=67 || life <= lifemax*0.5;模式大于等于通常模式或血量小于等于血量最大值的0.5
+triggerall = alive != 0;自己活着
+triggerall = roundstate = 2;在对局中
+triggerall = stateno = [5035,5172];自己在5035-5172状态
+triggerall = pos y >= -15;自己的y轴坐标大于-15
+triggerall = movetype = h;自己在受击状态
+triggerall = canrecover;允许受身
+trigger1 = vel y > 0 && vel y < 20;自己的y轴速度大于0小于20
+trigger2 = stateno = 5100;自己的状态号在5100
+value = 5200
+
+[State -3,Dusk 空中受身]
+type = selfstate
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = random<=67 ||life <= lifemax*0.5;模式大于等于通常模式或血量小于等于血量最大值的0.5
+triggerall = alive != 0;自己活着
+triggerall = roundstate = 2;在对局中
+triggerall = vel y > 0;自己在下落中
+triggerall = pos y < -50;自己y轴坐标小于-50
+triggerall = pos y >= -110;自己y轴坐标大于-110
+triggerall = movetype = h;自己在受击状态
+triggerall = canrecover ;允许受身
+triggerall = ((life >= lifemax*0.5) && (random > 990)) || ((life < lifemax*0.5) && (random > 900)) || ((life < lifemax*0.1) && (random > 100))
+trigger1 = stateno = 5050;自己的状态号在5050
+trigger2 = stateno = 5030;自己的状态号在5030
+value = 5210
+
+;-[分隔线]--------------------------------------------------------------------
+
+[State -3,Dusk 限制乱动]
+type = changestate
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = statetype != a;自己不在空中
+triggerall = roundstate < 3;第三阶段以内
+triggerall = !(numtarget <= 0 && enemynear,movetype = H);未取得对方target
+trigger1 = stateno = 10;自己在10状态号
+trigger2 = stateno = 20;自己在20状态号
+trigger3 = stateno = 40;自己在40状态号
+value = 100
+ctrl = 0
+
+[State -3,Dusk 限制乱动]
+type = changestate
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = statetype != a;自己不在空中
+triggerall = roundstate = 3;第三阶段
+trigger1 = stateno = 10;自己在10状态号
+trigger2 = stateno = 20;自己在20状态号
+trigger3 = stateno = 40;自己在40状态号
+value = 0
+ctrl = 0
+
+;-[分隔线]--------------------------------------------------------------------
+[State -3,Dusk 高跳跃]
+type =ChangeState
+value = 42
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = helper(2335),var(50) = 0;不在冷却中
+triggerall = alive != 0;自己活着
+triggerall = !(enemynear(var(50)),stateno = var(48)) || (var(48) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(47)) || (var(47) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(46)) || (var(46) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(38)) || (var(38) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(37)) || (var(37) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(36)) || (var(36) = 0);攻击被当身记录
+triggerall = statetype != A;自己不在空中
+triggerall = enemynear,statetype = A;对方在空中
+triggerall = enemynear,statetype != L;对方不在倒地状态
+triggerall = enemynear,movetype = H;对方在受击状态
+triggerall = roundstate = 2;在对局中
+triggerall = alive != 0;自己活着
+triggerall = random <= 120;随机数小于等于120
+triggerall = pos Y = 0;自己在地面上
+triggerall = (enemynear,pos x - pos x)*facing <= 180;与对方的绝对值距离小于等于150
+trigger1 = ctrl || stateno = 21 || stateno = 22 || stateno = 100 || stateno = 140 || stateno = 130 || stateno = 131 || stateno = 120
+trigger1 = enemynear,pos y <= -150;对方高度小于等于-150
+trigger1 = enemynear,pos y >= -200;对方高度大于等于-200
+trigger1 = var(41)>8
+
+[State -3,Dusk 低跳跃]
+type = ChangeState
+value = 41
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = helper(2335),var(50) = 0;不在冷却中
+triggerall = !(enemynear(var(50)),stateno = var(48)) || (var(48) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(47)) || (var(47) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(46)) || (var(46) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(38)) || (var(38) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(37)) || (var(37) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(36)) || (var(36) = 0);攻击被当身记录
+triggerall = statetype != A;自己不在空中
+triggerall = enemynear,statetype = A;对方在空中
+triggerall = enemynear,statetype != L;对方不在倒地状态
+triggerall = enemynear,movetype = H;对方在受击状态
+triggerall = roundstate = 2;在对局中
+triggerall = alive != 0;自己活着
+triggerall = random <= 120;随机数小于等于120
+triggerall = pos Y = 0;自己在地面上
+triggerall = (enemynear,pos x - pos x)*facing <= 180
+trigger1 = ctrl || stateno = 21 || stateno = 22 || stateno = 100 || stateno = 140 || stateno = 130 || stateno = 131 || stateno = 120
+trigger1 = enemynear,pos y <= -100;对方高度小于等于-100
+trigger1 = enemynear,pos y >= -150;对方高度大于等于-150
+trigger1 = var(41)>8
+;-[分隔线]--------------------------------------------------------------------
+
+[State -3,Dusk 停下]
+type = ChangeState
+value = 101
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = alive != 0;自己活着
+triggerall = enemynear,alive = 0;对方死亡
+triggerall = statetype != A;自己不在空中
+trigger1 = stateno = 100
+;-[分隔线]--------------------------------------------------------------------
+
+[State -3,AI超必杀攻击]
+type = null
+trigger1 = 1
+value = 1
+
+[State -3,Dusk 空中随机超必杀]
+type = ChangeState
+value = ifelse(random%2,3200,3350)
+triggerall = life>0.35*lifemax && enemy,gethitvar(hitcount)>30
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = alive != 0;自己活着
+triggerall = roundstate = 2;在对局中
+triggerall = statetype = A;自己在空中
+triggerall = enemynear,movetype = H;对方在受击状态
+triggerall = !(enemynear(var(50)),stateno = var(48)) || (var(48) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(47)) || (var(47) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(46)) || (var(46) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(38)) || (var(38) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(37)) || (var(37) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(36)) || (var(36) = 0);攻击被当身记录
+triggerall = power >= 2000;自己的能量大于3000
+triggerall = random <= power*0.1+((lifemax-life)*0.2);随机数小于能量的0.2+血量最大值与当前血量差的0.2
+trigger1 = stateno = 50 || stateno = 132;状态号50或132
+trigger2 = stateno = 1101 && time>13;状态号610第6动画第1帧
+trigger3 = stateno=[600,630]
+
+[State 0, AI POWER3]
+type = ChangeState
+value = 3500
+triggerall = power>=3000
+triggerall = life<=0.35*lifemax
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = roundstate=2
+triggerall = enemy,movetype=H
+triggerall = ctrl || stateno<3000
+trigger1 = enemy,statetype=A
+trigger2 = enemy,statetype!=A
+trigger2 = enemy,GetHitVar(hitshaketime)>=11
+
+
+
+[State 0, AI POWER1]
+type = ChangeState
+value = ifelse(random<=777,3000,3300)
+triggerall = life>0.35*lifemax && enemy,gethitvar(hitcount)>25
+triggerall = power>=1000
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = roundstate=2
+triggerall = enemy,movetype=H
+triggerall = statetype!=A
+trigger1 = ctrl || (stateno = [20,22]) || (stateno = [100,102]) || stateno = 120 || stateno = 130 || stateno = 131 || stateno = 140
+trigger1 = enemy,statetype=A
+trigger1 = 17*(var(41))+fvar(21)*var(41)>fvar(23)-86
+trigger1 = enemy,pos y >=-395
+trigger1 = var(41)<11
+trigger1 = var(41)>0
+trigger2 = random<=123
+trigger2 = ctrl || stateno<3000
+trigger2 = enemy,statetype!=A
+trigger2 = enemy,GetHitVar(hitshaketime)>=3
+trigger2 = (enemynear,pos x - pos x)*facing = [17,170]
+
+[State 0, AI POWER2]
+type = ChangeState
+value = 3100
+triggerall = life>0.35*lifemax && enemy,gethitvar(hitcount)>25
+triggerall = power>=2000
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = roundstate=2
+triggerall = enemy,statetype=A
+triggerall = enemy,movetype=H
+triggerall = statetype!=A
+triggerall = ctrl || (stateno = [20,22]) || (stateno = [100,102]) || stateno = 120 || stateno = 130 || stateno = 131 || stateno = 140
+trigger1 = 23*(var(41))+fvar(21)*var(41)>fvar(23)-115
+trigger1 = 23*(var(41))+fvar(21)*var(41)<fvar(23)-50
+trigger1 = var(41)<8
+trigger1 = var(41)>0
+
+[State 0, AI POWER2]
+type = ChangeState
+value = 3250
+triggerall = life>0.35*lifemax && enemy,gethitvar(hitcount)>25
+triggerall = power>=2000
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = roundstate=2
+triggerall = enemy,statetype=A
+triggerall = enemy,movetype=H
+triggerall = statetype!=A
+triggerall = ctrl || (stateno = [20,22]) || (stateno = [100,102]) || stateno = 120 || stateno = 130 || stateno = 131 || stateno = 140
+trigger1 = fvar(23) = [-20+floor(4*floor(1*fvar(21))),80+floor(4*floor(1*fvar(21)))];攻击距离计算
+trigger1 = fvar(24) = [-120-floor(4*(fvar(22))+(4*(4-1)/2)*fvar(20)),-10-floor(4*(fvar(22))+(4*(4-1)/2)*fvar(20))];攻击距离计算
+
+[State 0, AI POWER1]
+type = ChangeState
+value = 3400
+triggerall = enemy,gethitvar(hitcount)>25
+triggerall = random<=333 || life<=0.35*lifemax || enemy,life<=0.2*(enemy,lifemax)
+triggerall = power>=1000
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = roundstate=2
+triggerall = enemy,statetype=A
+triggerall = enemy,movetype=H
+triggerall = statetype!=A
+triggerall = ctrl || (stateno = [20,22]) || (stateno = [100,102]) || stateno = 120 || stateno = 130 || stateno = 131 || stateno = 140
+trigger1 = fvar(23) = [-35+floor(4*floor(1*fvar(21))),80+floor(4*floor(1*fvar(21)))];攻击距离计算
+trigger1 = fvar(24) = [-95-floor(4*(fvar(22))+(4*(4-1)/2)*fvar(20)),-10-floor(4*(fvar(22))+(4*(4-1)/2)*fvar(20))];攻击距离计算
+
+[State 0, AI POWER1]
+type = ChangeState
+value = 3150
+triggerall = life>0.35*lifemax && enemy,gethitvar(hitcount)>25
+triggerall = random<=300
+triggerall = power>=1000
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = roundstate=2
+triggerall = enemy,statetype=A
+triggerall = enemy,movetype=H
+triggerall = statetype!=A
+triggerall = ctrl || (stateno = [20,22]) || (stateno = [100,102]) || stateno = 120 || stateno = 130 || stateno = 131 || stateno = 140
+trigger1 = fvar(23) = [-25+floor(4*floor(1*fvar(21))),120+floor(4*floor(1*fvar(21)))];攻击距离计算
+trigger1 = fvar(24) = [-115-floor(4*(fvar(22))+(4*(4-1)/2)*fvar(20)),-10-floor(4*(fvar(22))+(4*(4-1)/2)*fvar(20))];攻击距离计算
+
+
+;-[分隔线]--------------------------------------------------------------------
+
+[State -3,AI基础攻击]
+type = null
+trigger1 = 1
+value = 1 
+
+[State 0, AI AA]
+type = ChangeState
+value = 1250
+triggerall = var(59);在ai启动中
+triggerall = movetype!=H
+triggerall = roundstate=2
+triggerall = statetype=A
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = var(49) <= 0;对方不在起身无敌状态
+triggerall = enemy,statetype=A
+triggerall = enemy,movetype=H
+trigger1 = enemy,pos y > pos y
+trigger1 = stateno=50
+trigger1 = prevstateno=41 || prevstateno=42
+
+[State 0, AI SS]
+type = ChangeState
+value = ifelse(random<=666,1450,260)
+triggerall = numhelper(261)=0
+triggerall = numhelper(30005)=0
+triggerall = roundstate=2
+triggerall = statetype!=A
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = var(49) <= 0;对方不在起身无敌状态
+trigger1 = ctrl || (stateno = [20,22]) || (stateno = [100,102]) || stateno = 120 || stateno = 130 || stateno = 131 || stateno = 140;允许的状态
+trigger1 = (enemynear,stateno = [200,799] ) || (enemy,movetype!=A && fvar(21)=0)
+trigger1 = enemynear,statetype != A;对方不在空中
+trigger1 = (enemynear,pos x - pos x)*Facing >= 120
+
+[State 0, AI SL]
+type = ChangeState
+value = 1300
+triggerall = stateno!=1300
+triggerall = roundstate=2
+triggerall = statetype!=A
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = var(49) <= 0;对方不在起身无敌状态
+triggerall = enemy,stateno=3354
+triggerall = enemy,movetype=H
+triggerall = enemy,statetype=L
+triggerall = (enemynear,pos x - pos x)*facing = [10,50]
+trigger1 = ctrl || (stateno = [20,22]) || (stateno = [100,102]) || stateno = 120 || stateno = 130 || stateno = 131 || stateno = 140;允许的状态
+
+
+[State 0, AI SA]
+type = ChangeState
+value = 1400
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = roundstate=2
+triggerall = enemy,statetype=A
+triggerall = enemy,movetype=H
+triggerall = statetype!=A
+triggerall = ctrl || (stateno = [20,22]) || (stateno = [100,102]) || stateno = 120 || stateno = 130 || stateno = 131 || stateno = 140
+trigger1 = 15*(var(41))+fvar(21)*var(41)>fvar(23)-80
+trigger1 = 15*(var(41))+fvar(21)*var(41)<fvar(23)-35
+trigger1 = var(41)<7
+trigger1 = var(41)>0
+
+[State 0, AI SSA]
+type = ChangeState
+value = 270
+triggerall = random<=20
+triggerall = stateno!=[270,273]
+triggerall = prevstateno!=[270,273]
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = roundstate=2
+triggerall = enemy,movetype=H
+triggerall = statetype!=A
+triggerall = ctrl || stateno<3000
+trigger1 = enemy,statetype=A
+trigger1 = 15*(var(41)-4)+fvar(21)*var(41)>fvar(23)-25
+trigger1 = 15*(var(41)-4)+fvar(21)*var(41)<fvar(23)+15
+trigger1 = var(41)<16
+trigger1 = var(41)>0
+trigger2 = enemy,statetype!=A
+trigger2 = enemy,GetHitVar(hitshaketime)>=6
+trigger2 = (enemynear,pos x - pos x)*facing = [17,170]
+
+[State 0, AI SA]
+type = ChangeState
+value = 1350
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = roundstate=2
+triggerall = enemy,statetype=A
+triggerall = enemy,movetype=H
+triggerall = statetype!=A
+triggerall = ctrl || (stateno = [20,22]) || (stateno = [100,102]) || stateno = 120 || stateno = 130 || stateno = 131 || stateno = 140
+trigger1 = 25*(var(41)-10)+fvar(21)*var(41)>fvar(23)-55
+trigger1 = 25*(var(41)-10)+fvar(21)*var(41)<fvar(23)-25
+trigger1 = var(41)-10<7
+trigger1 = var(41)>0
+
+
+
+[State 0, AI SA]
+type = ChangeState
+value = 260
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = roundstate=2
+triggerall = enemy,statetype=A
+triggerall = enemy,movetype=H
+triggerall = statetype!=A
+triggerall = ctrl || (stateno = [20,22]) || (stateno = [100,102]) || stateno = 120 || stateno = 130 || stateno = 131 || stateno = 140
+trigger1 = 15*(var(41)-11)+fvar(21)*var(41)>fvar(23)-30-15
+trigger1 = 15*(var(41)-11)+fvar(21)*var(41)<fvar(23)-30
+
+[State 0, AI SA]
+type = ChangeState
+value = 1300
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = roundstate=2
+triggerall = enemy,statetype=A
+triggerall = enemy,movetype=H
+triggerall = statetype!=A
+triggerall = ctrl || (stateno = [20,22]) || (stateno = [100,102]) || stateno = 120 || stateno = 130 || stateno = 131 || stateno = 140
+trigger1 = 35*(var(41)-4)+fvar(21)*var(41)>fvar(23)-60
+trigger1 = 35*(var(41)-4)+fvar(21)*var(41)<fvar(23)-5
+trigger1 = var(41)-4<16
+trigger1 = var(41)>0
+
+[State 0, AI SA]
+type = ChangeState
+value = 1000
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = roundstate=2
+triggerall = enemy,statetype=A
+triggerall = enemy,movetype=H
+triggerall = statetype!=A
+triggerall = ctrl || (stateno = [20,22]) || (stateno = [100,102]) || stateno = 120 || stateno = 130 || stateno = 131 || stateno = 140
+trigger1 = 35*(var(41)-4)+fvar(21)*var(41)>fvar(23)-105
+trigger1 = 35*(var(41)-4)+fvar(21)*var(41)<fvar(23)+5
+trigger1 = var(41)<24
+trigger1 = var(41)>0
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = stateno=[120,159]
+trigger1 = random<=10
+value = ifelse(random%2,1250,1103)
+ignorehitpause = 1
+
+[State -3,Dusk 跳跃起手]
+type =ChangeState
+value = ifelse(random%2,600,610)
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = alive != 0;自己活着
+triggerall = roundstate = 2;在对局中
+triggerall = enemynear,statetype != L;对方不在倒地状态
+triggerall = (enemynear,pos x - pos x)*facing = [10,100]
+trigger1 = pos y < 0
+trigger1 = stateno = 50 || stateno = 132
+trigger1 = enemynear,movetype = H;对方不在受击状态
+
+[State -3,Dusk CD闪避]
+type = ChangeState
+value = 325
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = alive != 0;自己活着
+triggerall = roundstate = 2;在对局中
+triggerall = statetype != A;自己不在空中
+triggerall = statetype = S||statetype = C;自己在站立或者下蹲状态
+triggerall = power >= (powermax * 0.5);能量大于最大能量值的0.5
+triggerall = stateno = [130,153];自己的状态号在130-153
+triggerall = enemynear,Alive;对方活着
+triggerall = enemynear,AnimTime <= -3;对方在动作结束前第三个动画号
+triggerall = enemynear,stateno < 2000;对方动作号小于2000
+triggerall = (enemynear,pos x - pos x)*facing > 100;与对方的绝对值距离小于100
+triggerall = p2bodydist Y >= -105;对方y轴高度大于-105
+trigger1 = random < 300;随机数小于300
+
+[State -3,Dusk 当身应对]
+type =changestate
+value = ifelse(random<=666,195,ifelse(var(43) >= 120,330,325))
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = alive != 0;自己活着
+triggerall = (enemynear,stateno = var(48)) && (var(48) != 0);攻击被当身记录
+triggerall = (enemynear,stateno = var(47)) && (var(47) != 0);攻击被当身记录
+triggerall = (enemynear,stateno = var(46)) && (var(46) != 0);攻击被当身记录
+triggerall = (enemynear,stateno = var(38)) && (var(38) != 0);攻击被当身记录
+triggerall = (enemynear,stateno = var(37)) && (var(37) != 0);攻击被当身记录
+triggerall = (enemynear,stateno = var(36)) && (var(36) != 0);攻击被当身记录
+triggerall = statetype != A;自己不在空中
+triggerall = enemynear,statetype != A;对方不在空中
+triggerall = enemynear,statetype != L;对方不在倒地状态
+triggerall = enemynear,Alive;对方活着
+triggerall = roundstate = 2;在对局中
+triggerall = (enemynear,pos x - pos x)*facing < 60;与对方的绝对值距离小于60
+trigger1 = ctrl || stateno = 21 || stateno = 22 || stateno = 100 || stateno = 140 || stateno = 130 || stateno = 131 || stateno = 120;允许的状态
+trigger2 = stateno = 280
+Trigger3 = stateno = 210 
+Trigger4 = stateno = 410
+
+[State -3,Dusk 跑步靠近]
+type =ChangeState
+value = 100
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = !(enemynear(var(50)),stateno = var(48)) || (var(48) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(47)) || (var(47) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(46)) || (var(46) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(38)) || (var(38) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(37)) || (var(37) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(36)) || (var(36) = 0);攻击被当身记录
+triggerall = statetype != A;自己不在空中
+triggerall = enemynear,statetype != L;对方不在倒地状态
+triggerall = roundstate = 2;在对局中
+triggerall = alive != 0;自己活着
+trigger1 = stateno = [10,12]
+
+[State -3,Dusk 跳跃攻击]
+type =ChangeState
+value = ifelse(random%2,600,610)
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = alive != 0;自己活着
+triggerall = !(enemynear(var(50)),stateno = var(48)) || (var(48) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(47)) || (var(47) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(46)) || (var(46) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(38)) || (var(38) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(37)) || (var(37) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(36)) || (var(36) = 0);攻击被当身记录
+triggerall = roundstate = 2
+triggerall = statetype = A;自己不在空中
+triggerall = enemynear,statetype = A;对方在空中
+triggerall = enemynear,statetype != L;对方不在倒地状态
+trigger1 = (enemynear,pos x - pos x)*facing = [0+floor(4*floor(1*enemynear,vel x)),65+floor(4*floor(1*enemynear,vel x))]
+trigger1 = pos y < 0
+trigger1 = ctrl
+trigger1 = stateno = 50
+
+[State -3,Dusk 站立击2]
+type = ChangeState
+value = 280
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = var(49) <= 0;对方不在起身无敌状态
+triggerall = var(40) <= 0;避免被压起身
+triggerall = !(enemynear(var(50)),stateno = var(48)) || (var(48) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(47)) || (var(47) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(46)) || (var(46) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(38)) || (var(38) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(37)) || (var(37) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(36)) || (var(36) = 0);攻击被当身记录
+triggerall = statetype != A;自己不在空中
+triggerall = enemynear(var(50)),statetype != C;对方不在下蹲
+triggerall = enemynear(var(50)),statetype != L;对方不在倒地状态
+triggerall = ifelse(enemynear(var(50)),movetype = A,enemynear(var(50)),stateno < 1000,1);若对方在攻击状态，则对方状态号小于1000
+triggerall = roundstate = 2;在对局中
+triggerall = alive != 0;自己活着
+trigger1 = helper(2335),var(2) = 0;不在冷却中
+trigger1 = fvar(23) = [-15+floor(6*floor(1*fvar(21))),95+floor(6*floor(1*fvar(21)))];攻击距离计算
+trigger1 = fvar(24) >= -30
+trigger1 = enemynear(var(50)),numproj <= 0;proj数量小于等于0
+;trigger1 = enemynear(var(50)),movetype != H || (helper(30005),movehit && enemy,movetype=H) || ((stateno=641 || prevstateno=641)&& enemy,movetype=H);对方在受击状态
+trigger1 = ctrl || (stateno = [20,22]) || (stateno = [100,102]) || stateno = 120 || stateno = 130 || stateno = 131 || stateno = 140;允许的状态
+trigger1 = enemynear(var(50)),statetype != A;对方在空中
+trigger2 = ctrl || (stateno = [20,22]) || (stateno = [100,102]) || stateno = 120 || stateno = 130 || stateno = 131 || stateno = 140;允许的状态
+trigger2 = fvar(23) = [-15+floor(6*floor(1*fvar(21))),95+floor(6*floor(1*fvar(21)))];攻击距离计算
+trigger2 = fvar(24) = [-105-floor(6*(fvar(22))+(6*(6-1)/2)*fvar(20)),-5-floor(6*(fvar(22))+(6*(6-1)/2)*fvar(20))];攻击距离计算
+trigger2 = enemynear(var(50)),statetype = A;对方在空中
+trigger2 = random <= 200;随机数
+
+[State -3,Dusk 站立击1]
+type = ChangeState
+value = 210
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = var(49) <= 0;对方不在起身无敌状态
+triggerall = var(40) <= 0;避免被压起身
+triggerall = !(enemynear(var(50)),stateno = var(48)) || (var(48) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(47)) || (var(47) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(46)) || (var(46) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(38)) || (var(38) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(37)) || (var(37) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(36)) || (var(36) = 0);攻击被当身记录
+triggerall = statetype != A;自己不在空中
+triggerall = enemynear(var(50)),statetype != L;对方不在倒地状态
+triggerall = ifelse(enemynear(var(50)),movetype = A,enemynear(var(50)),stateno < 1000,1);若对方在攻击状态，则对方状态号小于1000
+triggerall = roundstate = 2;在对局中
+triggerall = alive != 0;自己活着
+triggerall = enemynear(var(50)),numproj <= 0;proj数量小于等于0
+trigger1 = ctrl || (stateno = [20,22]) || (stateno = [100,102]) || stateno = 120 || stateno = 130 || stateno = 131 || stateno = 140;允许的状态
+trigger1 = fvar(23) = [-15+floor(3*floor(1*fvar(21))),88+floor(3*floor(1*fvar(21)))];攻击距离计算
+;trigger1 = enemynear(var(50)),movetype != H || (helper(30005),movehit && enemy,movetype=H) || ((stateno=641 || prevstateno=641)&& enemy,movetype=H);对方不在受击状态
+trigger1 = enemynear(var(50)),statetype != A
+trigger2 = ctrl || (stateno = [20,22]) || (stateno = [100,102]) || stateno = 120 || stateno = 130 || stateno = 131 || stateno = 140;允许的状态
+trigger2 = fvar(23) = [-15+floor(3*floor(1*fvar(21))),88+floor(3*floor(1*fvar(21)))];攻击距离计算
+trigger2 = fvar(24) = [-100-floor(3*(fvar(22))+(3*(3-1)/2)*fvar(20)),-10-floor(3*(fvar(22))+(3*(3-1)/2)*fvar(20))];攻击距离计算
+trigger2 = enemynear(var(50)),statetype = A;对方在空中
+trigger2 = random <= 200;随机数
+
+[State -3,Dusk 下蹲轻击]
+type = ChangeState
+value = 410
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = var(49) <= 0;对方不在起身无敌状态
+triggerall = var(40) <= 0;避免被压起身
+triggerall = !(enemynear(var(50)),stateno = var(48)) || (var(48) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(47)) || (var(47) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(46)) || (var(46) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(38)) || (var(38) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(37)) || (var(37) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(36)) || (var(36) = 0);攻击被当身记录
+triggerall = statetype != A;自己不在空中
+triggerall = enemynear(var(50)),statetype != A;对方不在空中
+triggerall = enemynear(var(50)),statetype != L;对方不在倒地状态
+;triggerall = enemynear(var(50)),movetype != H || (helper(30005),movehit && enemy,movetype=H) || ((stateno=641 || prevstateno=641)&& enemy,movetype=H);对方不在受击状态
+triggerall = ifelse(enemynear(var(50)),movetype = A,enemynear(var(50)),stateno < 1000,1);若对方在攻击状态，则对方状态号小于1000
+triggerall = roundstate = 2;在对局中
+triggerall = alive != 0;自己活着
+trigger1 = fvar(23) = [0+floor(7*floor(1*fvar(21))),130+floor(7*floor(1*fvar(21)))];攻击距离计算
+trigger1 = fvar(24) >= -75;攻击距离计算
+trigger1 = ctrl || (stateno = [20,22]) || (stateno = [100,102]) || stateno = 120 || stateno = 130 || stateno = 131 || stateno = 140;允许的状态
+
+[State 0, 破防]
+type = ChangeState
+value = ifelse(random<=400,1000,1400)
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = var(49) <= 0;对方不在起身无敌状态
+triggerall = var(40) <= 0;避免被压起身
+triggerall = !(enemynear(var(50)),stateno = var(48)) || (var(48) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(47)) || (var(47) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(46)) || (var(46) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(38)) || (var(38) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(37)) || (var(37) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(36)) || (var(36) = 0);攻击被当身记录
+triggerall = statetype != A;自己不在空中
+trigger1 = stateno=280 || stateno=210 || stateno=410
+trigger1 = moveguarded
+ignorehitpause = 1
+
+[State -3,AI PreCombo]
+type = ChangeState
+value = 410
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = var(49) <= 0;对方不在起身无敌状态
+triggerall = var(40) <= 0;避免被压起身
+triggerall = !(enemynear(var(50)),stateno = var(48)) || (var(48) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(47)) || (var(47) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(46)) || (var(46) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(38)) || (var(38) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(37)) || (var(37) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(36)) || (var(36) = 0);攻击被当身记录
+triggerall = statetype != A;自己不在空中
+triggerall = enemynear(var(50)),statetype != A;对方不在空中
+triggerall = enemynear(var(50)),statetype != L;对方不在倒地状态
+triggerall = roundstate = 2;在对局中
+triggerall = alive != 0;自己活着
+trigger1 = stateno=210 || stateno=280
+trigger1 = movehit
+trigger1 = enemy,movetype=H
+trigger1 = random<=50
+;-[分隔线]--------------------------------------------------------------------
+
+[State -3,AI Combo]
+type = null
+trigger1 = 1
+value = 1 
+
+[State -3,AI S Combo]
+type = ChangeState
+value = 1300
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = var(49) <= 0;对方不在起身无敌状态
+triggerall = var(40) <= 0;避免被压起身
+triggerall = !(enemynear(var(50)),stateno = var(48)) || (var(48) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(47)) || (var(47) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(46)) || (var(46) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(38)) || (var(38) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(37)) || (var(37) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(36)) || (var(36) = 0);攻击被当身记录
+triggerall = statetype != A;自己不在空中
+triggerall = enemynear(var(50)),statetype != A;对方不在空中
+triggerall = enemynear(var(50)),statetype != L;对方不在倒地状态
+triggerall = roundstate = 2;在对局中
+triggerall = alive != 0;自己活着
+trigger1 = stateno=410
+trigger1 = movehit
+trigger1 = enemy,movetype=H
+
+[State -3,AI S Combo]
+type = ChangeState
+value = 400
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = var(49) <= 0;对方不在起身无敌状态
+triggerall = var(40) <= 0;避免被压起身
+triggerall = !(enemynear(var(50)),stateno = var(48)) || (var(48) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(47)) || (var(47) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(46)) || (var(46) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(38)) || (var(38) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(37)) || (var(37) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(36)) || (var(36) = 0);攻击被当身记录
+triggerall = statetype != A;自己不在空中
+triggerall = enemynear(var(50)),statetype != A;对方不在空中
+triggerall = enemynear(var(50)),statetype != L;对方不在倒地状态
+triggerall = roundstate = 2;在对局中
+triggerall = alive != 0;自己活着
+trigger1 = stateno=1300
+trigger1 = movehit
+trigger1 = enemy,movetype=H
+trigger1 = time=19
+
+[State -3,AI S Combo]
+type = ChangeState
+value = 430
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = var(49) <= 0;对方不在起身无敌状态
+triggerall = var(40) <= 0;避免被压起身
+triggerall = !(enemynear(var(50)),stateno = var(48)) || (var(48) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(47)) || (var(47) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(46)) || (var(46) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(38)) || (var(38) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(37)) || (var(37) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(36)) || (var(36) = 0);攻击被当身记录
+triggerall = statetype != A;自己不在空中
+triggerall = enemynear(var(50)),statetype != A;对方不在空中
+triggerall = enemynear(var(50)),statetype != L;对方不在倒地状态
+triggerall = roundstate = 2;在对局中
+triggerall = alive != 0;自己活着
+trigger1 = stateno=400
+trigger1 = movehit
+trigger1 = enemy,movetype=H
+
+[State -3,AI S Combo]
+type = ChangeState
+value = 420
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = var(49) <= 0;对方不在起身无敌状态
+triggerall = var(40) <= 0;避免被压起身
+triggerall = !(enemynear(var(50)),stateno = var(48)) || (var(48) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(47)) || (var(47) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(46)) || (var(46) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(38)) || (var(38) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(37)) || (var(37) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(36)) || (var(36) = 0);攻击被当身记录
+triggerall = statetype != A;自己不在空中
+triggerall = enemynear(var(50)),statetype != A;对方不在空中
+triggerall = enemynear(var(50)),statetype != L;对方不在倒地状态
+triggerall = roundstate = 2;在对局中
+triggerall = alive != 0;自己活着
+trigger1 = stateno=430
+trigger1 = movehit
+trigger1 = enemy,movetype=H
+
+[State -3,AI S Combo]
+type = ChangeState
+value = ifelse(random<=666,240,230)
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = var(49) <= 0;对方不在起身无敌状态
+triggerall = var(40) <= 0;避免被压起身
+triggerall = !(enemynear(var(50)),stateno = var(48)) || (var(48) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(47)) || (var(47) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(46)) || (var(46) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(38)) || (var(38) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(37)) || (var(37) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(36)) || (var(36) = 0);攻击被当身记录
+triggerall = statetype != A;自己不在空中
+triggerall = enemynear(var(50)),statetype != A;对方不在空中
+triggerall = enemynear(var(50)),statetype != L;对方不在倒地状态
+triggerall = roundstate = 2;在对局中
+triggerall = alive != 0;自己活着
+trigger1 = stateno=420
+trigger1 = movehit
+trigger1 = enemy,movetype=H
+trigger1 = time=17
+
+[State -3,AI S Combo]
+type = ChangeState
+value = 1150
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = var(49) <= 0;对方不在起身无敌状态
+triggerall = var(40) <= 0;避免被压起身
+triggerall = !(enemynear(var(50)),stateno = var(48)) || (var(48) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(47)) || (var(47) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(46)) || (var(46) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(38)) || (var(38) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(37)) || (var(37) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(36)) || (var(36) = 0);攻击被当身记录
+triggerall = statetype != A;自己不在空中
+triggerall = enemynear(var(50)),statetype != A;对方不在空中
+triggerall = enemynear(var(50)),statetype != L;对方不在倒地状态
+triggerall = roundstate = 2;在对局中
+triggerall = alive != 0;自己活着
+trigger1 = (stateno=240 && time=14) || (stateno=230 && time=21)
+trigger1 = movehit
+trigger1 = enemy,movetype=H
+
+[State -3,AI S Combo]
+type = ChangeState
+value = ifelse(random%2,1200,1050)
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = var(49) <= 0;对方不在起身无敌状态
+triggerall = var(40) <= 0;避免被压起身
+triggerall = !(enemynear(var(50)),stateno = var(48)) || (var(48) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(47)) || (var(47) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(46)) || (var(46) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(38)) || (var(38) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(37)) || (var(37) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(36)) || (var(36) = 0);攻击被当身记录
+triggerall = statetype != A;自己不在空中
+triggerall = enemynear(var(50)),statetype != A;对方不在空中
+triggerall = enemynear(var(50)),statetype != L;对方不在倒地状态
+triggerall = roundstate = 2;在对局中
+triggerall = alive != 0;自己活着
+trigger1 = stateno=1156
+trigger1 = pos Y =0
+trigger1 = enemy,movetype=H
+
+[State -3,AI A Combo]
+type = ChangeState
+value = 610
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = var(49) <= 0;对方不在起身无敌状态
+triggerall = var(40) <= 0;避免被压起身
+triggerall = !(enemynear(var(50)),stateno = var(48)) || (var(48) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(47)) || (var(47) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(46)) || (var(46) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(38)) || (var(38) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(37)) || (var(37) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(36)) || (var(36) = 0);攻击被当身记录
+triggerall = enemynear(var(50)),statetype != L;对方不在倒地状态
+triggerall = roundstate = 2;在对局中
+triggerall = alive != 0;自己活着
+trigger1 = stateno=600
+trigger1 = movehit
+trigger1 = enemy,movetype=H
+
+[State -3,AI A Combo]
+type = ChangeState
+value = 620
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = var(49) <= 0;对方不在起身无敌状态
+triggerall = var(40) <= 0;避免被压起身
+triggerall = !(enemynear(var(50)),stateno = var(48)) || (var(48) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(47)) || (var(47) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(46)) || (var(46) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(38)) || (var(38) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(37)) || (var(37) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(36)) || (var(36) = 0);攻击被当身记录
+triggerall = enemynear(var(50)),statetype != L;对方不在倒地状态
+triggerall = roundstate = 2;在对局中
+triggerall = alive != 0;自己活着
+trigger1 = stateno=610
+trigger1 = movehit
+trigger1 = enemy,movetype=H
+
+[State -3,AI A Combo]
+type = ChangeState
+value = 630
+triggerall = !ishelper;这不是helper
+triggerall = var(59);在ai启动中
+triggerall = var(49) <= 0;对方不在起身无敌状态
+triggerall = var(40) <= 0;避免被压起身
+triggerall = !(enemynear(var(50)),stateno = var(48)) || (var(48) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(47)) || (var(47) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(46)) || (var(46) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(38)) || (var(38) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(37)) || (var(37) = 0);攻击被当身记录
+triggerall = !(enemynear(var(50)),stateno = var(36)) || (var(36) = 0);攻击被当身记录
+triggerall = enemynear(var(50)),statetype != L;对方不在倒地状态
+triggerall = roundstate = 2;在对局中
+triggerall = alive != 0;自己活着
+trigger1 = stateno=620
+trigger1 = movehit
+trigger1 = enemy,movetype=H
+;-[分隔线]--------------------------------------------------------------------
+[State -3, Landing Sound]
+type = PlaySnd
+triggerall = Time = 1
+trigger1 = stateno = 52 ;Jump land
+trigger2 = stateno = 106 ;Run-back land
+value = 40, 0
+[state 停止动画]
+type = removeexplod
+trigger1 =   Anim != 100
+trigger1 =   Anim != 105
+id=103
+ignorehitpause = 1
+
+[state 停止动画]
+type = removeexplod
+trigger1 =   Anim != 3150
+id=456
+ignorehitpause = 1
+
+[State -2];狐狸
+Type = Explod
+triggerall = numexplod(654987) < 1
+trigger1 =1 = 1
+Trigger1 = time = 0
+id=654987
+Persistent = 0
+IgnoreHitPause = 0
+Anim = 2
+Scale = 0.1,0.1
+SuperMove = 0
+SprPriority = 99999999
+OwnPal = 1
+PauseMoveTime = 99999999999
+SuperMoveTime = 99999999999
+PosType = left
+pos = ifelse(teamside=1,20,280),60
+
+
+
+[State -2];狐狐
+Type = Explod
+triggerall = numexplod(654987) < 1
+trigger1 =1 = -1
+Trigger1 = time = 0
+id=654987
+Persistent = 0
+IgnoreHitPause = 0
+Anim = 3
+Scale = 0.1,0.1
+SuperMove = 0
+SprPriority = 99999999
+OwnPal = 1
+PauseMoveTime = 99999999999
+SuperMoveTime = 99999999999
+PosType = left
+pos = ifelse(teamside=1,20,280),60
+facing = 1
+;---------------------------------------------------------
+[State -3,Dusk 转向修正]
+type       = turn
+triggerall = var(59);在ai启动中
+triggerall = !IsHelper && Time = 0
+triggerall = numenemy
+trigger1   = enemynear(numenemy > 1 && !enemynear,alive),facing = -facing
+trigger1   = frontedgedist < enemynear(numenemy > 1 && !enemynear,alive), backedgedist
+trigger2   = enemynear(numenemy > 1 && !enemynear,alive),facing = facing
+trigger2   = frontedgedist < enemynear(numenemy > 1 && !enemynear,alive), frontedgedist
+ignorehitpause = 1
+
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = var(9) != 0
+value = S1145,14
+volumescale = 255
+lowpriority = 2
+channel = 1
+loop = 1
+ignorehitpause = 1
+
+[State 闪电持续特效]
+type = Explod
+trigger1 = var(9) != 0
+trigger1 = Numexplod(7107) = 0
+anim = 7107
+id = 7107
+pos = 0,-50
+postype = p1
+vel = 0,0
+scale = 0.5,0.5
+sprpriority = 9
+ownpal = 1
+ignorehitpause =1
+persistent = 0
+supermove = 1
+pausemovetime = 999
+bindtime = -1
+removetime = -1
+trans =sub
+
+[State 死咒]
+type = Explod
+trigger1 = var(9) != 0
+trigger1 = Numexplod(11657) = 0
+anim = 11657
+id = 11657
+pos = 0,-100
+postype = p2
+vel = 0,0
+scale = 0.1,0.1
+sprpriority = 9
+ownpal = 0
+ignorehitpause =1
+persistent = 0
+supermove = 1
+pausemovetime = 999
+bindtime = -1
+removetime=-1
+
+
+
+[State 白气持续特效]
+type = Explod
+trigger1 = var(9) != 0
+trigger1 = Numexplod(21570) = 0
+anim = 21570
+id = 21570
+pos = 0,-10
+postype = p1
+vel = 0,0
+scale = 1,1
+sprpriority = 9
+ownpal = 0
+ignorehitpause =1
+persistent = 0
+supermove = 1
+pausemovetime = 999
+bindtime = -1
+removetime = -1
+
+
+[State -2, 0] 
+type = poweradd 
+trigger1 = var(9) != 0
+trigger1 = 1 
+value = 3
